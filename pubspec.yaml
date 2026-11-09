@@ -24,7 +24,7 @@ dependencies:
     git:
       url: https://github.com/EdoSag/Zero-Trust-Core.git
       path: packages/zero_trust_core
-      ref: 8a3051dc3bb7ba9176093ca4e830bae660d4947f # v0.8.0 (switch to the tag once it's pushed)
+      ref: v0.8.0
   flutter_riverpod: ^3.5.0
   supabase_flutter: ^2.9.0
   flutter_dotenv: ^6.0.1
