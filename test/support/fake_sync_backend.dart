@@ -26,8 +26,9 @@ class FakeSyncBackend implements SyncBackend {
     final accepted = <String>{};
     for (final item in items) {
       final existing = rows['$app/${item.itemId}'];
-      if (existing != null && item.updatedAt.isBefore(existing.updatedAt))
+      if (existing != null && item.updatedAt.isBefore(existing.updatedAt)) {
         continue;
+      }
       final stored = RemoteItem(
         itemId: item.itemId,
         updatedAt: item.updatedAt,
