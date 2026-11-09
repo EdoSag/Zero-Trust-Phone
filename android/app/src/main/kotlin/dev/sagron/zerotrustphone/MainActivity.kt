@@ -34,9 +34,10 @@ class MainActivity : FlutterFragmentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        val number = dialNumber(intent) ?: return
-        val ch = channel
-        if (ch != null) ch.invokeMethod("dial", number) else pendingDial = number
+        // Kept until the unlocked dialer takes it (consumeDial), so a number
+        // that arrives while the vault is locked isn't lost.
+        pendingDial = dialNumber(intent) ?: return
+        channel?.invokeMethod("dialPending", null)
     }
 
     private fun dialNumber(intent: Intent?): String? {

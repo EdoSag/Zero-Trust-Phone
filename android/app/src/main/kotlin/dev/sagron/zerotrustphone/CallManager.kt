@@ -4,6 +4,8 @@ import android.os.Handler
 import android.os.Looper
 import android.telecom.Call
 import android.telecom.CallAudioState
+import android.telecom.PhoneAccountHandle
+import android.telecom.TelecomManager
 import android.telecom.VideoProfile
 
 /**
@@ -19,6 +21,9 @@ object CallManager {
 
     private val main = Handler(Looper.getMainLooper())
     private val calls = linkedMapOf<Call, String>()
+
+    /** SIMs a call may use, while it waits for one to be picked. */
+    private val accountChoices = mutableMapOf<Call, List<PhoneAccountHandle>>()
     private val listeners = mutableSetOf<Listener>()
     private var nextId = 1
     var service: ZtInCallService? = null
@@ -48,6 +53,7 @@ object CallManager {
     fun remove(call: Call) {
         call.unregisterCallback(callback)
         calls.remove(call)
+        accountChoices.remove(call)
         notifyChanged()
     }
 
@@ -87,6 +93,8 @@ object CallManager {
 
     fun clearVaultNames() {
         vaultNames.clear()
+        // The call screen and notification drop names only the vault knew.
+        notifyChanged()
     }
 
     /** The caller's name: the unlocked vault first, then the phone's contacts. */
@@ -128,7 +136,48 @@ object CallManager {
                 (caps and Call.Details.CAPABILITY_MERGE_CONFERENCE) != 0),
             "canSwap" to ((caps and Call.Details.CAPABILITY_SWAP_CONFERENCE) != 0),
             "disconnectReason" to details.disconnectCause?.label?.toString(),
+            "accounts" to if (call.stateCompat() == Call.STATE_SELECT_PHONE_ACCOUNT) {
+                accountsFor(call).map { accountLabel(it) }
+            } else {
+                null
+            },
         )
+    }
+
+    /** The SIMs Telecom offers for [call], or every SIM that can call. */
+    @Suppress("DEPRECATION")
+    private fun accountsFor(call: Call): List<PhoneAccountHandle> {
+        accountChoices[call]?.let { return it }
+        val offered: List<PhoneAccountHandle> = call.details.intentExtras
+            ?.getParcelableArrayList<PhoneAccountHandle>(Call.AVAILABLE_PHONE_ACCOUNTS)
+            ?: emptyList()
+        val list = offered.ifEmpty {
+            val ctx = service ?: return emptyList()
+            try {
+                ctx.getSystemService(TelecomManager::class.java).callCapablePhoneAccounts
+            } catch (_: SecurityException) {
+                emptyList()
+            }
+        }
+        if (list.isNotEmpty()) accountChoices[call] = list
+        return list
+    }
+
+    private fun accountLabel(handle: PhoneAccountHandle): String {
+        val ctx = service ?: return "SIM"
+        return try {
+            ctx.getSystemService(TelecomManager::class.java)
+                .getPhoneAccount(handle)?.label?.toString()
+        } catch (_: SecurityException) {
+            null
+        } ?: "SIM"
+    }
+
+    /** Places [id]'s call on the SIM at [index] of its "accounts". */
+    fun selectAccount(id: String?, index: Int) {
+        val call = byId(id) ?: return
+        val handle = accountsFor(call).getOrNull(index) ?: return
+        call.phoneAccountSelected(handle, false)
     }
 
     private fun stateName(state: Int): String = when (state) {

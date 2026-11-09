@@ -63,13 +63,16 @@ class Telecom {
     : _channel = channel ?? const MethodChannel('zt_phone/telecom');
 
   final MethodChannel _channel;
-  final ValueNotifier<String?> dialRequests = ValueNotifier<String?>(null);
+
+  /// Ticks when a DIAL or tel: link arrives while the app is open; the
+  /// number itself waits on the Android side until [consumeDial] takes it.
+  final ValueNotifier<int> dialRequests = ValueNotifier<int>(0);
 
   bool get isSupported => defaultTargetPlatform == TargetPlatform.android;
 
   void listenForDials() {
     _channel.setMethodCallHandler((MethodCall call) async {
-      if (call.method == 'dial') dialRequests.value = call.arguments as String?;
+      if (call.method == 'dialPending') dialRequests.value++;
     });
   }
 

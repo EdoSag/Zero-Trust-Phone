@@ -12,9 +12,11 @@ class HistoryRetention extends Notifier<int?> {
   static const String _key = 'call_history_keep_days';
   static const List<int?> choices = <int?>[null, 90, 30, 7, 1];
 
+  late Future<void> _loaded;
+
   @override
   int? build() {
-    _load();
+    _loaded = _load();
     return null;
   }
 
@@ -25,6 +27,7 @@ class HistoryRetention extends Notifier<int?> {
   }
 
   Future<void> set(int? days) async {
+    await _loaded;
     state = days;
     await ref.read(ztPreferencesStoreProvider).write(_key, '${days ?? 0}');
     await apply();
@@ -32,6 +35,7 @@ class HistoryRetention extends Notifier<int?> {
 
   /// Deletes calls older than the chosen period. Returns how many.
   Future<int> apply({DateTime? now}) async {
+    await _loaded; // The saved period, not the default, on a cold start.
     final int? days = state;
     if (days == null) return 0;
     final DateTime cutoff = (now ?? DateTime.now()).subtract(

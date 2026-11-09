@@ -158,8 +158,7 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
   }
 
   Future<void> _start() async {
-    final String? dial = await _telecom.consumeDial();
-    if (dial != null) _openDialpad(dial);
+    await _onDialRequest();
     await ref.read(historyRetentionProvider.notifier).apply();
   }
 
@@ -180,11 +179,11 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
     }
   }
 
-  void _onDialRequest() {
-    final String? number = _telecom.dialRequests.value;
-    if (number == null) return;
-    _telecom.dialRequests.value = null;
-    _openDialpad(number);
+  /// Opens the dialpad for a DIAL or tel: link, including one that came
+  /// in while the vault was locked.
+  Future<void> _onDialRequest() async {
+    final String? number = await _telecom.consumeDial();
+    if (number != null) _openDialpad(number);
   }
 
   void _openDialpad(String number) {

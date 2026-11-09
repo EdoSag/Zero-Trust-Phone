@@ -34,6 +34,8 @@ class CallControl {
   Future<void> mute(bool on) => _do('mute', {'on': on});
   Future<void> route(int route) => _do('route', {'route': route});
   Future<void> addCall() => _do('addCall');
+  Future<void> selectAccount(String id, int index) =>
+      _do('selectAccount', {'id': id, 'index': index});
   Future<void> close() => _do('close');
 }
 
@@ -128,7 +130,13 @@ class _InCallScreenState extends ConsumerState<InCallScreen> {
                   const SizedBox(height: 32),
                   _CallerHeader(call: call),
                   const Spacer(),
-                  if (call.state == CallState.ringing)
+                  if (call.state == CallState.selectAccount)
+                    _PickSim(
+                      call: call,
+                      onPick: (int i) => _control.selectAccount(call.id, i),
+                      onCancel: () => _control.hangUp(call.id),
+                    )
+                  else if (call.state == CallState.ringing)
                     _IncomingActions(
                       onAnswer: () => _control.answer(call.id),
                       onDecline: () => _control.reject(call.id),
@@ -192,6 +200,7 @@ class _CallerHeader extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     final String status = switch (call.state) {
       CallState.ringing => 'Incoming call',
+      CallState.selectAccount => 'Choose a SIM',
       CallState.dialing || CallState.connecting => 'Calling…',
       CallState.holding => 'On hold',
       CallState.disconnecting || CallState.disconnected => 'Call ended',
@@ -229,6 +238,39 @@ class _CallerHeader extends StatelessWidget {
     final String ms = '${two(d.inMinutes % 60)}:${two(d.inSeconds % 60)}';
     return h > 0 ? '$h:$ms' : ms;
   }
+}
+
+/// Dual-SIM phones without a default SIM for calls ask which one to use.
+class _PickSim extends StatelessWidget {
+  const _PickSim({
+    required this.call,
+    required this.onPick,
+    required this.onCancel,
+  });
+
+  final PhoneCall call;
+  final ValueChanged<int> onPick;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 32),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        for (int i = 0; i < call.accounts.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: FilledButton.tonalIcon(
+              icon: const Icon(Icons.sim_card_outlined),
+              label: Text('Call with ${call.accounts[i]}'),
+              onPressed: () => onPick(i),
+            ),
+          ),
+        TextButton(onPressed: onCancel, child: const Text('Cancel')),
+      ],
+    ),
+  );
 }
 
 class _IncomingActions extends StatelessWidget {

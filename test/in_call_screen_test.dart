@@ -23,6 +23,9 @@ class FakeCallControl extends CallControl {
   Future<void> route(int route) async => done.add('route $route');
   @override
   Future<void> close() async => done.add('close');
+  @override
+  Future<void> selectAccount(String id, int index) async =>
+      done.add('sim $id $index');
 }
 
 void main() {
@@ -108,6 +111,27 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(seconds: 2));
     expect(control.done.last, 'close');
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('dual SIM without a default: pick the SIM', (tester) async {
+    await pump(tester);
+    calls.add(
+      CallsSnapshot.fromMap(<Object?, Object?>{
+        'calls': <Object?>[
+          <Object?, Object?>{
+            'id': 'c1',
+            'number': '07700900123',
+            'state': 'selectAccount',
+            'accounts': <Object?>['Work', 'Personal'],
+          },
+        ],
+      }),
+    );
+    await tester.pump();
+    expect(find.text('Choose a SIM'), findsOneWidget);
+    await tester.tap(find.text('Call with Personal'));
+    expect(control.done, <String>['sim c1 1']);
     await tester.pumpWidget(const SizedBox());
   });
 }

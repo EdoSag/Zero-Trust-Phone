@@ -58,6 +58,7 @@ object CallEngine {
                 "dtmf" -> call.argument<String>("digit")?.firstOrNull()?.let { CallManager.dtmf(it) }
                 "mute" -> CallManager.setMuted(call.argument<Boolean>("on") ?: false)
                 "route" -> CallManager.setRoute(call.argument<Int>("route") ?: 0)
+                "selectAccount" -> CallManager.selectAccount(id, call.argument<Int>("index") ?: 0)
                 "close" -> activity?.finishAndRemoveTask()
                 "addCall" -> activity?.addCall()
                 else -> {

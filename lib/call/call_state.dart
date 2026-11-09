@@ -11,6 +11,7 @@ class PhoneCall {
     this.canHold = false,
     this.canMerge = false,
     this.canSwap = false,
+    this.accounts = const <String>[],
   });
 
   factory PhoneCall.fromMap(Map<Object?, Object?> m) => PhoneCall(
@@ -28,6 +29,10 @@ class PhoneCall {
     canHold: m['canHold'] == true,
     canMerge: m['canMerge'] == true,
     canSwap: m['canSwap'] == true,
+    accounts: <String>[
+      for (final Object? a in (m['accounts'] as List<Object?>?) ?? <Object?>[])
+        if (a is String) a,
+    ],
   );
 
   final String id;
@@ -41,6 +46,9 @@ class PhoneCall {
   final bool canMerge;
   final bool canSwap;
 
+  /// SIM names to pick from, in order, while [state] is selectAccount.
+  final List<String> accounts;
+
   String get title => isConference
       ? 'Conference call'
       : (name?.isNotEmpty == true
@@ -50,6 +58,9 @@ class PhoneCall {
 
 enum CallState {
   ringing,
+
+  /// Waiting for the user to pick a SIM ([PhoneCall.accounts]).
+  selectAccount,
   dialing,
   connecting,
   active,
@@ -60,7 +71,8 @@ enum CallState {
 
   static CallState parse(String? s) => switch (s) {
     'ringing' => ringing,
-    'dialing' || 'new' || 'selectAccount' => dialing,
+    'dialing' || 'new' => dialing,
+    'selectAccount' => selectAccount,
     'connecting' => connecting,
     'active' => active,
     'holding' => holding,
@@ -118,6 +130,7 @@ class CallsSnapshot {
     final List<PhoneCall> top = topLevel;
     for (final CallState s in <CallState>[
       CallState.ringing,
+      CallState.selectAccount,
       CallState.active,
       CallState.dialing,
       CallState.connecting,
