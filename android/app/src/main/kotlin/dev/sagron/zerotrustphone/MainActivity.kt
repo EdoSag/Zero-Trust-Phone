@@ -70,6 +70,14 @@ class MainActivity : FlutterFragmentActivity() {
                     "isDefaultDialer" -> result.success(isDefaultDialer())
                     "requestDefaultDialer" -> requestDefaultDialer(result)
                     "requestPermissions" -> requestPhonePermissions(result)
+                    "callAlertsReady" -> {
+                        CallNotifications.createChannels(this)
+                        result.success(CallNotifications.alertsReady(this))
+                    }
+                    "fixCallAlerts" -> {
+                        fixCallAlerts()
+                        result.success(null)
+                    }
                     "hasPermission" -> result.success(
                         has(call.argument<String>("permission") ?: "")
                     )
@@ -204,6 +212,27 @@ class MainActivity : FlutterFragmentActivity() {
         arrayOf(Manifest.permission.POST_NOTIFICATIONS)
     } else {
         emptyArray()
+    }
+
+    /** Opens the screen that turns call notifications back on. */
+    private fun fixCallAlerts() {
+        val notificationsOn = androidx.core.app.NotificationManagerCompat.from(this)
+            .areNotificationsEnabled()
+        val intent = if (notificationsOn && android.os.Build.VERSION.SDK_INT >= 34) {
+            Intent(android.provider.Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT)
+                .setData(Uri.fromParts("package", packageName, null))
+        } else {
+            Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, packageName)
+        }
+        try {
+            startActivity(intent)
+        } catch (_: android.content.ActivityNotFoundException) {
+            startActivity(
+                Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    .setData(Uri.fromParts("package", packageName, null))
+            )
+        }
     }
 
     private fun requestPhonePermissions(result: MethodChannel.Result) {

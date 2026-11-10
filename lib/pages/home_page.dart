@@ -147,7 +147,31 @@ class DefaultDialerBanner extends ConsumerWidget {
     final Telecom telecom = ref.watch(telecomProvider);
     if (!telecom.isSupported) return const SizedBox.shrink();
     final bool isDefault = ref.watch(defaultDialerProvider).value ?? true;
-    if (isDefault) return const SizedBox.shrink();
+    if (isDefault) {
+      final bool alertsOk = ref.watch(callAlertsReadyProvider).value ?? true;
+      if (alertsOk) return const SizedBox.shrink();
+      return MaterialBanner(
+        leading: const Icon(Icons.notifications_off_outlined),
+        content: const Text(
+          'Incoming calls can\'t show on the lock screen or as a '
+          'notification. Allow call notifications for ZT Phone.',
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () async {
+              // Asks for the notification permission first; if it was
+              // refused before, opens the system setting instead.
+              await telecom.requestPermissions();
+              if (!await telecom.callAlertsReady()) {
+                await telecom.fixCallAlerts();
+              }
+              ref.invalidate(callAlertsReadyProvider);
+            },
+            child: const Text('Allow'),
+          ),
+        ],
+      );
+    }
     return MaterialBanner(
       leading: const Icon(Icons.phone_in_talk_outlined),
       content: const Text(

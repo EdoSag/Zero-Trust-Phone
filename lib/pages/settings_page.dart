@@ -46,7 +46,10 @@ class PhoneSettingsPage extends ConsumerWidget {
           onTap: isDefault
               ? null
               : () async {
-                  await ref.read(telecomProvider).requestDefaultDialer();
+                  final Telecom telecom = ref.read(telecomProvider);
+                  if (await telecom.requestDefaultDialer()) {
+                    await telecom.requestPermissions();
+                  }
                   ref.invalidate(defaultDialerProvider);
                 },
         ),

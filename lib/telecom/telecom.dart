@@ -213,6 +213,14 @@ class Telecom {
       _call<void>('setVaultNames', names);
 
   Future<void> clearVaultNames() => _call<void>('clearVaultNames');
+
+  /// Whether incoming calls can show their card and open over the lock
+  /// screen (notifications and, on Android 14+, full-screen alerts on).
+  Future<bool> callAlertsReady() async =>
+      await _call<bool>('callAlertsReady') ?? true;
+
+  /// Opens the system screen that turns call alerts back on.
+  Future<void> fixCallAlerts() => _call<void>('fixCallAlerts');
 }
 
 final telecomProvider = Provider<Telecom>((ref) => Telecom());
@@ -222,6 +230,13 @@ final telecomProvider = Provider<Telecom>((ref) => Telecom());
 final defaultDialerProvider = FutureProvider<bool>(
   (ref) => ref.watch(telecomProvider).isDefaultDialer(),
 );
+
+/// See [Telecom.callAlertsReady]. Refreshed with [defaultDialerProvider].
+final callAlertsReadyProvider = FutureProvider<bool>((ref) async {
+  ref.watch(defaultDialerProvider);
+  final Telecom telecom = ref.watch(telecomProvider);
+  return !telecom.isSupported || await telecom.callAlertsReady();
+});
 
 /// The call history, newest first. Refresh with `ref.invalidate`.
 final callLogProvider = FutureProvider<List<CallLogEntry>>(

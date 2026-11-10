@@ -7,7 +7,12 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.telecom.Call
+import android.app.KeyguardManager
+import android.os.Build
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.Person
 
 /** The incoming-call card (full screen when locked) and the ongoing-call one. */
 object CallNotifications {
@@ -31,6 +36,26 @@ object CallNotifications {
                 enableVibration(false)
             }
         )
+    }
+
+    /**
+     * Whether Android will show the incoming-call card, and open the call
+     * screen over the lock screen from it. Both need the notification
+     * permission; Android 14+ also needs the full-screen permission, which
+     * the user can turn off.
+     */
+    fun alertsReady(context: Context): Boolean {
+        if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return false
+        val nm = context.getSystemService(NotificationManager::class.java)
+        if (nm.getNotificationChannel(INCOMING)?.importance == NotificationManager.IMPORTANCE_NONE) return false
+        return Build.VERSION.SDK_INT < 34 || nm.canUseFullScreenIntent()
+    }
+
+    /** Locked, or the screen is off: the call screen should open itself. */
+    fun deviceIdle(context: Context): Boolean {
+        val keyguard = context.getSystemService(KeyguardManager::class.java)
+        val power = context.getSystemService(PowerManager::class.java)
+        return keyguard?.isKeyguardLocked == true || power?.isInteractive == false
     }
 
     fun cancel(context: Context) {
@@ -60,16 +85,25 @@ object CallNotifications {
             .setContentIntent(open)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         if (ringing) {
+            val answer = PendingIntent.getActivity(
+                context, 1, Intent(context, CallActivity::class.java)
+                    .setAction(CallActivity.ACTION_ANSWER)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            val caller = Person.Builder().setName(title).setImportant(true).build()
+            // The system's incoming-call card: big Answer and Decline buttons,
+            // pinned on top and on the lock screen.
             builder.setContentText("Incoming call")
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setFullScreenIntent(open, true)
-                .addAction(0, "Decline", CallActionReceiver.intent(context, CallActionReceiver.DECLINE))
-                .addAction(0, "Answer", PendingIntent.getActivity(
-                    context, 1, Intent(context, CallActivity::class.java)
-                        .setAction(CallActivity.ACTION_ANSWER)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                ))
+                .setStyle(
+                    NotificationCompat.CallStyle.forIncomingCall(
+                        caller,
+                        CallActionReceiver.intent(context, CallActionReceiver.DECLINE),
+                        answer,
+                    )
+                )
         } else {
             val connectedAt = call.details.connectTimeMillis
             builder.setSmallIcon(android.R.drawable.sym_action_call)

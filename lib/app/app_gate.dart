@@ -209,6 +209,13 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
 
   Future<void> _start() async {
     await _onRecentsRequest();
+    // Made default from Android's settings or Phone's own Settings row:
+    // the permissions (notifications above all, which the incoming-call
+    // card needs) were never asked for.
+    if (await _telecom.isDefaultDialer()) {
+      await _telecom.requestPermissions();
+      ref.invalidate(callAlertsReadyProvider);
+    }
     await ref.read(historyRetentionProvider.notifier).apply();
     await _backUp();
   }
@@ -235,6 +242,7 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
       // A call may have ended, or the default app changed, meanwhile.
       ref.invalidate(callLogProvider);
       ref.invalidate(defaultDialerProvider);
+      ref.invalidate(callAlertsReadyProvider);
       _backUp();
     }
   }
