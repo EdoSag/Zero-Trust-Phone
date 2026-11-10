@@ -216,9 +216,16 @@ class MainActivity : FlutterFragmentActivity() {
 
     /** Opens the screen that turns call notifications back on. */
     private fun fixCallAlerts() {
+        val nm = getSystemService(android.app.NotificationManager::class.java)
+        val channelBlocked = nm.getNotificationChannel(CallNotifications.INCOMING)
+            ?.importance == android.app.NotificationManager.IMPORTANCE_NONE
         val notificationsOn = androidx.core.app.NotificationManagerCompat.from(this)
-            .areNotificationsEnabled()
-        val intent = if (notificationsOn && android.os.Build.VERSION.SDK_INT >= 34) {
+            .areNotificationsEnabled() && !channelBlocked
+        // Only the full-screen permission is missing: open its own screen.
+        // Otherwise (app or "Incoming calls" notifications off) open the
+        // app's notification settings.
+        val intent = if (notificationsOn && android.os.Build.VERSION.SDK_INT >= 34 &&
+            !nm.canUseFullScreenIntent()) {
             Intent(android.provider.Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT)
                 .setData(Uri.fromParts("package", packageName, null))
         } else {

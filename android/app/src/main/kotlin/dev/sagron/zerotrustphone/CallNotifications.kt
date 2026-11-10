@@ -16,7 +16,7 @@ import androidx.core.app.Person
 
 /** The incoming-call card (full screen when locked) and the ongoing-call one. */
 object CallNotifications {
-    private const val INCOMING = "incoming_calls"
+    const val INCOMING = "incoming_calls"
     private const val ONGOING = "ongoing_calls"
     private const val ID = 4242
 
