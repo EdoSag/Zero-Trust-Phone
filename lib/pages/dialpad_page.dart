@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
+import 'package:zerotrust_phone/data/phone_items.dart';
+import 'package:zerotrust_phone/pages/call_actions.dart';
+import 'package:zerotrust_phone/pages/speed_dial_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/util/phone_numbers.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
@@ -60,6 +63,45 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
     });
   }
 
+  /// Long-press 1 calls voicemail (P5); 2 to 9 are speed dial (P8).
+  Future<void> _longPress(String digit) async {
+    HapticFeedback.heavyImpact();
+    if (digit == '1') {
+      await ref.read(telecomProvider).callVoicemail();
+      if (mounted) Navigator.of(context).maybePop();
+      return;
+    }
+    final int n = int.parse(digit);
+    final SpeedDial? dial =
+        (ref.read(speedDialsProvider).value ?? const <SpeedDial>[])
+            .where((SpeedDial s) => s.digit == n)
+            .firstOrNull;
+    if (dial != null) {
+      await placeCall(ref, dial.number);
+      if (mounted) Navigator.of(context).maybePop();
+      return;
+    }
+    if (!mounted) return;
+    final bool? assign = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext d) => AlertDialog(
+        title: Text('No speed dial on $digit'),
+        content: const Text('Pick a contact to call when you hold this key.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(d).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(d).pop(true),
+            child: const Text('Pick contact'),
+          ),
+        ],
+      ),
+    );
+    if (assign == true && mounted) await assignSpeedDial(context, ref, n);
+  }
+
   Future<void> _call(String number) async {
     if (number.trim().isEmpty) {
       // Like other dialers: an empty call button brings back the last number.
@@ -71,7 +113,7 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
       if (last != null) setState(() => _number.text = last.number);
       return;
     }
-    await ref.read(telecomProvider).placeCall(number.trim());
+    await placeCall(ref, number.trim());
     if (mounted) Navigator.of(context).maybePop();
   }
 
@@ -143,7 +185,7 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
                 ],
               ),
             ),
-            DialKeypad(onKey: _type),
+            DialKeypad(onKey: _type, onLongKey: _longPress),
             const SizedBox(height: 12),
             SizedBox(
               width: 72,
@@ -168,10 +210,18 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
 
 /// 1-9, *, 0, # with letters. Long-press 0 for +. Also used in calls.
 class DialKeypad extends StatelessWidget {
-  const DialKeypad({super.key, required this.onKey, this.foreground});
+  const DialKeypad({
+    super.key,
+    required this.onKey,
+    this.foreground,
+    this.onLongKey,
+  });
 
   final ValueChanged<String> onKey;
   final Color? foreground;
+
+  /// Long-press on 1 to 9 (voicemail and speed dial). Null in calls.
+  final ValueChanged<String>? onLongKey;
 
   static const List<(String, String)> keys = <(String, String)>[
     ('1', ''), ('2', 'ABC'), ('3', 'DEF'), //
@@ -194,12 +244,20 @@ class DialKeypad extends StatelessWidget {
           for (final (String digit, String letters) in keys)
             Semantics(
               button: true,
-              label: digit == '0' ? '0, hold for plus' : digit,
+              label: switch (digit) {
+                '0' => '0, hold for plus',
+                '1' when onLongKey != null => '1, hold for voicemail',
+                _ => digit,
+              },
               excludeSemantics: true,
               child: InkWell(
                 customBorder: const StadiumBorder(),
                 onTap: () => onKey(digit),
-                onLongPress: digit == '0' ? () => onKey('+') : null,
+                onLongPress: digit == '0'
+                    ? () => onKey('+')
+                    : (onLongKey != null && RegExp(r'^[1-9]$').hasMatch(digit)
+                          ? () => onLongKey!(digit)
+                          : null),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -209,12 +267,20 @@ class DialKeypad extends StatelessWidget {
                         color: foreground,
                       ),
                     ),
-                    Text(
-                      letters,
-                      style: theme.textTheme.labelSmall?.copyWith(
+                    if (digit == '1' && onLongKey != null)
+                      Icon(
+                        Icons.voicemail,
+                        size: 14,
                         color: foreground ?? theme.colorScheme.onSurfaceVariant,
+                      )
+                    else
+                      Text(
+                        letters,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color:
+                              foreground ?? theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),

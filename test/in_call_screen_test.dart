@@ -26,6 +26,11 @@ class FakeCallControl extends CallControl {
   @override
   Future<void> selectAccount(String id, int index) async =>
       done.add('sim $id $index');
+  @override
+  Future<void> rejectWithMessage(String id, String message) async =>
+      done.add('text $id $message');
+  @override
+  Future<void> endAndAnswer(String id) async => done.add('endAnswer $id');
 }
 
 void main() {
@@ -133,5 +138,65 @@ void main() {
     await tester.tap(find.text('Call with Personal'));
     expect(control.done, <String>['sim c1 1']);
     await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('decline with a quick reply', (tester) async {
+    await pump(tester);
+    calls.add(
+      CallsSnapshot.fromMap(<Object?, Object?>{
+        'calls': <Object?>[
+          <Object?, Object?>{
+            'id': 'c1',
+            'number': '+447700900123',
+            'state': 'ringing',
+          },
+        ],
+      }),
+    );
+    await tester.pump();
+    await tester.tap(find.text('Reply with a message'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('On my way.'));
+    await tester.pumpAndSettle();
+    expect(control.done, <String>['text c1 On my way.']);
+  });
+
+  testWidgets('call waiting: hold & answer, or end & answer', (tester) async {
+    await pump(tester);
+    calls.add(
+      CallsSnapshot.fromMap(<Object?, Object?>{
+        'calls': <Object?>[
+          <Object?, Object?>{'id': 'c1', 'number': '111', 'state': 'active'},
+          <Object?, Object?>{'id': 'c2', 'number': '222', 'state': 'ringing'},
+        ],
+      }),
+    );
+    await tester.pump();
+    await tester.tap(find.byTooltip('Hold & answer'));
+    await tester.tap(find.byTooltip('End & answer'));
+    expect(control.done, <String>['answer c2', 'endAnswer c2']);
+  });
+
+  testWidgets('car mode shows big mute and audio buttons', (tester) async {
+    await pump(tester);
+    calls.add(
+      CallsSnapshot.fromMap(<Object?, Object?>{
+        'carMode': true,
+        'calls': <Object?>[
+          <Object?, Object?>{'id': 'c1', 'number': '111', 'state': 'active'},
+        ],
+        'audio': <Object?, Object?>{
+          'muted': false,
+          'route': 2,
+          'supportedRoutes': 1 | 2 | 8,
+        },
+      }),
+    );
+    await tester.pump();
+    expect(find.text('Keypad'), findsNothing);
+    await tester.tap(find.text('Mute'));
+    await tester.tap(find.text('Car audio'));
+    await tester.tap(find.byTooltip('End call'));
+    expect(control.done, <String>['mute true', 'route 8', 'hangUp c1']);
   });
 }

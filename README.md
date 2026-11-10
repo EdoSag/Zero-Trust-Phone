@@ -32,6 +32,24 @@ Android only: iOS doesn't let an app replace the Phone app.
   numbers list (the system writes calls there whatever app is default).
   Settings > "Keep call history" deletes calls older than 1, 7, 30 or 90
   days each time the app opens.
+- **Call protection, on the phone (P1).** `ZtCallScreeningService` silences
+  unknown callers or sends them to voicemail, blocks hidden numbers and
+  number prefixes or whole countries, and applies per-contact "always send
+  to voicemail". It works while ZT Phone is locked: the app hands it the
+  rules plus Keystore-keyed HMACs of contact numbers, never plain numbers.
+- **Per-contact ringtone, SIM and voicemail (P6, P7), speed dial and quick
+  replies (P3, P8)** are encrypted items in the account (`contact_call_settings`,
+  `speed_dial`, `phone_settings`). Quick replies stay on the phone because
+  the call screen runs locked. Declining with a text uses Telecom's
+  `reject(true, text)`, so the app needs no SMS permission.
+- **Missed calls and voicemail (P2, P5).** As the default dialer the app
+  posts its own missed-call notification (Call back, Message, Add to
+  contacts) and the voicemail-waiting one. Hold 1 to call voicemail.
+- **Call history backup (P9)** is opt-in: each call is an encrypted
+  `call_history` item, trimmed by "Keep call history", and restorable on
+  a new phone.
+- **Car mode (P11).** In car mode the call screen shows only big Mute and
+  audio buttons; Android Auto shows its own call screen through Telecom.
 - No database changes: Phone uses the existing `vault_items` table and
   sign-in. Old and new accounts sign in exactly as in the other apps.
 

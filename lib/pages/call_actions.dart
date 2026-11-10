@@ -1,13 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
+import 'package:zerotrust_phone/contacts/vault_contacts.dart';
+import 'package:zerotrust_phone/data/phone_items.dart';
+import 'package:zerotrust_phone/pages/call_details_page.dart';
+import 'package:zerotrust_phone/pages/contact_call_settings_page.dart';
 import 'package:zerotrust_phone/pages/dialpad_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
 
-Future<void> placeCall(WidgetRef ref, String number) =>
-    ref.read(telecomProvider).placeCall(number);
+/// Calls [number], on the contact's own SIM when one is set (P6).
+Future<void> placeCall(WidgetRef ref, String number) {
+  final PhoneContact? contact = ref
+      .read(contactDirectoryProvider)
+      .lookup(number);
+  String? account;
+  if (contact != null) {
+    for (final ContactCallSettings s
+        in ref.read(contactSettingsProvider).value ??
+            const <ContactCallSettings>[]) {
+      if (s.contactId == contact.id) account = s.accountId;
+    }
+  }
+  return ref.read(telecomProvider).placeCall(number, account: account);
+}
+
+Future<void> sendMessage(String number) =>
+    launchUrl(Uri(scheme: 'smsto', path: number));
 
 /// A contact or number: call, copy, edit before calling, block.
 Future<void> showNumberSheet(
@@ -43,6 +64,48 @@ Future<void> showNumberSheet(
               onTap: () {
                 Navigator.of(sheet).pop();
                 placeCall(ref, n);
+              },
+            ),
+          ListTile(
+            leading: const Icon(Icons.message_outlined),
+            title: const Text('Send a message'),
+            onTap: () {
+              Navigator.of(sheet).pop();
+              sendMessage(number);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.history),
+            title: const Text('Call history'),
+            onTap: () {
+              Navigator.of(sheet).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => CallDetailsPage(number: number),
+                ),
+              );
+            },
+          ),
+          if (contact != null)
+            ListTile(
+              leading: const Icon(Icons.tune),
+              title: const Text('Ringtone, voicemail and SIM'),
+              onTap: () {
+                Navigator.of(sheet).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => ContactCallSettingsPage(contact: contact),
+                  ),
+                );
+              },
+            )
+          else
+            ListTile(
+              leading: const Icon(Icons.person_add_alt_outlined),
+              title: const Text('Add to contacts'),
+              onTap: () {
+                Navigator.of(sheet).pop();
+                ref.read(telecomProvider).addContact(number);
               },
             ),
           ListTile(
