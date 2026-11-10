@@ -46,7 +46,7 @@ class MissedCallReceiver : BroadcastReceiver() {
             .setAutoCancel(true)
             .setContentIntent(openRecents(context))
         @Suppress("DEPRECATION")
-        val clear = intent.getParcelableExtra<PendingIntent>(TelecomManager.EXTRA_CLEAR_MISSED_CALLS_INTENT)
+        val clear = intent.getParcelableExtra<PendingIntent>(EXTRA_CLEAR_MISSED_CALLS)
         if (clear != null) builder.setDeleteIntent(clear)
         if (!number.isNullOrBlank()) {
             builder.addAction(0, "Call back", PendingIntent.getBroadcast(
@@ -99,6 +99,8 @@ class MissedCallReceiver : BroadcastReceiver() {
         private const val MISSED_CHANNEL = "missed_calls"
         private const val VOICEMAIL_CHANNEL = "voicemail"
         const val MISSED_ID = 4300
+        /** TelecomManager.EXTRA_CLEAR_MISSED_CALLS_INTENT, which the SDK hides. */
+        const val EXTRA_CLEAR_MISSED_CALLS = "android.telecom.extra.CLEAR_MISSED_CALLS_INTENT"
         private const val VOICEMAIL_ID = 4301
 
         fun createChannels(context: Context) {

@@ -31,6 +31,12 @@ class ZtInCallService : InCallService() {
             // The full-screen notification opens the call screen when the
             // phone is locked or idle, and shows a heads-up card otherwise.
             CallNotifications.update(this)
+            // Without the notification (permission off) or its full-screen
+            // part, and whenever the phone is locked, open the call screen
+            // ourselves: Android lets a bound InCallService start it.
+            if (!CallNotifications.alertsReady(this) || CallNotifications.deviceIdle(this)) {
+                CallActivity.start(this)
+            }
         } else {
             CallActivity.start(this)
         }
