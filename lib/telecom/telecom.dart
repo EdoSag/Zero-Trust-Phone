@@ -24,6 +24,17 @@ class CallLogEntry {
     isNew: m['isNew'] == true,
   );
 
+  /// `CallLog.Calls.TYPE`, for the backup.
+  int get androidType => switch (type) {
+    CallType.incoming => 1,
+    CallType.outgoing => 2,
+    CallType.missed => 3,
+    CallType.voicemail => 4,
+    CallType.rejected => 5,
+    CallType.blocked => 6,
+    CallType.other => 1,
+  };
+
   final int id;
   final String number;
   final CallType type;
@@ -56,6 +67,13 @@ enum CallType {
   };
 }
 
+/// A SIM or other account calls can go out on.
+class PhoneAccount {
+  const PhoneAccount({required this.id, required this.label});
+  final String id;
+  final String label;
+}
+
 /// Android's phone side: the default Phone app role, placing calls, call
 /// history and blocked numbers. Fakeable in tests.
 class Telecom {
@@ -68,11 +86,15 @@ class Telecom {
   /// number itself waits on the Android side until [consumeDial] takes it.
   final ValueNotifier<int> dialRequests = ValueNotifier<int>(0);
 
+  /// Ticks when the missed-call notification is tapped while the app is open.
+  final ValueNotifier<int> recentsRequests = ValueNotifier<int>(0);
+
   bool get isSupported => defaultTargetPlatform == TargetPlatform.android;
 
   void listenForDials() {
     _channel.setMethodCallHandler((MethodCall call) async {
       if (call.method == 'dialPending') dialRequests.value++;
+      if (call.method == 'recentsPending') recentsRequests.value++;
     });
   }
 
@@ -97,8 +119,62 @@ class Telecom {
   /// dialpad, null when it was opened normally.
   Future<String?> consumeDial() => _call<String>('consumeDial');
 
-  Future<void> placeCall(String number) =>
-      _call<void>('placeCall', {'number': number});
+  /// Calls [number], on the SIM with [account] id when given (P6).
+  Future<void> placeCall(String number, {String? account}) =>
+      _call<void>('placeCall', {'number': number, 'account': account});
+
+  /// Calls the SIM's voicemail number (P5).
+  Future<void> callVoicemail() => _call<void>('callVoicemail');
+
+  Future<void> voicemailSettings() => _call<void>('voicemailSettings');
+
+  /// Whether the app was opened from the missed-call notification.
+  Future<bool> consumeShowRecents() async =>
+      await _call<bool>('consumeShowRecents') ?? false;
+
+  /// The SIMs this phone can call with.
+  Future<List<PhoneAccount>> phoneAccounts() async => <PhoneAccount>[
+    for (final Object? a
+        in await _call<List<Object?>>('phoneAccounts') ?? <Object?>[])
+      if (a is Map<Object?, Object?>)
+        PhoneAccount(id: '${a['id']}', label: '${a['label']}'),
+  ];
+
+  /// What on-device call screening needs while the vault is locked (P1,
+  /// P7). The Android side keeps only keyed hashes of the numbers.
+  Future<void> setScreening({
+    required String unknownMode,
+    required bool blockHidden,
+    required List<String> prefixes,
+    required List<String> contactKeys,
+    required List<String> voicemailKeys,
+    required Map<String, String> ringtones,
+  }) => _call<void>('setScreening', {
+    'unknownMode': unknownMode,
+    'blockHidden': blockHidden,
+    'prefixes': prefixes,
+    'contactKeys': contactKeys,
+    'voicemailKeys': voicemailKeys,
+    'ringtones': ringtones,
+  });
+
+  Future<void> clearScreeningContacts() =>
+      _call<void>('clearScreeningContacts');
+
+  /// Adds calls to Android's call history, skipping ones it already has.
+  Future<int> insertCalls(List<Map<String, Object?>> calls) async =>
+      await _call<int>('insertCalls', {'calls': calls}) ?? 0;
+
+  /// Android's ringtone picker. "" = the phone's ringtone, null = cancelled.
+  Future<String?> pickRingtone({String? current}) =>
+      _call<String>('pickRingtone', {'current': current});
+
+  Future<String?> ringtoneTitle(String uri) =>
+      _call<String>('ringtoneTitle', {'uri': uri});
+
+  /// Opens "add contact" with the number filled in.
+  Future<void> addContact(String number) =>
+      _call<void>('addContact', {'number': number});
 
   Future<List<CallLogEntry>> callLog({int limit = 500}) async {
     final List<Object?> rows =

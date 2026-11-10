@@ -5,6 +5,9 @@ import 'package:zerotrust_phone/app/auth_providers.dart';
 import 'package:zerotrust_phone/app/history_retention.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
+import 'package:zerotrust_phone/data/phone_items.dart';
+import 'package:zerotrust_phone/services/history_backup.dart';
+import 'package:zerotrust_phone/services/screening_sync.dart';
 import 'package:zerotrust_phone/pages/dialpad_page.dart';
 import 'package:zerotrust_phone/pages/home_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
@@ -27,17 +30,57 @@ class _AppGateState extends ConsumerState<AppGate> with WidgetsBindingObserver {
   late bool _signingIn = ref.read(currentUserProvider) == null;
   UnlockResult? _awaitingRecoveryKey;
 
+  late final Telecom _telecom = ref.read(telecomProvider);
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // DIAL and tel: links open the dialpad even while the vault is locked:
+    // dialling never waits for an unlock (P6).
+    _telecom.listenForDials();
+    _telecom.dialRequests.addListener(_onDialRequest);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onDialRequest());
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _telecom.dialRequests.removeListener(_onDialRequest);
     super.dispose();
   }
+
+  Future<void> _onDialRequest() async {
+    final String? number = await _telecom.consumeDial();
+    if (number == null || !mounted) return;
+    _openDialpad(number);
+  }
+
+  void _openDialpad([String number = '']) => Navigator.of(context).push(
+    MaterialPageRoute<void>(builder: (_) => DialpadPage(initialNumber: number)),
+  );
+
+  /// Sign-in and unlock screens get a dialpad button, so a call (including
+  /// an emergency call) never needs the password.
+  Widget _withDialpad(Widget screen) => Stack(
+    children: <Widget>[
+      screen,
+      Positioned(
+        top: 0,
+        left: 0,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: IconButton.filledTonal(
+              tooltip: 'Dialpad, no unlock needed',
+              icon: const Icon(Icons.dialpad),
+              onPressed: _openDialpad,
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
 
   /// A key still waiting behind the recovery-key screen is zeroed when the
   /// app leaves the foreground, so coming back asks for the password.
@@ -85,6 +128,8 @@ class _AppGateState extends ConsumerState<AppGate> with WidgetsBindingObserver {
     });
     ref.listen(currentUserProvider, (_, user) {
       if (user == null) {
+        // Screening hashes of the address book go with the account.
+        _telecom.clearScreeningContacts().ignore();
         ref.read(vaultControllerProvider.notifier).lock();
         setState(() => _signingIn = true);
       }
@@ -114,18 +159,22 @@ class _AppGateState extends ConsumerState<AppGate> with WidgetsBindingObserver {
 
     final user = ref.watch(currentUserProvider);
     if (user == null || _signingIn) {
-      return ZtSignInScreen(
-        onUnlocked: _onUnlocked,
-        onForgotPassword: _forgotPassword,
+      return _withDialpad(
+        ZtSignInScreen(
+          onUnlocked: _onUnlocked,
+          onForgotPassword: _forgotPassword,
+        ),
       );
     }
 
     if (ref.watch(vaultControllerProvider) is VaultLocked) {
-      return ZtUnlockScreen(
-        email: user.email,
-        onUnlocked: _onUnlocked,
-        onSignOut: () => ref.read(accountServiceProvider).signOut(),
-        onForgotPassword: _forgotPassword,
+      return _withDialpad(
+        ZtUnlockScreen(
+          email: user.email,
+          onUnlocked: _onUnlocked,
+          onSignOut: () => ref.read(accountServiceProvider).signOut(),
+          onForgotPassword: _forgotPassword,
+        ),
       );
     }
 
@@ -135,8 +184,9 @@ class _AppGateState extends ConsumerState<AppGate> with WidgetsBindingObserver {
 }
 
 /// The dialer once unlocked: keeps the Contacts names fresh, hands them to
-/// the in-call screen (memory only), trims old call history and opens the
-/// dialpad for DIAL and tel: links.
+/// the in-call screen (memory only) and to call screening (keyed hashes),
+/// trims and backs up call history, and opens Recents from the missed-call
+/// notification.
 class _PhoneHome extends ConsumerStatefulWidget {
   const _PhoneHome();
 
@@ -147,25 +197,34 @@ class _PhoneHome extends ConsumerStatefulWidget {
 class _PhoneHomeState extends ConsumerState<_PhoneHome>
     with WidgetsBindingObserver {
   late final Telecom _telecom = ref.read(telecomProvider);
+  ScreeningRules? _sentRules;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _telecom.listenForDials();
-    _telecom.dialRequests.addListener(_onDialRequest);
+    _telecom.recentsRequests.addListener(_onRecentsRequest);
     WidgetsBinding.instance.addPostFrameCallback((_) => _start());
   }
 
   Future<void> _start() async {
-    await _onDialRequest();
+    await _onRecentsRequest();
     await ref.read(historyRetentionProvider.notifier).apply();
+    await _backUp();
+  }
+
+  Future<void> _backUp() async {
+    try {
+      await ref.read(historyBackupProvider).backUp();
+    } on Object {
+      // Locked meanwhile, or offline: the next open tries again.
+    }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _telecom.dialRequests.removeListener(_onDialRequest);
+    _telecom.recentsRequests.removeListener(_onRecentsRequest);
     _telecom.clearVaultNames().ignore();
     super.dispose();
   }
@@ -176,23 +235,42 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
       // A call may have ended, or the default app changed, meanwhile.
       ref.invalidate(callLogProvider);
       ref.invalidate(defaultDialerProvider);
+      _backUp();
     }
   }
 
-  /// Opens the dialpad for a DIAL or tel: link, including one that came
-  /// in while the vault was locked.
-  Future<void> _onDialRequest() async {
-    final String? number = await _telecom.consumeDial();
-    if (number != null) _openDialpad(number);
+  Future<void> _onRecentsRequest() async {
+    if (await _telecom.consumeShowRecents() && mounted) {
+      Navigator.of(context).popUntil((Route<dynamic> r) => r.isFirst);
+      ref.read(homeTabProvider.notifier).show(HomeTab.recents);
+    }
   }
 
-  void _openDialpad(String number) {
-    if (!mounted) return;
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => DialpadPage(initialNumber: number),
-      ),
+  void _syncScreening() {
+    final List<PhoneContact>? contacts = ref.read(phoneContactsProvider).value;
+    final List<ContactCallSettings>? settings = ref
+        .read(contactSettingsProvider)
+        .value;
+    // Wait for the address book and settings, so a half-loaded state never
+    // marks every contact as unknown.
+    if (contacts == null || settings == null) return;
+    final ScreeningRules rules = ScreeningRules.build(
+      contacts: contacts,
+      settings: settings,
+      protection: ref.read(callProtectionProvider),
     );
+    if (rules.same(_sentRules)) return;
+    _sentRules = rules;
+    _telecom
+        .setScreening(
+          unknownMode: rules.unknownMode,
+          blockHidden: rules.blockHidden,
+          prefixes: rules.prefixes,
+          contactKeys: rules.contactKeys,
+          voicemailKeys: rules.voicemailKeys,
+          ringtones: rules.ringtones,
+        )
+        .ignore();
   }
 
   @override
@@ -200,7 +278,10 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
     ref.listen(contactDirectoryProvider, (_, ContactDirectory next) {
       _telecom.setVaultNames(next.namesByKey).ignore();
     });
-    // Phone's own synced store: empty for now, ready for synced settings.
+    ref.listen(phoneContactsProvider, (_, _) => _syncScreening());
+    ref.listen(contactSettingsProvider, (_, _) => _syncScreening());
+    ref.listen(callProtectionProvider, (_, _) => _syncScreening());
+    // Phone's own synced store: settings, speed dial, call-history backup.
     ref.watch(ztSyncControllerProvider);
     return const HomePage();
   }

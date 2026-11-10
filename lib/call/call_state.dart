@@ -96,6 +96,7 @@ class CallsSnapshot {
     this.muted = false,
     this.route = AudioRoute.earpiece,
     this.supportedRoutes = AudioRoute.earpiece | AudioRoute.speaker,
+    this.carMode = false,
   });
 
   factory CallsSnapshot.fromMap(Map<Object?, Object?> m) {
@@ -110,6 +111,7 @@ class CallsSnapshot {
       supportedRoutes:
           (audio?['supportedRoutes'] as num?)?.toInt() ??
           (AudioRoute.earpiece | AudioRoute.speaker),
+      carMode: m['carMode'] == true,
     );
   }
 
@@ -117,6 +119,9 @@ class CallsSnapshot {
   final bool muted;
   final int route;
   final int supportedRoutes;
+
+  /// Android Auto, a car dock or driving mode: bigger, fewer buttons (P11).
+  final bool carMode;
 
   /// Top-level calls (conference members are inside their conference).
   List<PhoneCall> get topLevel =>

@@ -1,5 +1,6 @@
 package dev.sagron.zerotrustphone
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.telecom.Call
@@ -37,7 +38,10 @@ object CallManager {
     private val vaultNames = mutableMapOf<String, String>()
 
     private val callback = object : Call.Callback() {
-        override fun onStateChanged(call: Call, state: Int) = notifyChanged()
+        override fun onStateChanged(call: Call, state: Int) {
+            if (ringing() == null) CallRinger.stop()
+            notifyChanged()
+        }
         override fun onDetailsChanged(call: Call, details: Call.Details) = notifyChanged()
         override fun onConferenceableCallsChanged(call: Call, conferenceableCalls: MutableList<Call>) =
             notifyChanged()
@@ -52,6 +56,7 @@ object CallManager {
 
     fun remove(call: Call) {
         call.unregisterCallback(callback)
+        if (ringing() == null || ringing() === call) CallRinger.stop()
         calls.remove(call)
         accountChoices.remove(call)
         notifyChanged()
@@ -99,10 +104,14 @@ object CallManager {
 
     /** The caller's name: the unlocked vault first, then the phone's contacts. */
     fun nameFor(number: String): String? {
+        val ctx = service ?: return vaultNames[PhoneNumbers.lookupKey(number)]
+        return nameFor(ctx, number)
+    }
+
+    fun nameFor(context: Context, number: String): String? {
         val key = PhoneNumbers.lookupKey(number)
         if (key.isNotEmpty()) vaultNames[key]?.let { return it }
-        val ctx = service ?: return null
-        return SystemContacts.lookupName(ctx, number)
+        return SystemContacts.lookupName(context, number)
     }
 
     private fun byId(id: String?): Call? = calls.entries.firstOrNull { it.value == id }?.key
@@ -111,6 +120,7 @@ object CallManager {
         val audio = audioState
         return mapOf(
             "calls" to calls.entries.map { (call, id) -> describe(call, id) },
+            "carMode" to carMode(),
             "audio" to if (audio == null) null else mapOf(
                 "muted" to audio.isMuted,
                 "route" to audio.route,
@@ -199,11 +209,36 @@ object CallManager {
     // Controls, by the id the in-call screen got from [snapshot].
 
     fun answer(id: String?) {
+        CallRinger.stop()
         (byId(id) ?: ringing())?.answer(VideoProfile.STATE_AUDIO_ONLY)
     }
 
     fun reject(id: String?) {
+        CallRinger.stop()
         (byId(id) ?: ringing())?.reject(false, null)
+    }
+
+    /** Declines and texts [message] through the phone's SMS app (Telecom). */
+    fun rejectWithMessage(id: String?, message: String) {
+        CallRinger.stop()
+        (byId(id) ?: ringing())?.reject(true, message)
+    }
+
+    /** Call waiting: ends the current call, then answers the new one. */
+    fun endAndAnswer(id: String?) {
+        val incoming = byId(id) ?: ringing() ?: return
+        calls.keys.filter { it !== incoming && it.parent == null &&
+            it.stateCompat() in setOf(Call.STATE_ACTIVE, Call.STATE_HOLDING, Call.STATE_DIALING) }
+            .forEach { it.disconnect() }
+        CallRinger.stop()
+        incoming.answer(VideoProfile.STATE_AUDIO_ONLY)
+    }
+
+    /** Car mode (Android Auto, a car dock or the driving mode). */
+    private fun carMode(): Boolean {
+        val ctx = service ?: return false
+        val ui = ctx.getSystemService(android.app.UiModeManager::class.java)
+        return ui?.currentModeType == android.content.res.Configuration.UI_MODE_TYPE_CAR
     }
 
     fun hangUp(id: String?) {

@@ -2,9 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zerotrust_phone/pages/contacts_page.dart';
 import 'package:zerotrust_phone/pages/dialpad_page.dart';
+import 'package:zerotrust_phone/pages/favorites_page.dart';
 import 'package:zerotrust_phone/pages/recents_page.dart';
 import 'package:zerotrust_phone/pages/settings_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
+
+enum HomeTab { favorites, recents, contacts }
+
+/// The tab on show; the missed-call notification switches it to Recents.
+final homeTabProvider = NotifierProvider<HomeTabController, HomeTab>(
+  HomeTabController.new,
+);
+
+class HomeTabController extends Notifier<HomeTab> {
+  @override
+  HomeTab build() => HomeTab.recents;
+
+  void show(HomeTab tab) => state = tab;
+}
 
 /// Favorites, Recents and Contacts, with search and the dialpad button.
 class HomePage extends ConsumerStatefulWidget {
@@ -15,7 +30,6 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  int _tab = 1;
   final TextEditingController _search = TextEditingController();
   String _query = '';
 
@@ -31,13 +45,18 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final HomeTab tab = ref.watch(homeTabProvider);
     final bool searching = _query.isNotEmpty;
+    // On Recents the search filters the call history (P4); elsewhere it
+    // finds contacts.
     final Widget body = searching
-        ? ContactsPage(query: _query)
+        ? (tab == HomeTab.recents
+              ? RecentsPage(query: _query)
+              : ContactsPage(query: _query))
         : IndexedStack(
-            index: _tab,
+            index: tab.index,
             children: const <Widget>[
-              ContactsPage(favoritesOnly: true),
+              FavoritesPage(),
               RecentsPage(),
               ContactsPage(),
             ],
@@ -48,7 +67,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         titleSpacing: 12,
         title: SearchBar(
           controller: _search,
-          hintText: 'Search contacts',
+          hintText: tab == HomeTab.recents ? 'Search calls' : 'Search contacts',
           leading: const Icon(Icons.search),
           elevation: const WidgetStatePropertyAll<double>(0),
           onChanged: (String v) => setState(() => _query = v.trim()),
@@ -89,14 +108,16 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: const Icon(Icons.dialpad),
       ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _tab,
+        selectedIndex: tab.index,
         onDestinationSelected: (int i) {
+          ref.read(homeTabProvider.notifier).show(HomeTab.values[i]);
           setState(() {
-            _tab = i;
             _search.clear();
             _query = '';
           });
-          if (i == 1) ref.read(telecomProvider).markMissedSeen().ignore();
+          if (HomeTab.values[i] == HomeTab.recents) {
+            ref.read(telecomProvider).markMissedSeen().ignore();
+          }
         },
         destinations: const <NavigationDestination>[
           NavigationDestination(

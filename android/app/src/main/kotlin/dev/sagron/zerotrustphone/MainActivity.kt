@@ -8,8 +8,11 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.BlockedNumberContract
+import android.media.RingtoneManager
 import android.provider.CallLog
+import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
+import android.telephony.TelephonyManager
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -27,13 +30,23 @@ class MainActivity : FlutterFragmentActivity() {
     /** A number from a DIAL / tel: intent, "" for an empty dialpad. */
     private var pendingDial: String? = null
 
+    /** Opened from the missed-call notification. */
+    private var pendingRecents = false
+    private var pendingRingtone: MethodChannel.Result? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pendingDial = dialNumber(intent)
+        pendingRecents = intent?.action == ACTION_SHOW_RECENTS
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        if (intent.action == ACTION_SHOW_RECENTS) {
+            pendingRecents = true
+            channel?.invokeMethod("recentsPending", null)
+            return
+        }
         // Kept until the unlocked dialer takes it (consumeDial), so a number
         // that arrives while the vault is locked isn't lost.
         pendingDial = dialNumber(intent) ?: return
@@ -65,7 +78,56 @@ class MainActivity : FlutterFragmentActivity() {
                         pendingDial = null
                     }
                     "placeCall" -> {
-                        placeCall(call.argument<String>("number") ?: "")
+                        placeCall(call.argument<String>("number") ?: "", call.argument<String>("account"))
+                        result.success(null)
+                    }
+                    "callVoicemail" -> {
+                        callVoicemail()
+                        result.success(null)
+                    }
+                    "consumeShowRecents" -> {
+                        result.success(pendingRecents)
+                        pendingRecents = false
+                    }
+                    "phoneAccounts" -> result.success(phoneAccounts())
+                    "setScreening" -> {
+                        @Suppress("UNCHECKED_CAST")
+                        ScreeningStore(this).update(
+                            unknownMode = call.argument<String>("unknownMode") ?: "ring",
+                            blockHidden = call.argument<Boolean>("blockHidden") ?: false,
+                            prefixes = call.argument<List<String>>("prefixes") ?: emptyList(),
+                            contactKeys = call.argument<List<String>>("contactKeys") ?: emptyList(),
+                            voicemailKeys = call.argument<List<String>>("voicemailKeys") ?: emptyList(),
+                            ringtones = call.argument<Map<String, String>>("ringtones") ?: emptyMap(),
+                        )
+                        result.success(null)
+                    }
+                    "clearScreeningContacts" -> {
+                        ScreeningStore(this).clearContacts()
+                        result.success(null)
+                    }
+                    "insertCalls" -> result.success(
+                        insertCalls(call.argument<List<Map<String, Any?>>>("calls") ?: emptyList())
+                    )
+                    "pickRingtone" -> pickRingtone(call.argument<String>("current"), result)
+                    "ringtoneTitle" -> result.success(
+                        call.argument<String>("uri")?.let { uri ->
+                            try {
+                                RingtoneManager.getRingtone(this, Uri.parse(uri))?.getTitle(this)
+                            } catch (_: Exception) {
+                                null
+                            }
+                        }
+                    )
+                    "addContact" -> {
+                        startActivity(MissedCallReceiver.addContactIntent(call.argument<String>("number") ?: ""))
+                        result.success(null)
+                    }
+                    "voicemailSettings" -> {
+                        startActivity(
+                            Intent(TelephonyManager.ACTION_CONFIGURE_VOICEMAIL)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        )
                         result.success(null)
                     }
                     "callLog" -> result.success(callLog(call.argument<Int>("limit") ?: 500))
@@ -163,6 +225,18 @@ class MainActivity : FlutterFragmentActivity() {
             pendingRole?.success(isDefaultDialer())
             pendingRole = null
         }
+        if (requestCode == REQUEST_RINGTONE) {
+            val picked: Uri? = if (resultCode == RESULT_OK) {
+                data?.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+            } else {
+                null
+            }
+            // "" means the phone's default ringtone; null means cancelled.
+            pendingRingtone?.success(
+                if (resultCode == RESULT_OK) picked?.toString() ?: "" else null
+            )
+            pendingRingtone = null
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -175,15 +249,91 @@ class MainActivity : FlutterFragmentActivity() {
         }
     }
 
-    private fun placeCall(number: String) {
+    private fun placeCall(number: String, accountId: String? = null) {
         if (number.isBlank()) return
         val uri = Uri.fromParts("tel", number, null)
         if (has(Manifest.permission.CALL_PHONE)) {
-            getSystemService(TelecomManager::class.java).placeCall(uri, Bundle())
+            val extras = Bundle()
+            // The contact's SIM (P6), when this phone still has it.
+            accountFor(accountId)?.let {
+                extras.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, it)
+            }
+            getSystemService(TelecomManager::class.java).placeCall(uri, extras)
         } else {
             // Without the permission, hand the number to the system dialer.
             startActivity(Intent(Intent.ACTION_DIAL, uri))
         }
+    }
+
+    private fun callVoicemail() {
+        val uri = Uri.fromParts("voicemail", "", null)
+        if (has(Manifest.permission.CALL_PHONE)) {
+            getSystemService(TelecomManager::class.java).placeCall(uri, Bundle())
+        } else {
+            startActivity(Intent(Intent.ACTION_DIAL, uri))
+        }
+    }
+
+    private fun callAccounts(): List<PhoneAccountHandle> = try {
+        getSystemService(TelecomManager::class.java).callCapablePhoneAccounts
+    } catch (_: SecurityException) {
+        emptyList()
+    }
+
+    private fun accountFor(id: String?): PhoneAccountHandle? =
+        if (id.isNullOrEmpty()) null else callAccounts().firstOrNull { it.id == id }
+
+    /** The SIMs (and other calling accounts) this phone can call with. */
+    private fun phoneAccounts(): List<Map<String, String>> {
+        val telecom = getSystemService(TelecomManager::class.java)
+        return callAccounts().map { handle ->
+            mapOf(
+                "id" to handle.id,
+                "label" to (telecom.getPhoneAccount(handle)?.label?.toString() ?: "SIM"),
+            )
+        }
+    }
+
+    private fun pickRingtone(current: String?, result: MethodChannel.Result) {
+        pendingRingtone?.success(null)
+        pendingRingtone = result
+        val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
+            .putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE)
+            .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+            .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+        if (!current.isNullOrEmpty()) {
+            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(current))
+        }
+        @Suppress("DEPRECATION")
+        startActivityForResult(intent, REQUEST_RINGTONE)
+    }
+
+    /** Puts backed-up calls into Android's call history, skipping ones it has. */
+    private fun insertCalls(rows: List<Map<String, Any?>>): Int {
+        if (rows.isEmpty() || !has(Manifest.permission.WRITE_CALL_LOG)) return 0
+        val existing = HashSet<String>()
+        contentResolver.query(
+            CallLog.Calls.CONTENT_URI,
+            arrayOf(CallLog.Calls.NUMBER, CallLog.Calls.DATE), null, null, null
+        )?.use { c ->
+            while (c.moveToNext()) existing.add("${PhoneNumbers.lookupKey(c.getString(0) ?: "")}|${c.getLong(1) / 1000}")
+        }
+        var added = 0
+        for (row in rows) {
+            val number = row["number"] as? String ?: continue
+            val date = (row["date"] as? Number)?.toLong() ?: continue
+            if (!existing.add("${PhoneNumbers.lookupKey(number)}|${date / 1000}")) continue
+            val values = ContentValues().apply {
+                put(CallLog.Calls.NUMBER, number)
+                put(CallLog.Calls.TYPE, (row["type"] as? Number)?.toInt() ?: CallLog.Calls.INCOMING_TYPE)
+                put(CallLog.Calls.DATE, date)
+                put(CallLog.Calls.DURATION, (row["duration"] as? Number)?.toLong() ?: 0L)
+                put(CallLog.Calls.NEW, 0)
+                put(CallLog.Calls.IS_READ, 1)
+            }
+            if (contentResolver.insert(CallLog.Calls.CONTENT_URI, values) != null) added++
+        }
+        return added
     }
 
     private fun callLog(limit: Int): List<Map<String, Any?>> {
@@ -278,5 +428,7 @@ class MainActivity : FlutterFragmentActivity() {
     companion object {
         private const val REQUEST_ROLE = 3101
         private const val REQUEST_PERMISSIONS = 3102
+        private const val REQUEST_RINGTONE = 3103
+        const val ACTION_SHOW_RECENTS = "dev.sagron.zerotrustphone.SHOW_RECENTS"
     }
 }

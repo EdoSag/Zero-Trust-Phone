@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zero_trust_core/zero_trust_core.dart';
 import 'package:zerotrust_phone/call/call_state.dart';
 import 'package:zerotrust_phone/pages/dialpad_page.dart';
+import 'package:zerotrust_phone/services/quick_replies.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
 
 /// Talks to CallManager.kt. Overridable in tests.
@@ -26,6 +27,11 @@ class CallControl {
 
   Future<void> answer(String id) => _do('answer', {'id': id});
   Future<void> reject(String id) => _do('reject', {'id': id});
+  Future<void> rejectWithMessage(String id, String message) =>
+      _do('rejectWithMessage', {'id': id, 'message': message});
+
+  /// Call waiting: hangs up the current call and answers [id].
+  Future<void> endAndAnswer(String id) => _do('endAndAnswer', {'id': id});
   Future<void> hangUp(String id) => _do('hangUp', {'id': id});
   Future<void> hold(String id, bool on) => _do('hold', {'id': id, 'on': on});
   Future<void> swap() => _do('swap');
@@ -127,8 +133,8 @@ class _InCallScreenState extends ConsumerState<InCallScreen> {
                 children: <Widget>[
                   if (snapshot.secondary case final PhoneCall other)
                     _OtherCallBar(call: other, onSwap: _control.swap),
-                  const SizedBox(height: 32),
-                  _CallerHeader(call: call),
+                  SizedBox(height: snapshot.carMode ? 16 : 32),
+                  _CallerHeader(call: call, large: snapshot.carMode),
                   const Spacer(),
                   if (call.state == CallState.selectAccount)
                     _PickSim(
@@ -138,8 +144,15 @@ class _InCallScreenState extends ConsumerState<InCallScreen> {
                     )
                   else if (call.state == CallState.ringing)
                     _IncomingActions(
+                      // Call waiting: Telecom holds the current call when
+                      // the new one is answered.
+                      waiting: snapshot.secondary != null,
                       onAnswer: () => _control.answer(call.id),
                       onDecline: () => _control.reject(call.id),
+                      onEndAndAnswer: () => _control.endAndAnswer(call.id),
+                      onMessage: call.number.isEmpty
+                          ? null
+                          : () => _declineWithText(call),
                     )
                   else ...<Widget>[
                     if (_keypad) ...<Widget>[
@@ -154,7 +167,13 @@ class _InCallScreenState extends ConsumerState<InCallScreen> {
                           _control.dtmf(d);
                         },
                       ),
-                    ] else
+                    ] else if (snapshot.carMode)
+                      _CarControls(
+                        snapshot: snapshot,
+                        call: call,
+                        control: _control,
+                      )
+                    else
                       _Controls(
                         snapshot: snapshot,
                         call: call,
@@ -191,9 +210,179 @@ class _InCallScreenState extends ConsumerState<InCallScreen> {
   }
 }
 
-class _CallerHeader extends StatelessWidget {
-  const _CallerHeader({required this.call});
+extension on _InCallScreenState {
+  /// P3: pick a quick reply (or write one) and decline with it.
+  Future<void> _declineWithText(PhoneCall call) async {
+    final List<String> replies = await ref
+        .read(quickRepliesProvider.future)
+        .catchError((Object _) => QuickReplies.defaults);
+    if (!mounted) return;
+    final String? text = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (BuildContext sheet) => _QuickReplySheet(replies: replies),
+    );
+    if (text == null || text.trim().isEmpty) return;
+    await _control.rejectWithMessage(call.id, text.trim());
+  }
+}
+
+class _QuickReplySheet extends StatefulWidget {
+  const _QuickReplySheet({required this.replies});
+  final List<String> replies;
+
+  @override
+  State<_QuickReplySheet> createState() => _QuickReplySheetState();
+}
+
+class _QuickReplySheetState extends State<_QuickReplySheet> {
+  final TextEditingController _own = TextEditingController();
+
+  @override
+  void dispose() {
+    _own.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => SafeArea(
+    child: Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+            child: Text(
+              'Decline and send a message',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
+          for (final String r in widget.replies)
+            ListTile(
+              leading: const Icon(Icons.message_outlined),
+              title: Text(r),
+              onTap: () => Navigator.of(context).pop(r),
+            ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 8, 16),
+            child: TextField(
+              controller: _own,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                hintText: 'Write your own…',
+                suffixIcon: IconButton(
+                  tooltip: 'Send',
+                  icon: const Icon(Icons.send),
+                  onPressed: () => Navigator.of(context).pop(_own.text),
+                ),
+              ),
+              onSubmitted: (String v) => Navigator.of(context).pop(v),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+/// Car mode (P11): only what's safe to tap while driving, extra large.
+class _CarControls extends StatelessWidget {
+  const _CarControls({
+    required this.snapshot,
+    required this.call,
+    required this.control,
+  });
+
+  final CallsSnapshot snapshot;
   final PhoneCall call;
+  final CallControl control;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool speaker = snapshot.route == AudioRoute.speaker;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: _BigButton(
+              icon: snapshot.muted ? Icons.mic_off : Icons.mic_none,
+              label: snapshot.muted ? 'Unmute' : 'Mute',
+              on: snapshot.muted,
+              onPressed: () => control.mute(!snapshot.muted),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: snapshot.hasBluetooth
+                ? _BigButton(
+                    icon: snapshot.route == AudioRoute.bluetooth
+                        ? Icons.bluetooth_audio
+                        : Icons.volume_up,
+                    label: snapshot.route == AudioRoute.bluetooth
+                        ? 'Car audio'
+                        : 'Phone audio',
+                    on: snapshot.route == AudioRoute.bluetooth,
+                    onPressed: () => control.route(
+                      snapshot.route == AudioRoute.bluetooth
+                          ? AudioRoute.speaker
+                          : AudioRoute.bluetooth,
+                    ),
+                  )
+                : _BigButton(
+                    icon: Icons.volume_up,
+                    label: 'Speaker',
+                    on: speaker,
+                    onPressed: () => control.route(
+                      speaker ? AudioRoute.earpiece : AudioRoute.speaker,
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BigButton extends StatelessWidget {
+  const _BigButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+    this.on = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+  final bool on;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    toggled: on,
+    child: SizedBox(
+      height: 96,
+      child: on
+          ? FilledButton.icon(
+              icon: Icon(icon, size: 36),
+              label: Text(label, style: const TextStyle(fontSize: 20)),
+              onPressed: onPressed,
+            )
+          : FilledButton.tonalIcon(
+              icon: Icon(icon, size: 36),
+              label: Text(label, style: const TextStyle(fontSize: 20)),
+              onPressed: onPressed,
+            ),
+    ),
+  );
+}
+
+class _CallerHeader extends StatelessWidget {
+  const _CallerHeader({required this.call, this.large = false});
+  final PhoneCall call;
+  final bool large;
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +404,7 @@ class _CallerHeader extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
             call.title,
-            style: text.headlineMedium,
+            style: large ? text.displaySmall : text.headlineMedium,
             textAlign: TextAlign.center,
           ),
         ),
@@ -274,26 +463,57 @@ class _PickSim extends StatelessWidget {
 }
 
 class _IncomingActions extends StatelessWidget {
-  const _IncomingActions({required this.onAnswer, required this.onDecline});
+  const _IncomingActions({
+    required this.onAnswer,
+    required this.onDecline,
+    required this.onEndAndAnswer,
+    this.onMessage,
+    this.waiting = false,
+  });
   final VoidCallback onAnswer;
   final VoidCallback onDecline;
+  final VoidCallback onEndAndAnswer;
+  final VoidCallback? onMessage;
+
+  /// Another call is already up (call waiting).
+  final bool waiting;
 
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
     children: <Widget>[
-      _RoundButton(
-        color: Colors.red.shade600,
-        icon: Icons.call_end,
-        label: 'Decline',
-        onPressed: onDecline,
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          _RoundButton(
+            color: Colors.red.shade600,
+            icon: Icons.call_end,
+            label: 'Decline',
+            onPressed: onDecline,
+          ),
+          if (waiting)
+            _RoundButton(
+              color: Colors.orange.shade700,
+              icon: Icons.phone_forwarded,
+              label: 'End & answer',
+              onPressed: onEndAndAnswer,
+            ),
+          _RoundButton(
+            color: Colors.green.shade600,
+            icon: waiting ? Icons.phone_paused : Icons.call,
+            label: waiting ? 'Hold & answer' : 'Answer',
+            onPressed: onAnswer,
+          ),
+        ],
       ),
-      _RoundButton(
-        color: Colors.green.shade600,
-        icon: Icons.call,
-        label: 'Answer',
-        onPressed: onAnswer,
-      ),
+      if (onMessage != null) ...<Widget>[
+        const SizedBox(height: 16),
+        TextButton.icon(
+          icon: const Icon(Icons.message_outlined),
+          label: const Text('Reply with a message'),
+          onPressed: onMessage,
+        ),
+      ],
     ],
   );
 }

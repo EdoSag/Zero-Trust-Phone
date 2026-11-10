@@ -27,6 +27,7 @@ class ZtInCallService : InCallService() {
         super.onCallAdded(call)
         CallManager.add(call)
         if (call.stateCompat() == Call.STATE_RINGING) {
+            call.details.handle?.schemeSpecificPart?.let { CallRinger.start(this, it) }
             // The full-screen notification opens the call screen when the
             // phone is locked or idle, and shows a heads-up card otherwise.
             CallNotifications.update(this)

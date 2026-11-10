@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/pages/call_actions.dart';
+import 'package:zerotrust_phone/pages/call_details_page.dart';
+import 'package:zerotrust_phone/services/history_backup.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/util/phone_numbers.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
@@ -32,15 +34,80 @@ class CallGroup {
       a.year == b.year && a.month == b.month && a.day == b.day;
 }
 
-class RecentsPage extends ConsumerWidget {
-  const RecentsPage({super.key, this.missedOnly = false});
+/// Which calls Recents shows (P4).
+enum RecentsFilter {
+  all('All'),
+  missed('Missed'),
+  incoming('Incoming'),
+  outgoing('Outgoing'),
+  blocked('Blocked');
 
-  final bool missedOnly;
+  const RecentsFilter(this.label);
+  final String label;
+
+  bool accepts(CallLogEntry e) => switch (this) {
+    RecentsFilter.all => true,
+    RecentsFilter.missed => e.type == CallType.missed,
+    RecentsFilter.incoming => e.type == CallType.incoming,
+    RecentsFilter.outgoing => e.type == CallType.outgoing,
+    RecentsFilter.blocked =>
+      e.type == CallType.blocked || e.type == CallType.rejected,
+  };
+}
+
+/// Calls matching [query] by contact name, saved name or number.
+List<CallLogEntry> filterCalls(
+  List<CallLogEntry> log,
+  ContactDirectory directory, {
+  String query = '',
+  RecentsFilter filter = RecentsFilter.all,
+}) {
+  final String q = query.trim().toLowerCase();
+  final String digits = q.replaceAll(RegExp(r'[^0-9]'), '');
+  return log.where((CallLogEntry e) {
+    if (!filter.accepts(e)) return false;
+    if (q.isEmpty) return true;
+    final String name = directory.lookup(e.number)?.name ?? e.cachedName ?? '';
+    if (name.toLowerCase().contains(q)) return true;
+    return digits.isNotEmpty &&
+        PhoneNumbers.normalize(e.number).contains(digits);
+  }).toList();
+}
+
+class RecentsPage extends ConsumerStatefulWidget {
+  const RecentsPage({super.key, this.query = ''});
+
+  final String query;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RecentsPage> createState() => _RecentsPageState();
+}
+
+class _RecentsPageState extends ConsumerState<RecentsPage> {
+  RecentsFilter _filter = RecentsFilter.all;
+
+  @override
+  Widget build(BuildContext context) {
     final AsyncValue<List<CallLogEntry>> log = ref.watch(callLogProvider);
     final ContactDirectory directory = ref.watch(contactDirectoryProvider);
+
+    final Widget chips = SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+      child: Row(
+        children: <Widget>[
+          for (final RecentsFilter f in RecentsFilter.values)
+            Padding(
+              padding: const EdgeInsetsDirectional.only(end: 8),
+              child: ChoiceChip(
+                label: Text(f.label),
+                selected: _filter == f,
+                onSelected: (_) => setState(() => _filter = f),
+              ),
+            ),
+        ],
+      ),
+    );
 
     return log.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -49,33 +116,47 @@ class RecentsPage extends ConsumerWidget {
         text: 'Couldn\'t read your call history.\n$e',
       ),
       data: (List<CallLogEntry> entries) {
-        final List<CallLogEntry> shown = missedOnly
-            ? entries
-                  .where((CallLogEntry e) => e.type == CallType.missed)
-                  .toList()
-            : entries;
-        if (shown.isEmpty) {
-          return const _Empty(
-            icon: Icons.history,
-            text: 'No calls yet.\nCalls you make and get show up here.',
-          );
-        }
+        final List<CallLogEntry> shown = filterCalls(
+          entries,
+          directory,
+          query: widget.query,
+          filter: _filter,
+        );
         final List<CallGroup> groups = CallGroup.group(shown);
-        return RefreshIndicator(
-          onRefresh: () => ref.refresh(callLogProvider.future),
-          child: ListView.builder(
-            itemCount: groups.length,
-            itemBuilder: (BuildContext context, int i) => _CallRow(
-              group: groups[i],
-              contact: directory.lookup(groups[i].latest.number),
-              showDay:
-                  i == 0 ||
-                  !CallGroup._sameDay(
-                    groups[i - 1].latest.date,
-                    groups[i].latest.date,
-                  ),
+        return Column(
+          children: <Widget>[
+            chips,
+            Expanded(
+              child: groups.isEmpty
+                  ? _Empty(
+                      icon: widget.query.isEmpty
+                          ? Icons.history
+                          : Icons.search_off,
+                      text: widget.query.isNotEmpty
+                          ? 'No calls match "${widget.query}"'
+                          : (_filter == RecentsFilter.all
+                                ? 'No calls yet.\nCalls you make and get '
+                                      'show up here.'
+                                : 'No ${_filter.label.toLowerCase()} calls'),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: () => ref.refresh(callLogProvider.future),
+                      child: ListView.builder(
+                        itemCount: groups.length,
+                        itemBuilder: (BuildContext context, int i) => _CallRow(
+                          group: groups[i],
+                          contact: directory.lookup(groups[i].latest.number),
+                          showDay:
+                              i == 0 ||
+                              !CallGroup._sameDay(
+                                groups[i - 1].latest.date,
+                                groups[i].latest.date,
+                              ),
+                        ),
+                      ),
+                    ),
             ),
-          ),
+          ],
         );
       },
     );
@@ -100,15 +181,7 @@ class _CallRow extends ConsumerWidget {
             ? call.cachedName!
             : (number.isEmpty ? 'Private number' : number));
     final bool missed = call.type == CallType.missed;
-    final (IconData icon, String label) = switch (call.type) {
-      CallType.incoming => (Icons.call_received, 'Incoming'),
-      CallType.outgoing => (Icons.call_made, 'Outgoing'),
-      CallType.missed => (Icons.call_missed, 'Missed'),
-      CallType.rejected => (Icons.call_end, 'Declined'),
-      CallType.blocked => (Icons.block, 'Blocked'),
-      CallType.voicemail => (Icons.voicemail, 'Voicemail'),
-      CallType.other => (Icons.call, 'Call'),
-    };
+    final (IconData icon, String label) = callTypeIcon(call.type);
     final String count = group.calls.length > 1
         ? ' (${group.calls.length})'
         : '';
@@ -166,11 +239,10 @@ class _CallRow extends ConsumerWidget {
                 ),
           onTap: number.isEmpty
               ? null
-              : () => showNumberSheet(
-                  context,
-                  ref,
-                  number: number,
-                  contact: contact,
+              : () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => CallDetailsPage(number: number),
+                  ),
                 ),
           onLongPress: () => _delete(context, ref),
         ),
@@ -203,6 +275,10 @@ class _CallRow extends ConsumerWidget {
     await ref.read(telecomProvider).deleteCalls(<int>[
       for (final CallLogEntry c in group.calls) c.id,
     ]);
+    await ref
+        .read(historyBackupProvider)
+        .forget(group.calls)
+        .catchError((_) {});
     ref.invalidate(callLogProvider);
   }
 }

@@ -51,6 +51,8 @@ object CallEngine {
             when (call.method) {
                 "answer" -> CallManager.answer(id)
                 "reject" -> CallManager.reject(id)
+                "rejectWithMessage" -> CallManager.rejectWithMessage(id, call.argument<String>("message") ?: "")
+                "endAndAnswer" -> CallManager.endAndAnswer(id)
                 "hangUp" -> CallManager.hangUp(id)
                 "hold" -> CallManager.hold(id, call.argument<Boolean>("on") ?: true)
                 "swap" -> CallManager.swap()
