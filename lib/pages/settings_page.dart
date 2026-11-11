@@ -6,6 +6,7 @@ import 'package:zerotrust_phone/app/history_retention.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
 import 'package:zerotrust_phone/pages/blocked_numbers_page.dart';
+import 'package:zerotrust_phone/pages/call_accessibility_page.dart';
 import 'package:zerotrust_phone/pages/call_protection_page.dart';
 import 'package:zerotrust_phone/pages/history_backup_page.dart';
 import 'package:zerotrust_phone/pages/quick_replies_page.dart';
@@ -93,6 +94,12 @@ class PhoneSettingsPage extends ConsumerWidget {
           title: Text(context.l10n.speedDial),
           subtitle: Text(context.l10n.speedDialBody),
           onTap: () => push(const SpeedDialPage()),
+        ),
+        ListTile(
+          leading: const Icon(Icons.rtt),
+          title: Text(context.l10n.callAccessibility),
+          subtitle: Text(context.l10n.callAccessibilityBody),
+          onTap: () => push(const CallAccessibilityPage()),
         ),
         ListTile(
           leading: const Icon(Icons.voicemail),

@@ -14,6 +14,19 @@ class PhoneCall {
     this.canMerge = false,
     this.canSwap = false,
     this.accounts = const <String>[],
+    this.rttActive = false,
+    this.canRtt = false,
+    this.rttRequest = false,
+    this.canVideo = false,
+    this.videoState = VideoState.audioOnly,
+    this.displayTexture,
+    this.previewTexture,
+    this.peerSize,
+    this.previewSize,
+    this.videoRequest = false,
+    this.backCamera = false,
+    this.cameraAllowed = false,
+    this.notice,
   });
 
   factory PhoneCall.fromMap(Map<Object?, Object?> m) => PhoneCall(
@@ -35,7 +48,26 @@ class PhoneCall {
       for (final Object? a in (m['accounts'] as List<Object?>?) ?? <Object?>[])
         if (a is String) a,
     ],
+    rttActive: m['rttActive'] == true,
+    canRtt: m['canRtt'] == true,
+    rttRequest: m['rttRequest'] == true,
+    canVideo: m['canVideo'] == true,
+    videoState: (m['videoState'] as num?)?.toInt() ?? VideoState.audioOnly,
+    displayTexture: (m['displayTexture'] as num?)?.toInt(),
+    previewTexture: (m['previewTexture'] as num?)?.toInt(),
+    peerSize: _size(m['peerWidth'], m['peerHeight']),
+    previewSize: _size(m['previewWidth'], m['previewHeight']),
+    videoRequest: m['videoRequest'] == true,
+    backCamera: m['backCamera'] == true,
+    cameraAllowed: m['cameraAllowed'] == true,
+    notice: m['notice'] as String?,
   );
+
+  static (int, int)? _size(Object? w, Object? h) {
+    final int width = (w as num?)?.toInt() ?? 0;
+    final int height = (h as num?)?.toInt() ?? 0;
+    return width > 0 && height > 0 ? (width, height) : null;
+  }
 
   final String id;
   final String number;
@@ -50,6 +82,40 @@ class PhoneCall {
 
   /// SIM names to pick from, in order, while [state] is selectAccount.
   final List<String> accounts;
+
+  /// Real-time text (P12) is on: both sides see each letter as it's typed.
+  final bool rttActive;
+
+  /// The SIM's carrier offers RTT, so it can be turned on in this call.
+  final bool canRtt;
+
+  /// The other person asked to switch to RTT.
+  final bool rttRequest;
+
+  /// The call can be upgraded to a carrier video call.
+  final bool canVideo;
+
+  /// `VideoProfile` state bits ([VideoState]).
+  final int videoState;
+
+  /// Flutter textures the carrier draws into: their video, our camera.
+  final int? displayTexture;
+  final int? previewTexture;
+  final (int, int)? peerSize;
+  final (int, int)? previewSize;
+
+  /// The other person asked to turn video on.
+  final bool videoRequest;
+  final bool backCamera;
+  final bool cameraAllowed;
+
+  /// "rttFailed" or "videoFailed", for a few seconds.
+  final String? notice;
+
+  bool get isVideo => VideoState.isVideo(videoState);
+  bool get sendingVideo =>
+      videoState & VideoState.tx != 0 && videoState & VideoState.paused == 0;
+  bool get receivingVideo => videoState & VideoState.rx != 0;
 
   String get title => isConference
       ? currentL10n.conferenceCall
@@ -82,6 +148,17 @@ enum CallState {
     'disconnected' => disconnected,
     _ => other,
   };
+}
+
+/// `VideoProfile` states.
+abstract final class VideoState {
+  static const int audioOnly = 0;
+  static const int tx = 1;
+  static const int rx = 2;
+  static const int bidirectional = 3;
+  static const int paused = 4;
+
+  static bool isVideo(int state) => state & bidirectional != 0;
 }
 
 /// `CallAudioState` routes.

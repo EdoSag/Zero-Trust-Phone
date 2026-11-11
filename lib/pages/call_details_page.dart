@@ -67,6 +67,12 @@ class CallDetailsPage extends ConsumerWidget {
                 label: Text(context.l10n.call),
                 onPressed: () => placeCall(ref, number),
               ),
+              if (ref.watch(callFeaturesProvider).value?.video ?? false)
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.videocam_outlined),
+                  label: Text(context.l10n.videoCall),
+                  onPressed: () => placeCall(ref, number, video: true),
+                ),
               OutlinedButton.icon(
                 icon: const Icon(Icons.message_outlined),
                 label: Text(context.l10n.message),

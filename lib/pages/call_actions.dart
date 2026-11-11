@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:zerotrust_phone/app/rtt_preference.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
@@ -12,8 +13,14 @@ import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
 
-/// Calls [number], on the contact's own SIM when one is set (P6).
-Future<void> placeCall(WidgetRef ref, String number) {
+/// Calls [number], on the contact's own SIM when one is set (P6), with
+/// real-time text when that's switched on (P12). [video] makes it a
+/// carrier video call.
+Future<void> placeCall(
+  WidgetRef ref,
+  String number, {
+  bool video = false,
+}) async {
   final PhoneContact? contact = ref
       .read(contactDirectoryProvider)
       .lookup(number);
@@ -25,7 +32,17 @@ Future<void> placeCall(WidgetRef ref, String number) {
       if (s.contactId == contact.id) account = s.accountId;
     }
   }
-  return ref.read(telecomProvider).placeCall(number, account: account);
+  final StartWithRtt rtt = ref.read(startWithRttProvider.notifier);
+  await rtt.loaded;
+  final Telecom telecom = ref.read(telecomProvider);
+  // Without the camera the call still goes out, showing only their video.
+  if (video) await telecom.requestCamera();
+  await telecom.placeCall(
+    number,
+    account: account,
+    rtt: ref.read(startWithRttProvider),
+    video: video,
+  );
 }
 
 Future<void> sendMessage(String number) =>
@@ -66,6 +83,20 @@ Future<void> showNumberSheet(
                 Navigator.of(sheet).pop();
                 placeCall(ref, n);
               },
+              // P12: only when the carrier offers video calls.
+              trailing: Consumer(
+                builder: (BuildContext _, WidgetRef inner, Widget? _) =>
+                    inner.watch(callFeaturesProvider).value?.video ?? false
+                    ? IconButton(
+                        tooltip: context.l10n.videoCall,
+                        icon: const Icon(Icons.videocam_outlined),
+                        onPressed: () {
+                          Navigator.of(sheet).pop();
+                          placeCall(ref, n, video: true);
+                        },
+                      )
+                    : const SizedBox.shrink(),
+              ),
             ),
           ListTile(
             leading: const Icon(Icons.message_outlined),

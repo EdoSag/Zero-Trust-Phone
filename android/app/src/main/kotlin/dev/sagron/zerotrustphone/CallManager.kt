@@ -5,6 +5,8 @@ import android.os.Handler
 import android.os.Looper
 import android.telecom.Call
 import android.telecom.CallAudioState
+import android.telecom.InCallService
+import android.telecom.PhoneAccount
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.telecom.VideoProfile
@@ -26,6 +28,15 @@ object CallManager {
     /** SIMs a call may use, while it waits for one to be picked. */
     private val accountChoices = mutableMapOf<Call, List<PhoneAccountHandle>>()
     private val listeners = mutableSetOf<Listener>()
+
+    /** The other person asked to switch to real-time text: Telecom's id. */
+    private val rttRequests = mutableMapOf<Call, Int>()
+
+    /** Whether each call's SIM offers RTT (asked once per call). */
+    private val rttCapable = mutableMapOf<Call, Boolean>()
+
+    /** A short message for the call screen ("rttFailed", "videoFailed"). */
+    private val notices = mutableMapOf<Call, String>()
     private var nextId = 1
     var service: ZtInCallService? = null
     var audioState: CallAudioState? = null
@@ -40,25 +51,50 @@ object CallManager {
     private val callback = object : Call.Callback() {
         override fun onStateChanged(call: Call, state: Int) {
             if (ringing() == null) CallRinger.stop()
+            VideoSessions.sync(service, call)
             notifyChanged()
         }
-        override fun onDetailsChanged(call: Call, details: Call.Details) = notifyChanged()
+        override fun onDetailsChanged(call: Call, details: Call.Details) {
+            VideoSessions.sync(service, call)
+            notifyChanged()
+        }
+        override fun onVideoCallChanged(call: Call, videoCall: InCallService.VideoCall?) {
+            VideoSessions.sync(service, call)
+            notifyChanged()
+        }
+        override fun onRttStatusChanged(call: Call, enabled: Boolean, rttCall: Call.RttCall?) {
+            if (enabled) calls[call]?.let { RttSessions.start(call, it) }
+            notifyChanged()
+        }
+        override fun onRttRequest(call: Call, id: Int) {
+            rttRequests[call] = id
+            notifyChanged()
+        }
+        override fun onRttInitiationFailure(call: Call, reason: Int) = notice(call, "rttFailed")
         override fun onConferenceableCallsChanged(call: Call, conferenceableCalls: MutableList<Call>) =
             notifyChanged()
         override fun onChildrenChanged(call: Call, children: MutableList<Call>) = notifyChanged()
     }
 
     fun add(call: Call) {
-        calls[call] = "c${nextId++}"
+        val id = "c${nextId++}"
+        calls[call] = id
         call.registerCallback(callback)
+        // Calls placed or answered with RTT already have their stream.
+        if (call.isRttActive) RttSessions.start(call, id)
+        VideoSessions.sync(service, call)
         notifyChanged()
     }
 
     fun remove(call: Call) {
         call.unregisterCallback(callback)
         if (ringing() == null || ringing() === call) CallRinger.stop()
-        calls.remove(call)
+        VideoSessions.remove(call)
+        calls.remove(call)?.let { RttSessions.clear(it) }
         accountChoices.remove(call)
+        rttRequests.remove(call)
+        rttCapable.remove(call)
+        notices.remove(call)
         notifyChanged()
     }
 
@@ -114,6 +150,34 @@ object CallManager {
         return SystemContacts.lookupName(context, number)
     }
 
+    /** Shows [message] on [call]'s screen for a few seconds. */
+    fun notice(call: Call, message: String) {
+        notices[call] = message
+        notifyChanged()
+        main.postDelayed({
+            if (notices[call] == message) {
+                notices.remove(call)
+                notifyChanged()
+            }
+        }, 5000)
+    }
+
+    /** RTT works on this call: it's on, or the SIM's carrier offers it. */
+    private fun canRtt(call: Call): Boolean {
+        if (call.details.hasProperty(Call.Details.PROPERTY_RTT)) return true
+        rttCapable[call]?.let { return it }
+        val handle = call.details.accountHandle ?: return false
+        val ctx = service ?: return false
+        val capable = try {
+            ctx.getSystemService(TelecomManager::class.java).getPhoneAccount(handle)
+                ?.hasCapabilities(PhoneAccount.CAPABILITY_RTT) == true
+        } catch (_: SecurityException) {
+            false
+        }
+        rttCapable[call] = capable
+        return capable
+    }
+
     private fun byId(id: String?): Call? = calls.entries.firstOrNull { it.value == id }?.key
 
     fun snapshot(): Map<String, Any?> {
@@ -133,7 +197,7 @@ object CallManager {
         val details = call.details
         val number = details.handle?.schemeSpecificPart ?: ""
         val caps = details.callCapabilities
-        return mapOf(
+        return VideoSessions.describe(call, service) + mapOf(
             "id" to id,
             "number" to number,
             "name" to (if (number.isNotEmpty()) nameFor(number) else null),
@@ -146,6 +210,13 @@ object CallManager {
                 (caps and Call.Details.CAPABILITY_MERGE_CONFERENCE) != 0),
             "canSwap" to ((caps and Call.Details.CAPABILITY_SWAP_CONFERENCE) != 0),
             "disconnectReason" to details.disconnectCause?.label?.toString(),
+            "rttActive" to call.isRttActive,
+            "canRtt" to canRtt(call),
+            "rttRequest" to rttRequests.containsKey(call),
+            // Upgrading needs our camera and the other side's screen.
+            "canVideo" to ((caps and Call.Details.CAPABILITY_SUPPORTS_VT_LOCAL_TX) != 0 &&
+                (caps and Call.Details.CAPABILITY_SUPPORTS_VT_REMOTE_RX) != 0),
+            "notice" to notices[call],
             "accounts" to if (call.stateCompat() == Call.STATE_SELECT_PHONE_ACCOUNT) {
                 accountsFor(call).map { accountLabel(it) }
             } else {
@@ -211,6 +282,74 @@ object CallManager {
     fun answer(id: String?) {
         CallRinger.stop()
         (byId(id) ?: ringing())?.answer(VideoProfile.STATE_AUDIO_ONLY)
+    }
+
+    /** Answers a video call with video; without camera access, only theirs. */
+    fun answerVideo(id: String?) {
+        CallRinger.stop()
+        val call = byId(id) ?: ringing() ?: return
+        val offered = call.details.videoState
+        val camera = service?.checkSelfPermission(android.Manifest.permission.CAMERA) ==
+            android.content.pm.PackageManager.PERMISSION_GRANTED
+        call.answer(
+            when {
+                !VideoProfile.isVideo(offered) -> VideoProfile.STATE_AUDIO_ONLY
+                camera -> offered
+                VideoProfile.isReceptionEnabled(offered) -> VideoProfile.STATE_RX_ENABLED
+                else -> VideoProfile.STATE_AUDIO_ONLY
+            }
+        )
+    }
+
+    // Real-time text (P12).
+
+    fun rttRequest(id: String?) {
+        (byId(id) ?: primary())?.sendRttRequest()
+    }
+
+    fun rttRespond(id: String?, accept: Boolean) {
+        val call = byId(id) ?: primary() ?: return
+        val request = rttRequests.remove(call) ?: return
+        call.respondToRttRequest(request, accept)
+        notifyChanged()
+    }
+
+    fun rttStop(id: String?) {
+        (byId(id) ?: primary())?.stopRtt()
+    }
+
+    fun rttWrite(id: String?, text: String) {
+        val call = byId(id) ?: primary() ?: return
+        if (!RttSessions.write(call, text)) notice(call, "rttFailed")
+    }
+
+    // Video (P12).
+
+    fun videoRequest(id: String?) {
+        (byId(id) ?: primary())?.let { VideoSessions.request(it) }
+    }
+
+    fun videoStop(id: String?) {
+        (byId(id) ?: primary())?.let { VideoSessions.stop(it) }
+    }
+
+    fun videoCamera(id: String?, on: Boolean) {
+        (byId(id) ?: primary())?.let { VideoSessions.setCameraOn(it, on) }
+    }
+
+    fun videoSwitchCamera(id: String?) {
+        val ctx = service ?: return
+        (byId(id) ?: primary())?.let { VideoSessions.switchCamera(ctx, it) }
+    }
+
+    fun videoRespond(id: String?, accept: Boolean) {
+        (byId(id) ?: primary())?.let { VideoSessions.respond(service, it, accept) }
+    }
+
+    /** Camera access arrived: start the preview of a call already in video. */
+    fun cameraGranted() {
+        calls.keys.forEach { VideoSessions.sync(service, it) }
+        notifyChanged()
     }
 
     fun reject(id: String?) {
