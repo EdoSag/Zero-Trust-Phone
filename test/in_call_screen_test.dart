@@ -517,4 +517,49 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('P12: an RTT line survives a call-waiting interruption', (
+    tester,
+  ) async {
+    await pump(tester);
+    Map<Object?, Object?> rttCall(String state) => <Object?, Object?>{
+      'id': 'c1',
+      'number': '111',
+      'state': state,
+      'rttActive': true,
+    };
+    calls.add(
+      CallsSnapshot.fromMap(<Object?, Object?>{
+        'calls': <Object?>[rttCall('active')],
+      }),
+    );
+    await tester.pump();
+    final Finder input = find.byKey(const ValueKey<String>('rtt-input'));
+    await tester.enterText(input, 'Half a sen');
+
+    // A second call rings: the RTT panel goes away for the incoming screen.
+    calls.add(
+      CallsSnapshot.fromMap(<Object?, Object?>{
+        'calls': <Object?>[
+          rttCall('active'),
+          <Object?, Object?>{'id': 'c2', 'number': '222', 'state': 'ringing'},
+        ],
+      }),
+    );
+    await tester.pump();
+    await tester.pump();
+    expect(input, findsNothing);
+
+    // Back to the RTT call: the field shows what they already see.
+    calls.add(
+      CallsSnapshot.fromMap(<Object?, Object?>{
+        'calls': <Object?>[rttCall('active')],
+      }),
+    );
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('Half a sen'), findsOneWidget);
+    await tester.enterText(input, 'Half a sentence');
+    expect(control.done.last, 'rtt c1 tence');
+  });
 }

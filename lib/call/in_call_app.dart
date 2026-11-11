@@ -1052,8 +1052,20 @@ class _RttPanel extends ConsumerStatefulWidget {
 }
 
 class _RttPanelState extends ConsumerState<_RttPanel> {
-  final TextEditingController _draft = TextEditingController();
+  late final TextEditingController _draft = TextEditingController(
+    text: _sentDraft(),
+  );
   final FocusNode _focus = FocusNode();
+
+  /// What the other person already sees of this call's line, so the field
+  /// and their screen stay the same when the panel is rebuilt.
+  String _sentDraft() => ref.read(rttProvider)[widget.call.id]?.draft ?? '';
+
+  @override
+  void didUpdateWidget(_RttPanel old) {
+    super.didUpdateWidget(old);
+    if (old.call.id != widget.call.id) _draft.text = _sentDraft();
+  }
 
   @override
   void dispose() {

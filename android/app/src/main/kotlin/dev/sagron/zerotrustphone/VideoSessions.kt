@@ -49,12 +49,19 @@ object VideoSessions {
         var request: VideoProfile? = null
         var wasVideo = false
 
+        /** The user turned the camera off: only they turn it back on. */
+        var cameraOffByUser = false
+
         val callback = object : InCallService.VideoCall.Callback() {
             override fun onSessionModifyRequestReceived(videoProfile: VideoProfile) {
-                // The other person asks to turn video on (or to change it).
-                if (VideoProfile.isVideo(videoProfile.videoState) &&
-                    !VideoProfile.isVideo(call.details.videoState)
-                ) {
+                // The other person asks to turn video on, or to turn our
+                // camera back on: that needs the user's yes.
+                val asked = videoProfile.videoState
+                val now = call.details.videoState
+                val startsVideo = VideoProfile.isVideo(asked) && !VideoProfile.isVideo(now)
+                val startsCamera = VideoProfile.isTransmissionEnabled(asked) &&
+                    (!VideoProfile.isTransmissionEnabled(now) || cameraOffByUser)
+                if (startsVideo || startsCamera) {
                     request = videoProfile
                     CallManager.notifyChanged()
                 } else {
@@ -130,7 +137,9 @@ object VideoSessions {
             session.display = null
         }
 
-        if (sending && session.cameraId == null && context != null && cameraAllowed(context)) {
+        if (sending && !session.cameraOffByUser && session.cameraId == null &&
+            context != null && cameraAllowed(context)
+        ) {
             val front = cameraFacing(context, front = true)
             val camera = front ?: cameraFacing(context, front = false)
             val t = newTexture()
@@ -144,7 +153,7 @@ object VideoSessions {
             } else {
                 t?.release()
             }
-        } else if (!sending && session.cameraId != null) {
+        } else if ((!sending || session.cameraOffByUser) && session.cameraId != null) {
             stopCamera(session)
         }
 
@@ -156,7 +165,7 @@ object VideoSessions {
             }
         }
         session.wasVideo = isVideo
-        if (isVideo) session.request = null
+        if (!live) session.request = null
     }
 
     fun remove(call: Call) {
@@ -221,19 +230,32 @@ object VideoSessions {
 
     /** Asks the carrier to turn video on ([send] false: only receive). */
     fun request(call: Call, send: Boolean = true) {
+        sessions[call]?.cameraOffByUser = !send
         val vc = call.videoCall ?: return
         vc.sendSessionModifyRequest(
             VideoProfile(if (send) VideoProfile.STATE_BIDIRECTIONAL else VideoProfile.STATE_RX_ENABLED)
         )
     }
 
-    /** Back to a voice call. */
+    /** Back to a voice call. The camera stops now, not when the carrier agrees. */
     fun stop(call: Call) {
+        sessions[call]?.let {
+            it.cameraOffByUser = true
+            if (it.cameraId != null) stopCamera(it)
+        }
         call.videoCall?.sendSessionModifyRequest(VideoProfile(VideoProfile.STATE_AUDIO_ONLY))
+        CallManager.notifyChanged()
     }
 
-    /** Camera off keeps the other person's video coming. */
+    /**
+     * Camera off keeps the other person's video coming. The camera stops
+     * at once and stays off even if the carrier refuses the change.
+     */
     fun setCameraOn(call: Call, on: Boolean) {
+        sessions[call]?.let {
+            it.cameraOffByUser = !on
+            if (!on && it.cameraId != null) stopCamera(it)
+        }
         val state = call.details.videoState
         val receiving = VideoProfile.isReceptionEnabled(state)
         val next = when {
@@ -243,6 +265,7 @@ object VideoSessions {
             else -> VideoProfile.STATE_AUDIO_ONLY
         }
         call.videoCall?.sendSessionModifyRequest(VideoProfile(next))
+        CallManager.notifyChanged()
     }
 
     fun switchCamera(context: Context, call: Call) {
@@ -263,8 +286,14 @@ object VideoSessions {
         val s = sessions[call] ?: return
         val asked = s.request ?: return
         s.request = null
+        if (accept) s.cameraOffByUser = false
+        val keep = call.details.videoState
         val profile = when {
-            !accept -> VideoProfile(VideoProfile.STATE_AUDIO_ONLY)
+            // Declining keeps the call as it is (their video, our camera off).
+            !accept -> VideoProfile(
+                if (VideoProfile.isVideo(keep)) keep and VideoProfile.STATE_TX_ENABLED.inv()
+                else VideoProfile.STATE_AUDIO_ONLY
+            )
             context != null && cameraAllowed(context) -> asked
             // No camera permission: watch their video without sending ours.
             else -> VideoProfile(VideoProfile.STATE_RX_ENABLED)

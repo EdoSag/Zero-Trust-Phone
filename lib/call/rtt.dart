@@ -22,6 +22,9 @@ class RttTranscript {
   /// What the other person already sees of the line being typed here.
   String _sent = '';
 
+  /// The line being typed here, so a rebuilt text field can show it again.
+  String get draft => _sent;
+
   /// The other person's line being typed, if any.
   RttMessage? get _open {
     for (final RttMessage m in messages.reversed) {
