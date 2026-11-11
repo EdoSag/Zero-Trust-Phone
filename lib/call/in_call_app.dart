@@ -216,6 +216,7 @@ class _InCallScreenState extends ConsumerState<InCallScreen> {
               call: call,
               control: _control,
               onCamera: () => _turnOnCamera(call),
+              onAcceptVideo: () => _acceptVideo(call),
             )
           : SafeArea(
               child: Column(
@@ -1203,12 +1204,14 @@ class _VideoCallView extends StatelessWidget {
     required this.call,
     required this.control,
     required this.onCamera,
+    required this.onAcceptVideo,
   });
 
   final CallsSnapshot snapshot;
   final PhoneCall call;
   final CallControl control;
   final VoidCallback onCamera;
+  final VoidCallback onAcceptVideo;
 
   @override
   Widget build(BuildContext context) {
@@ -1261,6 +1264,21 @@ class _VideoCallView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
+                    // They ask to turn our camera on while we only watch.
+                    if (call.videoRequest)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: _RequestBanner(
+                            icon: Icons.videocam_outlined,
+                            text: l.videoRequestBody,
+                            onAccept: onAcceptVideo,
+                            onDecline: () =>
+                                control.videoRespond(call.id, false),
+                          ),
+                        ),
+                      ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[

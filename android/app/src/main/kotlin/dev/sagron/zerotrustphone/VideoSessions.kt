@@ -222,6 +222,7 @@ object VideoSessions {
             "previewHeight" to (s?.previewHeight ?: 0),
             "videoRequest" to (s?.request != null),
             "backCamera" to (s?.cameraId != null && s.backCamera),
+            "cameraOff" to (s?.cameraOffByUser == true),
             "cameraAllowed" to (context != null && cameraAllowed(context)),
         )
     }
