@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
@@ -8,6 +9,7 @@ import 'package:zerotrust_phone/services/history_backup.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/util/phone_numbers.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// Back-to-back calls with one number, shown as one row.
 class CallGroup {
@@ -36,14 +38,29 @@ class CallGroup {
 
 /// Which calls Recents shows (P4).
 enum RecentsFilter {
-  all('All'),
-  missed('Missed'),
-  incoming('Incoming'),
-  outgoing('Outgoing'),
-  blocked('Blocked');
+  all,
+  missed,
+  incoming,
+  outgoing,
+  blocked;
 
-  const RecentsFilter(this.label);
-  final String label;
+  /// The chip's name in the app's language.
+  String label(AppL10n l) => switch (this) {
+    all => l.filterAll,
+    missed => l.missed,
+    incoming => l.incoming,
+    outgoing => l.outgoing,
+    blocked => l.blocked,
+  };
+
+  /// What an empty list says under this filter.
+  String empty(AppL10n l) => switch (this) {
+    all => l.noCallsYet,
+    missed => l.noMissedCalls,
+    incoming => l.noIncomingCalls,
+    outgoing => l.noOutgoingCalls,
+    blocked => l.noBlockedCalls,
+  };
 
   bool accepts(CallLogEntry e) => switch (this) {
     RecentsFilter.all => true,
@@ -100,7 +117,7 @@ class _RecentsPageState extends ConsumerState<RecentsPage> {
             Padding(
               padding: const EdgeInsetsDirectional.only(end: 8),
               child: ChoiceChip(
-                label: Text(f.label),
+                label: Text(f.label(context.l10n)),
                 selected: _filter == f,
                 onSelected: (_) => setState(() => _filter = f),
               ),
@@ -113,7 +130,7 @@ class _RecentsPageState extends ConsumerState<RecentsPage> {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (Object e, _) => _Empty(
         icon: Icons.history,
-        text: 'Couldn\'t read your call history.\n$e',
+        text: context.l10n.couldntReadHistory('$e'),
       ),
       data: (List<CallLogEntry> entries) {
         final List<CallLogEntry> shown = filterCalls(
@@ -133,11 +150,8 @@ class _RecentsPageState extends ConsumerState<RecentsPage> {
                           ? Icons.history
                           : Icons.search_off,
                       text: widget.query.isNotEmpty
-                          ? 'No calls match "${widget.query}"'
-                          : (_filter == RecentsFilter.all
-                                ? 'No calls yet.\nCalls you make and get '
-                                      'show up here.'
-                                : 'No ${_filter.label.toLowerCase()} calls'),
+                          ? context.l10n.noCallsMatch(widget.query)
+                          : _filter.empty(context.l10n),
                     )
                   : RefreshIndicator(
                       onRefresh: () => ref.refresh(callLogProvider.future),
@@ -179,7 +193,7 @@ class _CallRow extends ConsumerWidget {
         contact?.name ??
         (call.cachedName?.isNotEmpty == true
             ? call.cachedName!
-            : (number.isEmpty ? 'Private number' : number));
+            : (number.isEmpty ? context.l10n.privateNumber : ltr(number)));
     final bool missed = call.type == CallType.missed;
     final (IconData icon, String label) = callTypeIcon(call.type);
     final String count = group.calls.length > 1
@@ -223,7 +237,7 @@ class _CallRow extends ConsumerWidget {
               Flexible(
                 child: Text(
                   contact != null || call.cachedName != null
-                      ? '$number · $when'
+                      ? '${ltr(number)} · $when'
                       : when,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -233,7 +247,7 @@ class _CallRow extends ConsumerWidget {
           trailing: number.isEmpty
               ? null
               : IconButton(
-                  tooltip: 'Call $title',
+                  tooltip: context.l10n.callName(title),
                   icon: const Icon(Icons.call_outlined),
                   onPressed: () => placeCall(ref, number),
                 ),
@@ -256,17 +270,17 @@ class _CallRow extends ConsumerWidget {
       builder: (BuildContext d) => AlertDialog(
         title: Text(
           group.calls.length == 1
-              ? 'Delete this call from history?'
-              : 'Delete these ${group.calls.length} calls from history?',
+              ? d.l10n.deleteThisCall
+              : d.l10n.deleteCallsQuestion(group.calls.length),
         ),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(d).pop(false),
-            child: const Text('Cancel'),
+            child: Text(d.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(d).pop(true),
-            child: const Text('Delete'),
+            child: Text(d.l10n.delete),
           ),
         ],
       ),
@@ -287,14 +301,12 @@ String dayLabel(DateTime date, DateTime now) {
   final DateTime d = DateTime(date.year, date.month, date.day);
   final DateTime today = DateTime(now.year, now.month, now.day);
   final int days = today.difference(d).inDays;
-  if (days == 0) return 'Today';
-  if (days == 1) return 'Yesterday';
-  const List<String> months = <String>[
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', //
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-  ];
-  final String base = '${date.day} ${months[date.month - 1]}';
-  return date.year == now.year ? base : '$base ${date.year}';
+  if (days == 0) return currentL10n.today;
+  if (days == 1) return currentL10n.yesterday;
+  // "9 Nov" / "9 בנוב׳", in the app's language (Intl.defaultLocale).
+  return date.year == now.year
+      ? DateFormat('d MMM').format(date)
+      : DateFormat('d MMM y').format(date);
 }
 
 class _Empty extends StatelessWidget {

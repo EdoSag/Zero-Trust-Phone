@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zero_trust_core/zero_trust_core.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
 import 'package:zerotrust_phone/services/history_backup.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// Encrypted call-history backup and restore (P9).
 class HistoryBackupPage extends ConsumerStatefulWidget {
@@ -36,18 +37,16 @@ class _HistoryBackupPageState extends ConsumerState<HistoryBackupPage> {
     final PhoneData data = ref.read(phoneDataProvider);
     final HistoryBackup backup = ref.read(historyBackupProvider);
 
+    final AppL10n l = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('Call history backup')),
+      appBar: AppBar(title: Text(l.callHistoryBackup)),
       body: ListView(
         children: <Widget>[
           if (_busy) const LinearProgressIndicator(),
           SwitchListTile(
             secondary: const Icon(Icons.cloud_sync_outlined),
-            title: const Text('Back up call history'),
-            subtitle: const Text(
-              'End-to-end encrypted in your account, so a new phone can get '
-              'it back. Only you can read it.',
-            ),
+            title: Text(l.backUpCallHistory),
+            subtitle: Text(l.backUpCallHistoryBody),
             value: p.backupHistory,
             onChanged: _busy
                 ? null
@@ -55,44 +54,34 @@ class _HistoryBackupPageState extends ConsumerState<HistoryBackupPage> {
                     await data.saveProtection(p.copyWith(backupHistory: on));
                     if (on) {
                       final int n = await backup.backUp();
-                      return 'Backed up $n ${n == 1 ? 'call' : 'calls'}';
+                      return l.backedUpCalls(n);
                     }
                     await backup.deleteAll();
-                    return 'Backup turned off and deleted';
+                    return l.backupDeleted;
                   }),
           ),
           ListTile(
             enabled: p.backupHistory && !_busy,
             leading: const Icon(Icons.backup_outlined),
-            title: const Text('Back up now'),
+            title: Text(l.backUpNow),
             onTap: () => _run(() async {
               final int n = await backup.backUp();
-              return n == 0
-                  ? 'Already up to date'
-                  : 'Backed up $n ${n == 1 ? 'call' : 'calls'}';
+              return n == 0 ? l.alreadyUpToDate : l.backedUpCalls(n);
             }),
           ),
           ListTile(
             enabled: !_busy,
             leading: const Icon(Icons.restore),
-            title: const Text('Restore to this phone'),
-            subtitle: const Text(
-              'Adds backed-up calls missing from this phone\'s history',
-            ),
+            title: Text(l.restoreToPhone),
+            subtitle: Text(l.restoreToPhoneBody),
             onTap: () => _run(() async {
               final int n = await backup.restore();
-              return n == 0
-                  ? 'Nothing to restore'
-                  : 'Restored $n ${n == 1 ? 'call' : 'calls'}';
+              return n == 0 ? l.nothingToRestore : l.restoredCalls(n);
             }),
           ),
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'The backup follows "Keep call history": older calls are '
-              'removed from it too. Deleting a call in Recents also deletes '
-              'its backup.',
-            ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(l.backupExplain),
           ),
         ],
       ),

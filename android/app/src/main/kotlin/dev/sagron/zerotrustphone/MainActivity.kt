@@ -166,6 +166,11 @@ class MainActivity : FlutterFragmentActivity() {
                         CallManager.setVaultNames(call.arguments as? Map<String, String> ?: emptyMap())
                         result.success(null)
                     }
+                    "setNativeStrings" -> {
+                        @Suppress("UNCHECKED_CAST")
+                        NativeStrings.set(this, call.arguments as? Map<String, String> ?: emptyMap())
+                        result.success(null)
+                    }
                     "clearVaultNames" -> {
                         CallManager.clearVaultNames()
                         result.success(null)

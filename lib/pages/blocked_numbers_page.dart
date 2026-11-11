@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zerotrust_phone/pages/call_actions.dart';
 import 'package:zerotrust_phone/pages/recents_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 final blockedNumbersProvider = FutureProvider<List<String>>(
   (ref) => ref.watch(telecomProvider).blockedNumbers(),
@@ -16,30 +17,25 @@ class BlockedNumbersPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<List<String>> blocked = ref.watch(blockedNumbersProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Blocked numbers')),
+      appBar: AppBar(title: Text(context.l10n.blockedNumbers)),
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.add),
-        label: const Text('Add a number'),
+        label: Text(context.l10n.addANumber),
         onPressed: () => _add(context, ref),
       ),
       body: blocked.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (Object e, _) => EmptyState(icon: Icons.block, text: '$e'),
         data: (List<String> numbers) => numbers.isEmpty
-            ? const EmptyState(
-                icon: Icons.block,
-                text:
-                    'No blocked numbers.\nBlock a number from Recents or '
-                    'from here.',
-              )
+            ? EmptyState(icon: Icons.block, text: context.l10n.noBlockedNumbers)
             : ListView(
                 children: <Widget>[
                   for (final String n in numbers)
                     ListTile(
                       leading: const Icon(Icons.block),
-                      title: Text(n),
+                      title: Text(ltr(n)),
                       trailing: TextButton(
-                        child: const Text('Unblock'),
+                        child: Text(context.l10n.unblock),
                         onPressed: () async {
                           await ref.read(telecomProvider).unblock(n);
                           ref.invalidate(blockedNumbersProvider);
@@ -57,21 +53,22 @@ class BlockedNumbersPage extends ConsumerWidget {
     final String? value = await showDialog<String>(
       context: context,
       builder: (BuildContext d) => AlertDialog(
-        title: const Text('Block a number'),
+        title: Text(d.l10n.blockANumber),
         content: TextField(
           controller: number,
           autofocus: true,
           keyboardType: TextInputType.phone,
-          decoration: const InputDecoration(labelText: 'Phone number'),
+          textDirection: TextDirection.ltr,
+          decoration: InputDecoration(labelText: d.l10n.phoneNumber),
         ),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(d).pop(),
-            child: const Text('Cancel'),
+            child: Text(d.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(d).pop(number.text.trim()),
-            child: const Text('Next'),
+            child: Text(d.l10n.next),
           ),
         ],
       ),

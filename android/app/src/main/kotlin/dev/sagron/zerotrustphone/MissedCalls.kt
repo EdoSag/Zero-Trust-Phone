@@ -36,12 +36,13 @@ class MissedCallReceiver : BroadcastReceiver() {
         createChannels(context)
         val number = intent.getStringExtra(TelecomManager.EXTRA_NOTIFICATION_PHONE_NUMBER)
         val name = number?.let { CallManager.nameFor(context, it) }
-        val who = name ?: number?.takeIf { it.isNotBlank() } ?: "Private number"
-        val title = if (count == 1) "Missed call" else "$count missed calls"
+        val who = name ?: number?.takeIf { it.isNotBlank() } ?: NativeStrings.get(context, "nativePrivateNumber", R.string.private_number)
+        val title = if (count == 1) NativeStrings.get(context, "nativeMissedCall", R.string.missed_call)
+            else NativeStrings.format(context, "nativeMissedCalls", R.string.missed_calls, count)
         val builder = NotificationCompat.Builder(context, MISSED_CHANNEL)
             .setSmallIcon(android.R.drawable.stat_notify_missed_call)
             .setContentTitle(title)
-            .setContentText(if (count == 1) who else "Latest from $who")
+            .setContentText(if (count == 1) who else NativeStrings.format(context, "nativeLatestFrom", R.string.latest_from, who))
             .setCategory(NotificationCompat.CATEGORY_MISSED_CALL)
             .setAutoCancel(true)
             .setContentIntent(openRecents(context))
@@ -49,18 +50,18 @@ class MissedCallReceiver : BroadcastReceiver() {
         val clear = intent.getParcelableExtra<PendingIntent>(EXTRA_CLEAR_MISSED_CALLS)
         if (clear != null) builder.setDeleteIntent(clear)
         if (!number.isNullOrBlank()) {
-            builder.addAction(0, "Call back", PendingIntent.getBroadcast(
+            builder.addAction(0, NativeStrings.get(context, "nativeCallBack", R.string.call_back), PendingIntent.getBroadcast(
                 context, 10, Intent(context, CallBackReceiver::class.java)
                     .setAction(ACTION_CALL_BACK).putExtra(EXTRA_NUMBER, number),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             ))
-            builder.addAction(0, "Message", PendingIntent.getActivity(
+            builder.addAction(0, NativeStrings.get(context, "message", R.string.message), PendingIntent.getActivity(
                 context, 11, Intent(Intent.ACTION_SENDTO, Uri.fromParts("smsto", number, null))
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             ))
             if (name == null) {
-                builder.addAction(0, "Add to contacts", PendingIntent.getActivity(
+                builder.addAction(0, NativeStrings.get(context, "addToContacts", R.string.add_to_contacts), PendingIntent.getActivity(
                     context, 12, addContactIntent(number),
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 ))
@@ -85,11 +86,14 @@ class MissedCallReceiver : BroadcastReceiver() {
         )
         val builder = NotificationCompat.Builder(context, VOICEMAIL_CHANNEL)
             .setSmallIcon(android.R.drawable.stat_notify_voicemail)
-            .setContentTitle("New voicemail")
-            .setContentText(if (count > 1) "$count messages. Tap to call voicemail" else "Tap to call voicemail")
+            .setContentTitle(NativeStrings.get(context, "nativeNewVoicemail", R.string.new_voicemail))
+            .setContentText(
+                if (count > 1) NativeStrings.format(context, "nativeVoicemailMessages", R.string.voicemail_messages, count)
+                else NativeStrings.get(context, "nativeTapToCallVoicemail", R.string.tap_to_call_voicemail)
+            )
             .setOngoing(false)
             .setContentIntent(listen)
-            .addAction(0, "Call voicemail", listen)
+            .addAction(0, NativeStrings.get(context, "nativeCallVoicemail", R.string.call_voicemail), listen)
         notify(context, VOICEMAIL_ID, builder.build())
     }
 
@@ -106,11 +110,11 @@ class MissedCallReceiver : BroadcastReceiver() {
         fun createChannels(context: Context) {
             val nm = context.getSystemService(NotificationManager::class.java)
             nm.createNotificationChannel(
-                NotificationChannel(MISSED_CHANNEL, "Missed calls", NotificationManager.IMPORTANCE_DEFAULT)
+                NotificationChannel(MISSED_CHANNEL, NativeStrings.get(context, "nativeMissedChannel", R.string.missed_calls_channel), NotificationManager.IMPORTANCE_DEFAULT)
                     .apply { lockscreenVisibility = Notification.VISIBILITY_PRIVATE }
             )
             nm.createNotificationChannel(
-                NotificationChannel(VOICEMAIL_CHANNEL, "Voicemail", NotificationManager.IMPORTANCE_DEFAULT)
+                NotificationChannel(VOICEMAIL_CHANNEL, NativeStrings.get(context, "voicemail", R.string.voicemail), NotificationManager.IMPORTANCE_DEFAULT)
             )
         }
 

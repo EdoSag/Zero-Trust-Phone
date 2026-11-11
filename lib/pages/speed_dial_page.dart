@@ -4,6 +4,7 @@ import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// Picks a contact (and number) for speed dial [digit], and saves it.
 Future<void> assignSpeedDial(
@@ -36,7 +37,7 @@ Future<void> assignSpeedDial(
   } on Object {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unlock ZT Phone to change speed dial')),
+        SnackBar(content: Text(context.l10n.unlockToChangeSpeedDial)),
       );
     }
   }
@@ -51,13 +52,13 @@ class SpeedDialPage extends ConsumerWidget {
     final List<SpeedDial> dials =
         ref.watch(speedDialsProvider).value ?? const <SpeedDial>[];
     return Scaffold(
-      appBar: AppBar(title: const Text('Speed dial')),
+      appBar: AppBar(title: Text(context.l10n.speedDial)),
       body: ListView(
         children: <Widget>[
-          const ListTile(
-            leading: CircleAvatar(child: Text('1')),
-            title: Text('Voicemail'),
-            subtitle: Text('Hold 1 on the dialpad'),
+          ListTile(
+            leading: const CircleAvatar(child: Text('1')),
+            title: Text(context.l10n.voicemail),
+            subtitle: Text(context.l10n.hold1),
           ),
           for (int d = 2; d <= 9; d++)
             Builder(
@@ -67,12 +68,12 @@ class SpeedDialPage extends ConsumerWidget {
                     .firstOrNull;
                 return ListTile(
                   leading: CircleAvatar(child: Text('$d')),
-                  title: Text(dial?.name ?? 'Not set'),
-                  subtitle: dial == null ? null : Text(dial.number),
+                  title: Text(dial?.name ?? context.l10n.notSet),
+                  subtitle: dial == null ? null : Text(ltr(dial.number)),
                   trailing: dial == null
                       ? null
                       : IconButton(
-                          tooltip: 'Remove',
+                          tooltip: context.l10n.remove,
                           icon: const Icon(Icons.close),
                           onPressed: () =>
                               ref.read(phoneDataProvider).clearSpeedDial(d),
@@ -81,12 +82,9 @@ class SpeedDialPage extends ConsumerWidget {
                 );
               },
             ),
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'Hold a number on the dialpad to call. Saved '
-              'encrypted in your account.',
-            ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(context.l10n.speedDialExplain),
           ),
         ],
       ),
@@ -116,14 +114,14 @@ class _ContactPickerState extends State<_ContactPicker> {
         title: TextField(
           autofocus: true,
           decoration: InputDecoration(
-            hintText: 'Speed dial ${widget.digit}: search contacts',
+            hintText: context.l10n.speedDialSearch(widget.digit),
             border: InputBorder.none,
           ),
           onChanged: (String v) => setState(() => _query = v),
         ),
       ),
       body: shown.isEmpty
-          ? const Center(child: Text('No contacts with a phone number'))
+          ? Center(child: Text(context.l10n.noContactsWithNumber))
           : ListView(
               children: <Widget>[
                 for (final PhoneContact c in shown)
@@ -131,7 +129,7 @@ class _ContactPickerState extends State<_ContactPicker> {
                     ListTile(
                       leading: ContactAvatar(label: c.name),
                       title: Text(c.name),
-                      subtitle: Text(p),
+                      subtitle: Text(ltr(p)),
                       onTap: () => Navigator.of(context).pop((c, p)),
                     ),
               ],

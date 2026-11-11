@@ -1,0 +1,334 @@
+{
+  "@@locale": "en",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "save": "Save",
+  "block": "Block",
+  "call": "Call",
+  "privateNumber": "Private number",
+  "voicemail": "Voicemail",
+  "callName": "Call {name}",
+  "@callName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "retentionForever": "Forever",
+  "retention24h": "24 hours",
+  "retentionDays": "{days} days",
+  "@retentionDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dialpadNoUnlock": "Dialpad, no unlock needed",
+  "conferenceCall": "Conference call",
+  "callEnded": "Call ended",
+  "hide": "Hide",
+  "endCall": "End call",
+  "declineWithMessage": "Decline and send a message",
+  "writeYourOwn": "Write your own…",
+  "send": "Send",
+  "mute": "Mute",
+  "unmute": "Unmute",
+  "carAudio": "Car audio",
+  "phoneAudio": "Phone audio",
+  "speaker": "Speaker",
+  "incomingCall": "Incoming call",
+  "chooseSim": "Choose a SIM",
+  "calling": "Calling…",
+  "onHold": "On hold",
+  "connected": "Connected",
+  "callWithAccount": "Call with {account}",
+  "@callWithAccount": {
+    "placeholders": {
+      "account": {
+        "type": "String"
+      }
+    }
+  },
+  "decline": "Decline",
+  "endAndAnswer": "End & answer",
+  "holdAndAnswer": "Hold & answer",
+  "answer": "Answer",
+  "replyWithMessage": "Reply with a message",
+  "keypad": "Keypad",
+  "audio": "Audio",
+  "resume": "Resume",
+  "hold": "Hold",
+  "merge": "Merge",
+  "addCall": "Add call",
+  "bluetooth": "Bluetooth",
+  "headset": "Headset",
+  "phoneEarpiece": "Phone",
+  "swap": "Swap",
+  "defaultPhoneApp": "Default Phone app",
+  "defaultPhoneAppOn": "ZT Phone handles your calls",
+  "defaultPhoneAppOff": "Another app handles calls. Tap to switch to ZT Phone",
+  "namesFromContacts": "Names from ZT Contacts",
+  "namesFromContactsBody": "{count, plural, =1{1 contact, encrypted on this phone. Edit them in ZT Contacts} other{{count} contacts, encrypted on this phone. Edit them in ZT Contacts}}",
+  "@namesFromContactsBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "keepCallHistory": "Keep call history",
+  "callProtection": "Call protection",
+  "blockedNumbers": "Blocked numbers",
+  "quickReplies": "Quick replies",
+  "quickRepliesBody": "Texts to send when you decline a call",
+  "speedDial": "Speed dial",
+  "speedDialBody": "Hold 2 to 9 on the dialpad",
+  "voicemailBody": "Hold 1 on the dialpad to call it. Tap for your carrier's voicemail settings",
+  "callHistoryBackup": "Call history backup",
+  "backupOn": "On, end-to-end encrypted",
+  "off": "Off",
+  "dndStarred": "Do Not Disturb and starred contacts",
+  "dndStarredBody": "Android lets starred contacts through Do Not Disturb only if it can see them. Turn on \"Show in Phone and Messages\" in ZT Contacts settings for that.",
+  "unknownSilenced": "Unknown callers silenced",
+  "unknownToVoicemail": "Unknown callers to voicemail",
+  "hiddenBlocked": "hidden numbers blocked",
+  "prefixesBlocked": "{count, plural, =1{1 blocked prefix} other{{count} blocked prefixes}}",
+  "@prefixesBlocked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "protectionOff": "Off. Silence unknown callers, block hidden numbers or prefixes",
+  "retentionBody": "Older calls are deleted from this phone's call history, also for other apps.",
+  "addANumber": "Add a number",
+  "noBlockedNumbers": "No blocked numbers.\nBlock a number from Recents or from here.",
+  "unblock": "Unblock",
+  "blockANumber": "Block a number",
+  "phoneNumber": "Phone number",
+  "next": "Next",
+  "sendAMessage": "Send a message",
+  "callHistory": "Call history",
+  "ringtoneVoicemailSim": "Ringtone, voicemail and SIM",
+  "addToContacts": "Add to contacts",
+  "editBeforeCalling": "Edit number before calling",
+  "copyNumber": "Copy number",
+  "blockNumber": "Block number",
+  "blockNumberBody": "Calls from it are silently declined",
+  "setAsPhoneToBlock": "Set ZT Phone as your Phone app to block numbers",
+  "blockNumberQuestion": "Block {number}?",
+  "@blockNumberQuestion": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "blockNumberExplain": "You won't get calls or texts from this number. Android keeps the list, so it also applies in other phone and messaging apps.",
+  "numberBlocked": "{number} blocked",
+  "@numberBlocked": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "reset": "Reset",
+  "add": "Add",
+  "quickRepliesExplain": "Offered when a call comes in. The text goes out through your messaging app, from your number.",
+  "newReply": "New reply",
+  "editReply": "Edit reply",
+  "unlockToChangeSpeedDial": "Unlock ZT Phone to change speed dial",
+  "hold1": "Hold 1 on the dialpad",
+  "notSet": "Not set",
+  "remove": "Remove",
+  "speedDialExplain": "Hold a number on the dialpad to call. Saved encrypted in your account.",
+  "speedDialSearch": "Speed dial {digit}: search contacts",
+  "@speedDialSearch": {
+    "placeholders": {
+      "digit": {
+        "type": "int"
+      }
+    }
+  },
+  "noContactsWithNumber": "No contacts with a phone number",
+  "backUpCallHistory": "Back up call history",
+  "backUpCallHistoryBody": "End-to-end encrypted in your account, so a new phone can get it back. Only you can read it.",
+  "backedUpCalls": "{count, plural, =1{Backed up 1 call} other{Backed up {count} calls}}",
+  "@backedUpCalls": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupDeleted": "Backup turned off and deleted",
+  "backUpNow": "Back up now",
+  "alreadyUpToDate": "Already up to date",
+  "restoreToPhone": "Restore to this phone",
+  "restoreToPhoneBody": "Adds backed-up calls missing from this phone's history",
+  "nothingToRestore": "Nothing to restore",
+  "restoredCalls": "{count, plural, =1{Restored 1 call} other{Restored {count} calls}}",
+  "@restoredCalls": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupExplain": "The backup follows \"Keep call history\": older calls are removed from it too. Deleting a call in Recents also deletes its backup.",
+  "unknownCallersHeader": "Calls from numbers not in your contacts",
+  "blockHidden": "Block hidden numbers",
+  "blockHiddenBody": "Private and unknown caller IDs",
+  "blockedPrefixes": "Blocked prefixes and countries",
+  "blockedPrefixesBody": "Block every number that starts with, for example, +1900 or a whole country such as +44",
+  "addPrefix": "Add prefix",
+  "removePrefix": "Remove {prefix}",
+  "@removePrefix": {
+    "placeholders": {
+      "prefix": {
+        "type": "String"
+      }
+    }
+  },
+  "protectionExplain": "Contacts you block or send to voicemail in ZT Contacts are handled here too. Rules work while ZT Phone is locked, and your contacts always ring unless you send them to voicemail.",
+  "blockStartingWith": "Block numbers starting with",
+  "unknownRing": "Ring as usual",
+  "unknownSilence": "Silence (they still show in Recents)",
+  "unknownVoicemail": "Send to voicemail",
+  "couldntOpenContacts": "Couldn't open your contacts. {reason}",
+  "@couldntOpenContacts": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "noContactsMatch": "No contacts match \"{query}\"",
+  "@noContactsMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "noFavoritesContacts": "No favorites yet.\nStar contacts in ZT Contacts and they show up here.",
+  "contactsComeFrom": "Your contacts come from ZT Contacts, end-to-end encrypted with the same account. Add some there and they show up here.",
+  "getZtContacts": "Get ZT Contacts",
+  "deleteThisHistory": "Delete this history",
+  "message": "Message",
+  "callSettings": "Call settings",
+  "noCallsInHistory": "No calls in this phone's history.",
+  "dayAndTime": "{day}, {time}",
+  "@dayAndTime": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteCallsQuestion": "{count, plural, =1{Delete 1 call from history?} other{Delete {count} calls from history?}}",
+  "@deleteCallsQuestion": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "durationSeconds": "{seconds} sec",
+  "@durationSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "incoming": "Incoming",
+  "outgoing": "Outgoing",
+  "missed": "Missed",
+  "declined": "Declined",
+  "blocked": "Blocked",
+  "noFavoritesFrequent": "No favorites yet.\nStar contacts in ZT Contacts and they show up here, with the people you call most.",
+  "frequent": "Frequent",
+  "searchCalls": "Search calls",
+  "searchContacts": "Search contacts",
+  "clearSearch": "Clear search",
+  "settings": "Settings",
+  "dialpad": "Dialpad",
+  "favorites": "Favorites",
+  "recents": "Recents",
+  "contacts": "Contacts",
+  "callAlertsOff": "Incoming calls can't show on the lock screen or as a notification. Allow call notifications for ZT Phone.",
+  "allow": "Allow",
+  "makeDefault": "Make ZT Phone your Phone app to answer calls here, see your call history and block numbers.",
+  "setAsDefault": "Set as default",
+  "ringtone": "Ringtone",
+  "phoneRingtone": "The phone's ringtone",
+  "custom": "Custom",
+  "sendToVoicemail": "Send calls to voicemail",
+  "sendToVoicemailBody": "Their calls don't ring; they can leave a message",
+  "callWith": "Call with",
+  "askOrDefault": "Ask or use the default",
+  "callSettingsExplain": "Saved encrypted in your account, so a new phone gets them too. They work while ZT Phone is locked; the phone keeps only a scrambled form of the numbers for that.",
+  "filterAll": "All",
+  "couldntReadHistory": "Couldn't read your call history.\n{reason}",
+  "@couldntReadHistory": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "noCallsMatch": "No calls match \"{query}\"",
+  "@noCallsMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "noCallsYet": "No calls yet.\nCalls you make and get show up here.",
+  "noMissedCalls": "No missed calls",
+  "noIncomingCalls": "No incoming calls",
+  "noOutgoingCalls": "No outgoing calls",
+  "noBlockedCalls": "No blocked calls",
+  "deleteThisCall": "Delete this call from history?",
+  "noSpeedDialOn": "No speed dial on {digit}",
+  "@noSpeedDialOn": {
+    "placeholders": {
+      "digit": {
+        "type": "String"
+      }
+    }
+  },
+  "pickContactForKey": "Pick a contact to call when you hold this key.",
+  "pickContact": "Pick contact",
+  "keyZeroHold": "0, hold for plus",
+  "keyOneHold": "1, hold for voicemail",
+  "nativePrivateNumber": "Private number",
+  "nativeMissedCall": "Missed call",
+  "nativeMissedCalls": "%d missed calls",
+  "nativeLatestFrom": "Latest from %s",
+  "nativeCallBack": "Call back",
+  "nativeNewVoicemail": "New voicemail",
+  "nativeVoicemailMessages": "%d messages. Tap to call voicemail",
+  "nativeTapToCallVoicemail": "Tap to call voicemail",
+  "nativeCallVoicemail": "Call voicemail",
+  "nativeMissedChannel": "Missed calls",
+  "nativeIncomingChannel": "Incoming calls",
+  "nativeOngoingChannel": "Ongoing calls",
+  "nativeOngoingCall": "Ongoing call",
+  "nativeHangUp": "Hang up",
+  "replyCantTalk": "Can't talk now. I'll call you back.",
+  "replyDriving": "I'm driving. I'll call you soon.",
+  "replyMeeting": "In a meeting. Can you text me?",
+  "replyOnMyWay": "On my way."
+}

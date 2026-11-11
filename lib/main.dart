@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:zero_trust_core/zero_trust_core.dart';
 import 'package:zerotrust_phone/app/app_gate.dart';
+import 'package:zerotrust_phone/app/native_strings.dart';
 import 'package:zerotrust_phone/app/phone_config.dart';
 import 'package:zerotrust_phone/call/in_call_app.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +16,8 @@ Future<void> main() async {
     url: dotenv.env['SUPABASE_URL']!,
     publishableKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
+  // English or Hebrew, as picked in Settings, from the first frame.
+  await ZtLanguageController.preload();
   runApp(
     ProviderScope(
       overrides: [ztAppConfigProvider.overrideWithValue(phoneAppConfig)],
@@ -26,8 +29,14 @@ Future<void> main() async {
 /// The in-call screen's own entry point (see CallActivity.kt). No account,
 /// no vault and no network: a call must show at once, even when locked.
 @pragma('vm:entry-point')
-void callMain() {
+Future<void> callMain() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // The language picked in settings, but never hold up a ringing call for
+  // it: after a moment the screen shows and switches when it's read.
+  await ZtLanguageController.preload().timeout(
+    const Duration(milliseconds: 150),
+    onTimeout: () {},
+  );
   runApp(
     ProviderScope(
       overrides: [ztAppConfigProvider.overrideWithValue(phoneAppConfig)],
@@ -48,19 +57,20 @@ class ZeroTrustPhoneApp extends ConsumerWidget {
         theme: theme,
         darkTheme: darkTheme,
         themeMode: mode,
+        // English (default) or Hebrew, from Settings → Appearance → Language.
+        locale: ref.watch(ztLanguageProvider),
+        supportedLocales: ZtLanguages.supported,
         localizationsDelegates: const [
-          ZtL10n.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
+          AppL10n.delegate,
+          ...ZtLanguages.delegates,
         ],
-        supportedLocales: ZtL10n.supportedLocales,
         home: const AppGate(),
         // Any touch on any screen counts as activity for auto-lock.
         builder: (BuildContext context, Widget? child) => Listener(
           onPointerDown: (_) =>
               ref.read(vaultControllerProvider.notifier).touch(),
-          child: child,
+          // Notifications shown by Android follow the app's language too.
+          child: NativeStringsSync(child: child!),
         ),
       ),
     );

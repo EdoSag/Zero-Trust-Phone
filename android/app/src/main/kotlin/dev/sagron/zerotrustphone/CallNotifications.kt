@@ -23,7 +23,7 @@ object CallNotifications {
     fun createChannels(context: Context) {
         val nm = context.getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(
-            NotificationChannel(INCOMING, "Incoming calls", NotificationManager.IMPORTANCE_HIGH).apply {
+            NotificationChannel(INCOMING, NativeStrings.get(context, "nativeIncomingChannel", R.string.incoming_calls_channel), NotificationManager.IMPORTANCE_HIGH).apply {
                 // Telecom already plays the ringtone and vibrates.
                 setSound(null, null)
                 enableVibration(false)
@@ -31,7 +31,7 @@ object CallNotifications {
             }
         )
         nm.createNotificationChannel(
-            NotificationChannel(ONGOING, "Ongoing calls", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            NotificationChannel(ONGOING, NativeStrings.get(context, "nativeOngoingChannel", R.string.ongoing_calls_channel), NotificationManager.IMPORTANCE_DEFAULT).apply {
                 setSound(null, null)
                 enableVibration(false)
             }
@@ -69,7 +69,7 @@ object CallNotifications {
             return
         }
         val number = call.details.handle?.schemeSpecificPart ?: ""
-        val title = CallManager.nameFor(number) ?: number.ifEmpty { "Private number" }
+        val title = CallManager.nameFor(number) ?: number.ifEmpty { NativeStrings.get(context, "nativePrivateNumber", R.string.private_number) }
         val open = PendingIntent.getActivity(
             context, 0, Intent(context, CallActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
@@ -94,7 +94,7 @@ object CallNotifications {
             val caller = Person.Builder().setName(title).setImportant(true).build()
             // The system's incoming-call card: big Answer and Decline buttons,
             // pinned on top and on the lock screen.
-            builder.setContentText("Incoming call")
+            builder.setContentText(NativeStrings.get(context, "incomingCall", R.string.incoming_call))
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setFullScreenIntent(open, true)
                 .setStyle(
@@ -109,12 +109,12 @@ object CallNotifications {
             builder.setSmallIcon(android.R.drawable.sym_action_call)
                 .setContentText(
                     when (call.stateCompat()) {
-                        Call.STATE_ACTIVE -> "Ongoing call"
-                        Call.STATE_HOLDING -> "On hold"
-                        else -> "Calling…"
+                        Call.STATE_ACTIVE -> NativeStrings.get(context, "nativeOngoingCall", R.string.ongoing_call)
+                        Call.STATE_HOLDING -> NativeStrings.get(context, "onHold", R.string.on_hold)
+                        else -> NativeStrings.get(context, "calling", R.string.calling)
                     }
                 )
-                .addAction(0, "Hang up", CallActionReceiver.intent(context, CallActionReceiver.HANG_UP))
+                .addAction(0, NativeStrings.get(context, "nativeHangUp", R.string.hang_up), CallActionReceiver.intent(context, CallActionReceiver.HANG_UP))
             if (connectedAt > 0) builder.setWhen(connectedAt).setUsesChronometer(true)
         }
         context.getSystemService(NotificationManager::class.java).notify(ID, builder.build())

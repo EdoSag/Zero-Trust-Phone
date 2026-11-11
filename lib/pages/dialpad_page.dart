@@ -9,6 +9,7 @@ import 'package:zerotrust_phone/pages/speed_dial_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/util/phone_numbers.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// The keypad. Typing digits also finds contacts by name (T9) or number.
 class DialpadPage extends ConsumerStatefulWidget {
@@ -85,16 +86,16 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
     final bool? assign = await showDialog<bool>(
       context: context,
       builder: (BuildContext d) => AlertDialog(
-        title: Text('No speed dial on $digit'),
-        content: const Text('Pick a contact to call when you hold this key.'),
+        title: Text(d.l10n.noSpeedDialOn(digit)),
+        content: Text(d.l10n.pickContactForKey),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(d).pop(false),
-            child: const Text('Cancel'),
+            child: Text(d.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(d).pop(true),
-            child: const Text('Pick contact'),
+            child: Text(d.l10n.pickContact),
           ),
         ],
       ),
@@ -149,7 +150,7 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
                       ListTile(
                         leading: ContactAvatar(label: c.name),
                         title: Text(c.name),
-                        subtitle: Text(p),
+                        subtitle: Text(ltr(p)),
                         onTap: () => _call(p),
                       ),
                 ],
@@ -166,6 +167,8 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
                       showCursor: true,
                       autofocus: true,
                       textAlign: TextAlign.center,
+                      // Numbers read left to right in Hebrew too.
+                      textDirection: TextDirection.ltr,
                       style: theme.textTheme.headlineMedium,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
@@ -177,7 +180,7 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
                     GestureDetector(
                       onLongPress: () => setState(() => _number.clear()),
                       child: IconButton(
-                        tooltip: 'Delete',
+                        tooltip: context.l10n.delete,
                         icon: const Icon(Icons.backspace_outlined),
                         onPressed: _backspace,
                       ),
@@ -195,7 +198,7 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
                 shape: const CircleBorder(),
                 backgroundColor: Colors.green.shade600,
                 foregroundColor: Colors.white,
-                tooltip: 'Call',
+                tooltip: context.l10n.call,
                 onPressed: () => _call(_number.text),
                 child: const Icon(Icons.call, size: 32),
               ),
@@ -235,57 +238,63 @@ class DialKeypad extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: GridView.count(
-        crossAxisCount: 3,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        childAspectRatio: 1.6,
-        children: <Widget>[
-          for (final (String digit, String letters) in keys)
-            Semantics(
-              button: true,
-              label: switch (digit) {
-                '0' => '0, hold for plus',
-                '1' when onLongKey != null => '1, hold for voicemail',
-                _ => digit,
-              },
-              excludeSemantics: true,
-              child: InkWell(
-                customBorder: const StadiumBorder(),
-                onTap: () => onKey(digit),
-                onLongPress: digit == '0'
-                    ? () => onKey('+')
-                    : (onLongKey != null && RegExp(r'^[1-9]$').hasMatch(digit)
-                          ? () => onLongKey!(digit)
-                          : null),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      digit,
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        color: foreground,
-                      ),
-                    ),
-                    if (digit == '1' && onLongKey != null)
-                      Icon(
-                        Icons.voicemail,
-                        size: 14,
-                        color: foreground ?? theme.colorScheme.onSurfaceVariant,
-                      )
-                    else
+      // A phone keypad is the same in every language: 1 2 3 left to right.
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: GridView.count(
+          crossAxisCount: 3,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          childAspectRatio: 1.6,
+          children: <Widget>[
+            for (final (String digit, String letters) in keys)
+              Semantics(
+                button: true,
+                label: switch (digit) {
+                  '0' => context.l10n.keyZeroHold,
+                  '1' when onLongKey != null => context.l10n.keyOneHold,
+                  _ => digit,
+                },
+                excludeSemantics: true,
+                child: InkWell(
+                  customBorder: const StadiumBorder(),
+                  onTap: () => onKey(digit),
+                  onLongPress: digit == '0'
+                      ? () => onKey('+')
+                      : (onLongKey != null && RegExp(r'^[1-9]$').hasMatch(digit)
+                            ? () => onLongKey!(digit)
+                            : null),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
                       Text(
-                        letters,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color:
-                              foreground ?? theme.colorScheme.onSurfaceVariant,
+                        digit,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          color: foreground,
                         ),
                       ),
-                  ],
+                      if (digit == '1' && onLongKey != null)
+                        Icon(
+                          Icons.voicemail,
+                          size: 14,
+                          color:
+                              foreground ?? theme.colorScheme.onSurfaceVariant,
+                        )
+                      else
+                        Text(
+                          letters,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color:
+                                foreground ??
+                                theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
