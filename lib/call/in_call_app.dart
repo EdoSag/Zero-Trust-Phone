@@ -8,6 +8,7 @@ import 'package:zerotrust_phone/call/call_state.dart';
 import 'package:zerotrust_phone/pages/dialpad_page.dart';
 import 'package:zerotrust_phone/services/quick_replies.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// Talks to CallManager.kt. Overridable in tests.
 class CallControl {
@@ -59,6 +60,13 @@ class InCallApp extends ConsumerWidget {
     builder: (context, theme, darkTheme, mode) => MaterialApp(
       title: 'ZT Phone',
       debugShowCheckedModeBanner: false,
+      // The language picked in ZT Phone's settings.
+      locale: ref.watch(ztLanguageProvider),
+      supportedLocales: ZtLanguages.supported,
+      localizationsDelegates: const [
+        AppL10n.delegate,
+        ...ZtLanguages.delegates,
+      ],
       theme: theme,
       darkTheme: darkTheme,
       themeMode: mode,
@@ -128,7 +136,7 @@ class _InCallScreenState extends ConsumerState<InCallScreen> {
       backgroundColor: scheme.surfaceContainerLowest,
       body: SafeArea(
         child: call == null
-            ? const Center(child: Text('Call ended'))
+            ? Center(child: Text(context.l10n.callEnded))
             : Column(
                 children: <Widget>[
                   if (snapshot.secondary case final PhoneCall other)
@@ -189,13 +197,13 @@ class _InCallScreenState extends ConsumerState<InCallScreen> {
                             width: 96,
                             child: TextButton(
                               onPressed: () => setState(() => _keypad = false),
-                              child: const Text('Hide'),
+                              child: Text(context.l10n.hide),
                             ),
                           ),
                         _RoundButton(
                           color: Colors.red.shade600,
                           icon: Icons.call_end,
-                          label: 'End call',
+                          label: context.l10n.endCall,
                           onPressed: () => _control.hangUp(call.id),
                         ),
                         if (_keypad) const SizedBox(width: 96),
@@ -255,7 +263,7 @@ class _QuickReplySheetState extends State<_QuickReplySheet> {
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
             child: Text(
-              'Decline and send a message',
+              context.l10n.declineWithMessage,
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
@@ -271,9 +279,9 @@ class _QuickReplySheetState extends State<_QuickReplySheet> {
               controller: _own,
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
-                hintText: 'Write your own…',
+                hintText: context.l10n.writeYourOwn,
                 suffixIcon: IconButton(
-                  tooltip: 'Send',
+                  tooltip: context.l10n.send,
                   icon: const Icon(Icons.send),
                   onPressed: () => Navigator.of(context).pop(_own.text),
                 ),
@@ -309,7 +317,7 @@ class _CarControls extends StatelessWidget {
           Expanded(
             child: _BigButton(
               icon: snapshot.muted ? Icons.mic_off : Icons.mic_none,
-              label: snapshot.muted ? 'Unmute' : 'Mute',
+              label: snapshot.muted ? context.l10n.unmute : context.l10n.mute,
               on: snapshot.muted,
               onPressed: () => control.mute(!snapshot.muted),
             ),
@@ -322,8 +330,8 @@ class _CarControls extends StatelessWidget {
                         ? Icons.bluetooth_audio
                         : Icons.volume_up,
                     label: snapshot.route == AudioRoute.bluetooth
-                        ? 'Car audio'
-                        : 'Phone audio',
+                        ? context.l10n.carAudio
+                        : context.l10n.phoneAudio,
                     on: snapshot.route == AudioRoute.bluetooth,
                     onPressed: () => control.route(
                       snapshot.route == AudioRoute.bluetooth
@@ -333,7 +341,7 @@ class _CarControls extends StatelessWidget {
                   )
                 : _BigButton(
                     icon: Icons.volume_up,
-                    label: 'Speaker',
+                    label: context.l10n.speaker,
                     on: speaker,
                     onPressed: () => control.route(
                       speaker ? AudioRoute.earpiece : AudioRoute.speaker,
@@ -387,13 +395,14 @@ class _CallerHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
+    final AppL10n l = context.l10n;
     final String status = switch (call.state) {
-      CallState.ringing => 'Incoming call',
-      CallState.selectAccount => 'Choose a SIM',
-      CallState.dialing || CallState.connecting => 'Calling…',
-      CallState.holding => 'On hold',
-      CallState.disconnecting || CallState.disconnected => 'Call ended',
-      CallState.active => _elapsed(call.connectedAt),
+      CallState.ringing => l.incomingCall,
+      CallState.selectAccount => l.chooseSim,
+      CallState.dialing || CallState.connecting => l.calling,
+      CallState.holding => l.onHold,
+      CallState.disconnecting || CallState.disconnected => l.callEnded,
+      CallState.active => _elapsed(l, call.connectedAt),
       CallState.other => '',
     };
     return Column(
@@ -409,7 +418,7 @@ class _CallerHeader extends StatelessWidget {
           ),
         ),
         if (call.name != null && call.number.isNotEmpty)
-          Text(call.number, style: text.titleMedium),
+          Text(ltr(call.number), style: text.titleMedium),
         const SizedBox(height: 8),
         Semantics(
           liveRegion: call.state != CallState.active,
@@ -419,8 +428,8 @@ class _CallerHeader extends StatelessWidget {
     );
   }
 
-  static String _elapsed(DateTime? since) {
-    if (since == null) return 'Connected';
+  static String _elapsed(AppL10n l, DateTime? since) {
+    if (since == null) return l.connected;
     final Duration d = DateTime.now().difference(since);
     String two(int n) => n.toString().padLeft(2, '0');
     final int h = d.inHours;
@@ -452,11 +461,11 @@ class _PickSim extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 12),
             child: FilledButton.tonalIcon(
               icon: const Icon(Icons.sim_card_outlined),
-              label: Text('Call with ${call.accounts[i]}'),
+              label: Text(context.l10n.callWithAccount(call.accounts[i])),
               onPressed: () => onPick(i),
             ),
           ),
-        TextButton(onPressed: onCancel, child: const Text('Cancel')),
+        TextButton(onPressed: onCancel, child: Text(context.l10n.cancel)),
       ],
     ),
   );
@@ -488,20 +497,20 @@ class _IncomingActions extends StatelessWidget {
           _RoundButton(
             color: Colors.red.shade600,
             icon: Icons.call_end,
-            label: 'Decline',
+            label: context.l10n.decline,
             onPressed: onDecline,
           ),
           if (waiting)
             _RoundButton(
               color: Colors.orange.shade700,
               icon: Icons.phone_forwarded,
-              label: 'End & answer',
+              label: context.l10n.endAndAnswer,
               onPressed: onEndAndAnswer,
             ),
           _RoundButton(
             color: Colors.green.shade600,
             icon: waiting ? Icons.phone_paused : Icons.call,
-            label: waiting ? 'Hold & answer' : 'Answer',
+            label: waiting ? context.l10n.holdAndAnswer : context.l10n.answer,
             onPressed: onAnswer,
           ),
         ],
@@ -510,7 +519,7 @@ class _IncomingActions extends StatelessWidget {
         const SizedBox(height: 16),
         TextButton.icon(
           icon: const Icon(Icons.message_outlined),
-          label: const Text('Reply with a message'),
+          label: Text(context.l10n.replyWithMessage),
           onPressed: onMessage,
         ),
       ],
@@ -545,18 +554,24 @@ class _Controls extends StatelessWidget {
         children: <Widget>[
           _Toggle(
             icon: snapshot.muted ? Icons.mic_off : Icons.mic_none,
-            label: 'Mute',
+            label: context.l10n.mute,
             on: snapshot.muted,
             onTap: () => control.mute(!snapshot.muted),
           ),
-          _Toggle(icon: Icons.dialpad, label: 'Keypad', onTap: onKeypad),
+          _Toggle(
+            icon: Icons.dialpad,
+            label: context.l10n.keypad,
+            onTap: onKeypad,
+          ),
           _Toggle(
             icon: snapshot.hasBluetooth
                 ? (snapshot.route == AudioRoute.bluetooth
                       ? Icons.bluetooth_audio
                       : (speaker ? Icons.volume_up : Icons.phone_in_talk))
                 : Icons.volume_up,
-            label: snapshot.hasBluetooth ? 'Audio' : 'Speaker',
+            label: snapshot.hasBluetooth
+                ? context.l10n.audio
+                : context.l10n.speaker,
             on: snapshot.hasBluetooth
                 ? snapshot.route != AudioRoute.earpiece
                 : speaker,
@@ -569,20 +584,20 @@ class _Controls extends StatelessWidget {
           if (call.canHold || held)
             _Toggle(
               icon: held ? Icons.play_arrow : Icons.pause,
-              label: held ? 'Resume' : 'Hold',
+              label: held ? context.l10n.resume : context.l10n.hold,
               on: held,
               onTap: () => control.hold(call.id, !held),
             ),
           if (twoCalls && call.canMerge)
             _Toggle(
               icon: Icons.call_merge,
-              label: 'Merge',
+              label: context.l10n.merge,
               onTap: control.merge,
             ),
           if (!twoCalls)
             _Toggle(
               icon: Icons.add_call,
-              label: 'Add call',
+              label: context.l10n.addCall,
               onTap: control.addCall,
             ),
         ],
@@ -593,12 +608,12 @@ class _Controls extends StatelessWidget {
   Future<void> _pickRoute(BuildContext context) async {
     final List<(int, IconData, String)> routes = <(int, IconData, String)>[
       if (snapshot.supportedRoutes & AudioRoute.bluetooth != 0)
-        (AudioRoute.bluetooth, Icons.bluetooth_audio, 'Bluetooth'),
+        (AudioRoute.bluetooth, Icons.bluetooth_audio, context.l10n.bluetooth),
       if (snapshot.supportedRoutes & AudioRoute.wiredHeadset != 0)
-        (AudioRoute.wiredHeadset, Icons.headset, 'Headset')
+        (AudioRoute.wiredHeadset, Icons.headset, context.l10n.headset)
       else if (snapshot.supportedRoutes & AudioRoute.earpiece != 0)
-        (AudioRoute.earpiece, Icons.phone_in_talk, 'Phone'),
-      (AudioRoute.speaker, Icons.volume_up, 'Speaker'),
+        (AudioRoute.earpiece, Icons.phone_in_talk, context.l10n.phoneEarpiece),
+      (AudioRoute.speaker, Icons.volume_up, context.l10n.speaker),
     ];
     final int? picked = await showModalBottomSheet<int>(
       context: context,
@@ -635,8 +650,12 @@ class _OtherCallBar extends StatelessWidget {
     child: ListTile(
       leading: const Icon(Icons.pause_circle_outline),
       title: Text(call.title),
-      subtitle: Text(call.state == CallState.holding ? 'On hold' : 'Calling…'),
-      trailing: TextButton(onPressed: onSwap, child: const Text('Swap')),
+      subtitle: Text(
+        call.state == CallState.holding
+            ? context.l10n.onHold
+            : context.l10n.calling,
+      ),
+      trailing: TextButton(onPressed: onSwap, child: Text(context.l10n.swap)),
     ),
   );
 }

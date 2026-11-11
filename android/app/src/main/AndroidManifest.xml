@@ -21,6 +21,7 @@
     <uses-feature android:name="android.hardware.telephony" android:required="false"/>
 
     <application
+        android:supportsRtl="true"
         android:label="ZT Phone"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">

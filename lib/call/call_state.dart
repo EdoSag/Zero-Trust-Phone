@@ -1,3 +1,5 @@
+import 'package:zerotrust_phone/l10n/l10n.dart';
+
 /// The calls the in-call screen shows, as sent by CallManager.kt.
 class PhoneCall {
   const PhoneCall({
@@ -50,10 +52,10 @@ class PhoneCall {
   final List<String> accounts;
 
   String get title => isConference
-      ? 'Conference call'
+      ? currentL10n.conferenceCall
       : (name?.isNotEmpty == true
             ? name!
-            : (number.isEmpty ? 'Private number' : number));
+            : (number.isEmpty ? currentL10n.privateNumber : ltr(number)));
 }
 
 enum CallState {

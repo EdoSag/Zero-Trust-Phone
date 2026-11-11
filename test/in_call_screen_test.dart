@@ -7,6 +7,7 @@ import 'package:zero_trust_core/zero_trust_core.dart';
 import 'package:zerotrust_phone/app/phone_config.dart';
 import 'package:zerotrust_phone/call/call_state.dart';
 import 'package:zerotrust_phone/call/in_call_app.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 class FakeCallControl extends CallControl {
   final List<String> done = <String>[];
@@ -37,7 +38,10 @@ void main() {
   late StreamController<CallsSnapshot> calls;
   late FakeCallControl control;
 
-  Future<void> pump(WidgetTester tester) async {
+  Future<void> pump(
+    WidgetTester tester, {
+    Locale locale = ZtLanguages.english,
+  }) async {
     calls = StreamController<CallsSnapshot>();
     control = FakeCallControl();
     await tester.pumpWidget(
@@ -50,9 +54,18 @@ void main() {
           callControlProvider.overrideWithValue(control),
           callsProvider.overrideWith((ref) => calls.stream),
         ],
-        child: const MaterialApp(home: InCallScreen()),
+        child: MaterialApp(
+          locale: locale,
+          supportedLocales: ZtLanguages.supported,
+          localizationsDelegates: const [
+            AppL10n.delegate,
+            ...ZtLanguages.delegates,
+          ],
+          home: const InCallScreen(),
+        ),
       ),
     );
+    await tester.pump(); // Loads the strings.
   }
 
   testWidgets('incoming call: answer and decline', (tester) async {
@@ -101,7 +114,7 @@ void main() {
       }),
     );
     await tester.pump();
-    expect(find.text('07700900123'), findsOneWidget);
+    expect(find.text(ltr('07700900123')), findsOneWidget);
     expect(find.text('00:00'), findsOneWidget);
     await tester.tap(find.bySemanticsLabel('Mute'));
     await tester.tap(find.bySemanticsLabel('Speaker'));
@@ -198,5 +211,34 @@ void main() {
     await tester.tap(find.text('Car audio'));
     await tester.tap(find.byTooltip('End call'));
     expect(control.done, <String>['mute true', 'route 8', 'hangUp c1']);
+  });
+
+  testWidgets('Hebrew: the incoming call screen is translated and RTL, the '
+      'number stays left-to-right', (tester) async {
+    await pump(tester, locale: ZtLanguages.hebrew);
+    calls.add(
+      CallsSnapshot.fromMap(<Object?, Object?>{
+        'calls': <Object?>[
+          <Object?, Object?>{
+            'id': 'c1',
+            'number': '+447700900123',
+            'name': 'עדה',
+            'state': 'ringing',
+          },
+        ],
+      }),
+    );
+    await tester.pump();
+    expect(find.text('שיחה נכנסת'), findsOneWidget);
+    expect(find.text(ltr('+447700900123')), findsOneWidget);
+    expect(
+      Directionality.of(tester.element(find.byType(InCallScreen))),
+      TextDirection.rtl,
+    );
+    // Decline comes first in the row, so in Hebrew it is on the right.
+    final Rect decline = tester.getRect(find.byTooltip('דחייה'));
+    final Rect answer = tester.getRect(find.byTooltip('מענה'));
+    expect(decline.left, greaterThan(answer.right));
+    expect(tester.takeException(), isNull);
   });
 }

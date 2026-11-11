@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Used until the app has run once; after that ZT Phone saves these in
+         the language picked in its settings (NativeStrings.kt). -->
+    <string name="private_number">Private number</string>
+    <string name="missed_call">Missed call</string>
+    <string name="missed_calls">%d missed calls</string>
+    <string name="latest_from">Latest from %s</string>
+    <string name="call_back">Call back</string>
+    <string name="message">Message</string>
+    <string name="add_to_contacts">Add to contacts</string>
+    <string name="new_voicemail">New voicemail</string>
+    <string name="voicemail_messages">%d messages. Tap to call voicemail</string>
+    <string name="tap_to_call_voicemail">Tap to call voicemail</string>
+    <string name="call_voicemail">Call voicemail</string>
+    <string name="missed_calls_channel">Missed calls</string>
+    <string name="voicemail">Voicemail</string>
+    <string name="incoming_calls_channel">Incoming calls</string>
+    <string name="ongoing_calls_channel">Ongoing calls</string>
+    <string name="incoming_call">Incoming call</string>
+    <string name="ongoing_call">Ongoing call</string>
+    <string name="on_hold">On hold</string>
+    <string name="calling">Calling…</string>
+    <string name="hang_up">Hang up</string>
+</resources>

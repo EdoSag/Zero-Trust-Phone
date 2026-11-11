@@ -7,6 +7,7 @@ import 'package:zerotrust_phone/pages/recents_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/util/phone_numbers.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// Starred contacts, then the people you call most (P8).
 class FavoritesPage extends ConsumerWidget {
@@ -52,11 +53,9 @@ class FavoritesPage extends ConsumerWidget {
       ref.watch(contactDirectoryProvider),
     );
     if (favorites.isEmpty && often.isEmpty) {
-      return const EmptyState(
+      return EmptyState(
         icon: Icons.star_outline,
-        text:
-            'No favorites yet.\nStar contacts in ZT Contacts and they show '
-            'up here, with the people you call most.',
+        text: context.l10n.noFavoritesFrequent,
       );
     }
     final ThemeData theme = Theme.of(context);
@@ -84,7 +83,7 @@ class FavoritesPage extends ConsumerWidget {
                   ),
                   child: Semantics(
                     button: true,
-                    label: 'Call ${c.name}',
+                    label: context.l10n.callName(c.name),
                     excludeSemantics: true,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -111,7 +110,7 @@ class FavoritesPage extends ConsumerWidget {
               child: Semantics(
                 header: true,
                 child: Text(
-                  'Frequent',
+                  context.l10n.frequent,
                   style: theme.textTheme.labelLarge?.copyWith(
                     color: theme.colorScheme.primary,
                   ),
@@ -123,13 +122,13 @@ class FavoritesPage extends ConsumerWidget {
             itemCount: often.length,
             itemBuilder: (BuildContext context, int i) {
               final (String number, PhoneContact? c) = often[i];
-              final String title = c?.name ?? number;
+              final String title = c?.name ?? ltr(number);
               return ListTile(
                 leading: ContactAvatar(label: c?.name ?? ''),
                 title: Text(title),
-                subtitle: c == null ? null : Text(number),
+                subtitle: c == null ? null : Text(ltr(number)),
                 trailing: IconButton(
-                  tooltip: 'Call $title',
+                  tooltip: context.l10n.callName(title),
                   icon: const Icon(Icons.call_outlined),
                   onPressed: () => placeCall(ref, number),
                 ),

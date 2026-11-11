@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 final phoneAccountsProvider = FutureProvider<List<PhoneAccount>>(
   (ref) => ref.watch(telecomProvider).phoneAccounts(),
@@ -33,11 +34,11 @@ class ContactCallSettingsPage extends ConsumerWidget {
         children: <Widget>[
           ListTile(
             leading: const Icon(Icons.music_note_outlined),
-            title: const Text('Ringtone'),
+            title: Text(context.l10n.ringtone),
             subtitle: Text(
               settings.ringtone == null
-                  ? 'The phone\'s ringtone'
-                  : (settings.ringtoneTitle ?? 'Custom'),
+                  ? context.l10n.phoneRingtone
+                  : (settings.ringtoneTitle ?? context.l10n.custom),
             ),
             onTap: () async {
               final Telecom telecom = ref.read(telecomProvider);
@@ -58,11 +59,8 @@ class ContactCallSettingsPage extends ConsumerWidget {
           ),
           SwitchListTile(
             secondary: const Icon(Icons.voicemail),
-            title: const Text('Send calls to voicemail'),
-            subtitle: const Text(
-              'Their calls don\'t ring; they can leave a '
-              'message',
-            ),
+            title: Text(context.l10n.sendToVoicemail),
+            subtitle: Text(context.l10n.sendToVoicemailBody),
             value: settings.toVoicemail,
             onChanged: (bool on) =>
                 data.saveContactSettings(settings.copyWith(toVoicemail: on)),
@@ -70,17 +68,15 @@ class ContactCallSettingsPage extends ConsumerWidget {
           if (accounts.length > 1)
             ListTile(
               leading: const Icon(Icons.sim_card_outlined),
-              title: const Text('Call with'),
-              subtitle: Text(settings.accountLabel ?? 'Ask or use the default'),
+              title: Text(context.l10n.callWith),
+              subtitle: Text(
+                settings.accountLabel ?? context.l10n.askOrDefault,
+              ),
               onTap: () => _pickSim(context, data, settings, accounts),
             ),
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'Saved encrypted in your account, so a new phone gets them too. '
-              'They work while ZT Phone is locked; the phone keeps only a '
-              'scrambled form of the numbers for that.',
-            ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(context.l10n.callSettingsExplain),
           ),
         ],
       ),
@@ -96,12 +92,12 @@ class ContactCallSettingsPage extends ConsumerWidget {
     final PhoneAccount? picked = await showDialog<PhoneAccount?>(
       context: context,
       builder: (BuildContext d) => SimpleDialog(
-        title: const Text('Call with'),
+        title: Text(d.l10n.callWith),
         children: <Widget>[
           SimpleDialogOption(
             onPressed: () =>
                 Navigator.of(d).pop(const PhoneAccount(id: '', label: '')),
-            child: const Text('Ask or use the default'),
+            child: Text(d.l10n.askOrDefault),
           ),
           for (final PhoneAccount a in accounts)
             SimpleDialogOption(

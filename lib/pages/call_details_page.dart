@@ -9,6 +9,7 @@ import 'package:zerotrust_phone/services/history_backup.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/util/phone_numbers.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// Every call with one number, with its length, and what to do next (P4).
 class CallDetailsPage extends ConsumerWidget {
@@ -36,7 +37,7 @@ class CallDetailsPage extends ConsumerWidget {
         actions: <Widget>[
           if (calls.isNotEmpty)
             IconButton(
-              tooltip: 'Delete this history',
+              tooltip: context.l10n.deleteThisHistory,
               icon: const Icon(Icons.delete_outline),
               onPressed: () => _deleteAll(context, ref, calls),
             ),
@@ -49,12 +50,12 @@ class CallDetailsPage extends ConsumerWidget {
           const SizedBox(height: 12),
           Center(
             child: Text(
-              title,
+              title == number ? ltr(number) : title,
               style: theme.textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
           ),
-          if (title != number) Center(child: Text(number)),
+          if (title != number) Center(child: Text(ltr(number))),
           const SizedBox(height: 16),
           Wrap(
             alignment: WrapAlignment.center,
@@ -63,24 +64,24 @@ class CallDetailsPage extends ConsumerWidget {
             children: <Widget>[
               FilledButton.icon(
                 icon: const Icon(Icons.call),
-                label: const Text('Call'),
+                label: Text(context.l10n.call),
                 onPressed: () => placeCall(ref, number),
               ),
               OutlinedButton.icon(
                 icon: const Icon(Icons.message_outlined),
-                label: const Text('Message'),
+                label: Text(context.l10n.message),
                 onPressed: () => sendMessage(number),
               ),
               if (contact == null)
                 OutlinedButton.icon(
                   icon: const Icon(Icons.person_add_alt_outlined),
-                  label: const Text('Add to contacts'),
+                  label: Text(context.l10n.addToContacts),
                   onPressed: () => ref.read(telecomProvider).addContact(number),
                 )
               else
                 OutlinedButton.icon(
                   icon: const Icon(Icons.tune),
-                  label: const Text('Call settings'),
+                  label: Text(context.l10n.callSettings),
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => ContactCallSettingsPage(contact: contact),
@@ -89,7 +90,7 @@ class CallDetailsPage extends ConsumerWidget {
                 ),
               OutlinedButton.icon(
                 icon: const Icon(Icons.block),
-                label: const Text('Block'),
+                label: Text(context.l10n.block),
                 onPressed: () => confirmBlock(context, ref, number),
               ),
             ],
@@ -97,10 +98,10 @@ class CallDetailsPage extends ConsumerWidget {
           const SizedBox(height: 16),
           const Divider(),
           if (calls.isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(24),
+            Padding(
+              padding: const EdgeInsets.all(24),
               child: Text(
-                'No calls in this phone\'s history.',
+                context.l10n.noCallsInHistory,
                 textAlign: TextAlign.center,
               ),
             ),
@@ -114,8 +115,10 @@ class CallDetailsPage extends ConsumerWidget {
               ),
               title: Text(callTypeIcon(c.type).$2),
               subtitle: Text(
-                '${dayLabel(c.date, DateTime.now())}, '
-                '${TimeOfDay.fromDateTime(c.date).format(context)}',
+                context.l10n.dayAndTime(
+                  dayLabel(c.date, DateTime.now()),
+                  TimeOfDay.fromDateTime(c.date).format(context),
+                ),
               ),
               trailing: c.duration > Duration.zero
                   ? Text(formatDuration(c.duration))
@@ -134,18 +137,15 @@ class CallDetailsPage extends ConsumerWidget {
     final bool? ok = await showDialog<bool>(
       context: context,
       builder: (BuildContext d) => AlertDialog(
-        title: Text(
-          'Delete ${calls.length} '
-          '${calls.length == 1 ? 'call' : 'calls'} from history?',
-        ),
+        title: Text(d.l10n.deleteCallsQuestion(calls.length)),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(d).pop(false),
-            child: const Text('Cancel'),
+            child: Text(d.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(d).pop(true),
-            child: const Text('Delete'),
+            child: Text(d.l10n.delete),
           ),
         ],
       ),
@@ -162,7 +162,7 @@ class CallDetailsPage extends ConsumerWidget {
 
 /// "1:05", "12 sec", "1:02:03".
 String formatDuration(Duration d) {
-  if (d.inSeconds < 60) return '${d.inSeconds} sec';
+  if (d.inSeconds < 60) return currentL10n.durationSeconds(d.inSeconds);
   String two(int n) => n.toString().padLeft(2, '0');
   final String ms = '${d.inMinutes % 60}:${two(d.inSeconds % 60)}';
   return d.inHours > 0
@@ -170,12 +170,15 @@ String formatDuration(Duration d) {
       : ms;
 }
 
-(IconData, String) callTypeIcon(CallType t) => switch (t) {
-  CallType.incoming => (Icons.call_received, 'Incoming'),
-  CallType.outgoing => (Icons.call_made, 'Outgoing'),
-  CallType.missed => (Icons.call_missed, 'Missed'),
-  CallType.rejected => (Icons.call_end, 'Declined'),
-  CallType.blocked => (Icons.block, 'Blocked'),
-  CallType.voicemail => (Icons.voicemail, 'Voicemail'),
-  CallType.other => (Icons.call, 'Call'),
-};
+(IconData, String) callTypeIcon(CallType t) {
+  final AppL10n l = currentL10n;
+  return switch (t) {
+    CallType.incoming => (Icons.call_received, l.incoming),
+    CallType.outgoing => (Icons.call_made, l.outgoing),
+    CallType.missed => (Icons.call_missed, l.missed),
+    CallType.rejected => (Icons.call_end, l.declined),
+    CallType.blocked => (Icons.block, l.blocked),
+    CallType.voicemail => (Icons.voicemail, l.voicemail),
+    CallType.other => (Icons.call, l.call),
+  };
+}

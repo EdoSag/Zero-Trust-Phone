@@ -214,6 +214,11 @@ class Telecom {
 
   Future<void> clearVaultNames() => _call<void>('clearVaultNames');
 
+  /// Notification words in the app's language, for the Android side
+  /// (NativeStrings.kt), which shows them while Flutter isn't running.
+  Future<void> setNativeStrings(Map<String, String> strings) =>
+      _call<void>('setNativeStrings', strings);
+
   /// Whether incoming calls can show their card and open over the lock
   /// screen (notifications and, on Android 14+, full-screen alerts on).
   Future<bool> callAlertsReady() async =>
