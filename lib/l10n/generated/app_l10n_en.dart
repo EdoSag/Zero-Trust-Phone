@@ -685,4 +685,119 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get replyOnMyWay => 'On my way.';
+
+  @override
+  String get accept => 'Accept';
+
+  @override
+  String get rtt => 'RTT';
+
+  @override
+  String get video => 'Video';
+
+  @override
+  String get videoCall => 'Video call';
+
+  @override
+  String get incomingVideoCall => 'Incoming video call';
+
+  @override
+  String get answerVoice => 'Voice';
+
+  @override
+  String get answerVideo => 'Video';
+
+  @override
+  String get rttRequestBody => 'They want to switch to real-time text (RTT).';
+
+  @override
+  String get videoRequestBody => 'They want to switch to video.';
+
+  @override
+  String get rttFailed => 'Real-time text isn\'t available on this call.';
+
+  @override
+  String get videoFailed =>
+      'Video couldn\'t start. Your carrier may not allow it on this call.';
+
+  @override
+  String get rttHint =>
+      'Type to talk. They see each letter as you type it, and their words appear here as they type.';
+
+  @override
+  String get rttTypeHere => 'Type a message';
+
+  @override
+  String get rttSeesTyping => 'Sent as you type';
+
+  @override
+  String get rttYouSaid => 'You';
+
+  @override
+  String get rttTheySaid => 'Them';
+
+  @override
+  String get waitingForVideo => 'Waiting for video';
+
+  @override
+  String get cameraOff => 'Camera off';
+
+  @override
+  String get cameraOn => 'Camera on';
+
+  @override
+  String get switchCamera => 'Flip';
+
+  @override
+  String get voiceOnly => 'Voice only';
+
+  @override
+  String get callAccessibility => 'Accessibility and video';
+
+  @override
+  String get callAccessibilityBody =>
+      'Real-time text (RTT), TTY and video calls';
+
+  @override
+  String get startWithRtt => 'Start calls with real-time text';
+
+  @override
+  String get startWithRttBody =>
+      'Type and read during calls, with or instead of talking. The other person sees each letter as you type. You can also turn on RTT during any call that supports it.';
+
+  @override
+  String get rttAvailable => 'Your carrier offers RTT on this phone';
+
+  @override
+  String get rttNotAvailable => 'RTT isn\'t offered on this phone right now';
+
+  @override
+  String get rttNotAvailableBody =>
+      'RTT needs your carrier\'s support. On many phones it also needs RTT switched on in Android\'s accessibility settings, under TTY and RTT below.';
+
+  @override
+  String get videoCalling => 'Carrier video calls';
+
+  @override
+  String get videoAvailable =>
+      'Available. Look for the video button when you call, or turn video on during a call.';
+
+  @override
+  String get videoNotAvailable =>
+      'Not offered right now. Video calls need your carrier\'s VoLTE and video calling, which you may need to turn on in Android\'s SIM settings.';
+
+  @override
+  String get ttySettings => 'TTY mode and RTT settings';
+
+  @override
+  String get ttySettingsBody =>
+      'Opens your phone\'s built-in call accessibility settings. Android lets only the built-in Phone app change TTY mode.';
+
+  @override
+  String get ttySettingsMissing =>
+      'This phone has no built-in screen for TTY mode, and Android doesn\'t let other apps change it.';
+
+  @override
+  String get callAccessibilityPrivacy =>
+      'Real-time text and video go over your carrier\'s network, straight to the other person. ZT Phone never sends them to its servers or keeps them after the call.';
 }

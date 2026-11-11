@@ -67,6 +67,26 @@ enum CallType {
   };
 }
 
+/// Call features the SIMs offer (P12).
+class CallFeatures {
+  const CallFeatures({
+    this.rtt = false,
+    this.video = false,
+    this.systemSettings = false,
+  });
+
+  /// Real-time text: needs the carrier, and on many phones Android's own
+  /// RTT switch.
+  final bool rtt;
+
+  /// Carrier video calls (ViLTE): needs VoLTE and the carrier's video
+  /// calling turned on.
+  final bool video;
+
+  /// The built-in Phone app has a TTY / RTT settings screen.
+  final bool systemSettings;
+}
+
 /// A SIM or other account calls can go out on.
 class PhoneAccount {
   const PhoneAccount({required this.id, required this.label});
@@ -120,8 +140,40 @@ class Telecom {
   Future<String?> consumeDial() => _call<String>('consumeDial');
 
   /// Calls [number], on the SIM with [account] id when given (P6).
-  Future<void> placeCall(String number, {String? account}) =>
-      _call<void>('placeCall', {'number': number, 'account': account});
+  /// [rtt] starts the call with real-time text, [video] as a carrier
+  /// video call (P12); the carrier drops either if it can't.
+  Future<void> placeCall(
+    String number, {
+    String? account,
+    bool rtt = false,
+    bool video = false,
+  }) => _call<void>('placeCall', {
+    'number': number,
+    'account': account,
+    'rtt': rtt,
+    'video': video,
+  });
+
+  /// What this phone's SIMs offer (P12).
+  Future<CallFeatures> callFeatures() async {
+    final Map<Object?, Object?>? m = await _call<Map<Object?, Object?>>(
+      'callFeatures',
+    );
+    return CallFeatures(
+      rtt: m?['rtt'] == true,
+      video: m?['video'] == true,
+      systemSettings: m?['systemSettings'] == true,
+    );
+  }
+
+  /// Opens the built-in Phone app's TTY and RTT settings. False if the
+  /// phone has none.
+  Future<bool> openCallAccessibilitySettings() async =>
+      await _call<bool>('openCallAccessibilitySettings') ?? false;
+
+  /// Asks for the camera, for video calls. True when allowed.
+  Future<bool> requestCamera() async =>
+      await _call<bool>('requestCamera') ?? false;
 
   /// Calls the SIM's voicemail number (P5).
   Future<void> callVoicemail() => _call<void>('callVoicemail');
@@ -241,6 +293,18 @@ final callAlertsReadyProvider = FutureProvider<bool>((ref) async {
   ref.watch(defaultDialerProvider);
   final Telecom telecom = ref.watch(telecomProvider);
   return !telecom.isSupported || await telecom.callAlertsReady();
+});
+
+/// What the SIMs offer: RTT, carrier video calls. Refresh with
+/// `ref.invalidate`.
+final callFeaturesProvider = FutureProvider<CallFeatures>((ref) async {
+  final Telecom telecom = ref.watch(telecomProvider);
+  if (!telecom.isSupported) return const CallFeatures();
+  try {
+    return await telecom.callFeatures();
+  } on PlatformException {
+    return const CallFeatures();
+  }
 });
 
 /// The call history, newest first. Refresh with `ref.invalidate`.

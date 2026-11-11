@@ -686,4 +686,118 @@ class AppL10nHe extends AppL10n {
 
   @override
   String get replyOnMyWay => 'בדרך.';
+
+  @override
+  String get accept => 'אישור';
+
+  @override
+  String get rtt => 'RTT';
+
+  @override
+  String get video => 'וידאו';
+
+  @override
+  String get videoCall => 'שיחת וידאו';
+
+  @override
+  String get incomingVideoCall => 'שיחת וידאו נכנסת';
+
+  @override
+  String get answerVoice => 'קולית';
+
+  @override
+  String get answerVideo => 'וידאו';
+
+  @override
+  String get rttRequestBody => 'הצד השני רוצה לעבור לטקסט בזמן אמת (RTT).';
+
+  @override
+  String get videoRequestBody => 'הצד השני רוצה לעבור לווידאו.';
+
+  @override
+  String get rttFailed => 'טקסט בזמן אמת לא זמין בשיחה הזו.';
+
+  @override
+  String get videoFailed =>
+      'לא ניתן להפעיל וידאו. ייתכן שהספק לא מאפשר זאת בשיחה הזו.';
+
+  @override
+  String get rttHint =>
+      'אפשר לדבר בהקלדה. הצד השני רואה כל אות ברגע שמקלידים אותה, והמילים שלו מופיעות כאן תוך כדי הקלדה.';
+
+  @override
+  String get rttTypeHere => 'כתיבת הודעה';
+
+  @override
+  String get rttSeesTyping => 'נשלח תוך כדי הקלדה';
+
+  @override
+  String get rttYouSaid => 'אני';
+
+  @override
+  String get rttTheySaid => 'הצד השני';
+
+  @override
+  String get waitingForVideo => 'ממתין לווידאו';
+
+  @override
+  String get cameraOff => 'כיבוי מצלמה';
+
+  @override
+  String get cameraOn => 'הפעלת מצלמה';
+
+  @override
+  String get switchCamera => 'החלפה';
+
+  @override
+  String get voiceOnly => 'קול בלבד';
+
+  @override
+  String get callAccessibility => 'נגישות ווידאו';
+
+  @override
+  String get callAccessibilityBody => 'טקסט בזמן אמת (RTT), TTY ושיחות וידאו';
+
+  @override
+  String get startWithRtt => 'התחלת שיחות עם טקסט בזמן אמת';
+
+  @override
+  String get startWithRttBody =>
+      'הקלדה וקריאה במהלך שיחות, לצד דיבור או במקומו. הצד השני רואה כל אות ברגע שמקלידים אותה. אפשר גם להפעיל RTT במהלך כל שיחה שתומכת בכך.';
+
+  @override
+  String get rttAvailable => 'הספק שלך מציע RTT בטלפון הזה';
+
+  @override
+  String get rttNotAvailable => 'RTT לא זמין בטלפון הזה כרגע';
+
+  @override
+  String get rttNotAvailableBody =>
+      'RTT דורש תמיכה של הספק. בטלפונים רבים צריך גם להפעיל RTT בהגדרות הנגישות של Android, דרך \"מצב TTY והגדרות RTT\" למטה.';
+
+  @override
+  String get videoCalling => 'שיחות וידאו דרך הספק';
+
+  @override
+  String get videoAvailable =>
+      'זמין. אפשר ללחוץ על כפתור הווידאו בזמן חיוג, או להפעיל וידאו במהלך שיחה.';
+
+  @override
+  String get videoNotAvailable =>
+      'לא זמין כרגע. שיחות וידאו דורשות VoLTE ושיחות וידאו מהספק, ולפעמים צריך להפעיל אותן בהגדרות ה-SIM של Android.';
+
+  @override
+  String get ttySettings => 'מצב TTY והגדרות RTT';
+
+  @override
+  String get ttySettingsBody =>
+      'פתיחת הגדרות הנגישות לשיחות של אפליקציית הטלפון המובנית. Android מאפשר רק לאפליקציית הטלפון המובנית לשנות את מצב TTY.';
+
+  @override
+  String get ttySettingsMissing =>
+      'אין בטלפון הזה מסך מובנה למצב TTY, ו-Android לא מאפשר לאפליקציות אחרות לשנות אותו.';
+
+  @override
+  String get callAccessibilityPrivacy =>
+      'טקסט בזמן אמת ווידאו עוברים ברשת של הספק, ישירות לצד השני. ZT Phone אף פעם לא שולח אותם לשרתים שלו ולא שומר אותם אחרי השיחה.';
 }

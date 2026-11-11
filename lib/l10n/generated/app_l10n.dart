@@ -1266,6 +1266,216 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'On my way.'**
   String get replyOnMyWay;
+
+  /// No description provided for @accept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get accept;
+
+  /// No description provided for @rtt.
+  ///
+  /// In en, this message translates to:
+  /// **'RTT'**
+  String get rtt;
+
+  /// No description provided for @video.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get video;
+
+  /// No description provided for @videoCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Video call'**
+  String get videoCall;
+
+  /// No description provided for @incomingVideoCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Incoming video call'**
+  String get incomingVideoCall;
+
+  /// No description provided for @answerVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice'**
+  String get answerVoice;
+
+  /// No description provided for @answerVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get answerVideo;
+
+  /// No description provided for @rttRequestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'They want to switch to real-time text (RTT).'**
+  String get rttRequestBody;
+
+  /// No description provided for @videoRequestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'They want to switch to video.'**
+  String get videoRequestBody;
+
+  /// No description provided for @rttFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time text isn\'t available on this call.'**
+  String get rttFailed;
+
+  /// No description provided for @videoFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Video couldn\'t start. Your carrier may not allow it on this call.'**
+  String get videoFailed;
+
+  /// No description provided for @rttHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type to talk. They see each letter as you type it, and their words appear here as they type.'**
+  String get rttHint;
+
+  /// No description provided for @rttTypeHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message'**
+  String get rttTypeHere;
+
+  /// No description provided for @rttSeesTyping.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent as you type'**
+  String get rttSeesTyping;
+
+  /// No description provided for @rttYouSaid.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get rttYouSaid;
+
+  /// No description provided for @rttTheySaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Them'**
+  String get rttTheySaid;
+
+  /// No description provided for @waitingForVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for video'**
+  String get waitingForVideo;
+
+  /// No description provided for @cameraOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera off'**
+  String get cameraOff;
+
+  /// No description provided for @cameraOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera on'**
+  String get cameraOn;
+
+  /// No description provided for @switchCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip'**
+  String get switchCamera;
+
+  /// No description provided for @voiceOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice only'**
+  String get voiceOnly;
+
+  /// No description provided for @callAccessibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Accessibility and video'**
+  String get callAccessibility;
+
+  /// No description provided for @callAccessibilityBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time text (RTT), TTY and video calls'**
+  String get callAccessibilityBody;
+
+  /// No description provided for @startWithRtt.
+  ///
+  /// In en, this message translates to:
+  /// **'Start calls with real-time text'**
+  String get startWithRtt;
+
+  /// No description provided for @startWithRttBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Type and read during calls, with or instead of talking. The other person sees each letter as you type. You can also turn on RTT during any call that supports it.'**
+  String get startWithRttBody;
+
+  /// No description provided for @rttAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Your carrier offers RTT on this phone'**
+  String get rttAvailable;
+
+  /// No description provided for @rttNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'RTT isn\'t offered on this phone right now'**
+  String get rttNotAvailable;
+
+  /// No description provided for @rttNotAvailableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'RTT needs your carrier\'s support. On many phones it also needs RTT switched on in Android\'s accessibility settings, under TTY and RTT below.'**
+  String get rttNotAvailableBody;
+
+  /// No description provided for @videoCalling.
+  ///
+  /// In en, this message translates to:
+  /// **'Carrier video calls'**
+  String get videoCalling;
+
+  /// No description provided for @videoAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available. Look for the video button when you call, or turn video on during a call.'**
+  String get videoAvailable;
+
+  /// No description provided for @videoNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not offered right now. Video calls need your carrier\'s VoLTE and video calling, which you may need to turn on in Android\'s SIM settings.'**
+  String get videoNotAvailable;
+
+  /// No description provided for @ttySettings.
+  ///
+  /// In en, this message translates to:
+  /// **'TTY mode and RTT settings'**
+  String get ttySettings;
+
+  /// No description provided for @ttySettingsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens your phone\'s built-in call accessibility settings. Android lets only the built-in Phone app change TTY mode.'**
+  String get ttySettingsBody;
+
+  /// No description provided for @ttySettingsMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone has no built-in screen for TTY mode, and Android doesn\'t let other apps change it.'**
+  String get ttySettingsMissing;
+
+  /// No description provided for @callAccessibilityPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time text and video go over your carrier\'s network, straight to the other person. ZT Phone never sends them to its servers or keeps them after the call.'**
+  String get callAccessibilityPrivacy;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

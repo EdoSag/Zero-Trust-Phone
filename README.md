@@ -50,6 +50,14 @@ Android only: iOS doesn't let an app replace the Phone app.
   a new phone.
 - **Car mode (P11).** In car mode the call screen shows only big Mute and
   audio buttons; Android Auto shows its own call screen through Telecom.
+- **Real-time text and video calls (P12).** When the carrier offers RTT,
+  the call screen turns into a live chat: each letter goes out as it's
+  typed (`Call.RttCall`), and Settings > Accessibility and video can start
+  every call with RTT. Carrier video calls (ViLTE) draw the other
+  person's video and the camera preview into Flutter textures through
+  `InCallService.VideoCall`. Both go over the carrier's network only;
+  nothing is stored. TTY mode can only be changed by the phone's built-in
+  Phone app, so Settings links to its screen when there is one.
 - No database changes: Phone uses the existing `vault_items` table and
   sign-in. Old and new accounts sign in exactly as in the other apps.
 
@@ -67,7 +75,10 @@ first upload:
    placing/receiving a call, for the review.
 3. **Full-screen intent** (Android 14+): declare "calling app" use for
    `USE_FULL_SCREEN_INTENT` in App content.
-4. **Data safety**: call history and contacts stay on the device or
+4. **Camera**: asked for only when a video call starts (P12). The
+   camera stays with the carrier's video call; no photos or video are
+   saved or uploaded.
+5. **Data safety**: call history and contacts stay on the device or
    end-to-end encrypted; nothing readable reaches the server.
 
 Sideloaded APKs from GitHub Releases need none of this.
