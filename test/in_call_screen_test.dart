@@ -484,6 +484,55 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('P12: a camera the carrier kept "on" can be turned back on, '
+      'and a request to turn it on shows over their video', (tester) async {
+    await pump(tester);
+    calls.add(
+      CallsSnapshot.fromMap(<Object?, Object?>{
+        'calls': <Object?>[
+          <Object?, Object?>{
+            'id': 'c1',
+            'number': '111',
+            'name': 'Ada',
+            'state': 'active',
+            // The carrier refused to stop sending; the camera is off anyway.
+            'videoState': VideoState.bidirectional,
+            'cameraOff': true,
+            'videoRequest': true,
+            'displayTexture': 7,
+            'peerWidth': 480,
+            'peerHeight': 640,
+          },
+        ],
+      }),
+    );
+    await tester.pump();
+    expect(find.byKey(const ValueKey<String>('remote-video')), findsOneWidget);
+    expect(find.byKey(const ValueKey<String>('own-video')), findsNothing);
+    expect(find.bySemanticsLabel('Camera off'), findsNothing);
+    expect(find.bySemanticsLabel('Flip'), findsNothing);
+    // The request sits above the caller's name, inside the screen.
+    final Rect banner = tester.getRect(
+      find.text('They want to switch to video.'),
+    );
+    expect(banner.bottom, lessThan(tester.getRect(find.text('Ada')).top));
+    expect(banner.left, greaterThan(0));
+
+    await tester.tap(find.bySemanticsLabel('Camera on'));
+    await tester.pump();
+    await tester.tap(find.text('Decline'));
+    await tester.tap(find.text('Accept'));
+    await tester.pump();
+    expect(control.done, <String>[
+      'camera',
+      'videoCamera c1 true',
+      'videoRespond c1 false',
+      'camera',
+      'videoRespond c1 true',
+    ]);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('P12 in Hebrew: the RTT chat is translated and mirrored', (
     tester,
   ) async {

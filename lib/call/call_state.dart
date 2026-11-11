@@ -25,6 +25,7 @@ class PhoneCall {
     this.previewSize,
     this.videoRequest = false,
     this.backCamera = false,
+    this.cameraOff = false,
     this.cameraAllowed = false,
     this.notice,
   });
@@ -59,6 +60,7 @@ class PhoneCall {
     previewSize: _size(m['previewWidth'], m['previewHeight']),
     videoRequest: m['videoRequest'] == true,
     backCamera: m['backCamera'] == true,
+    cameraOff: m['cameraOff'] == true,
     cameraAllowed: m['cameraAllowed'] == true,
     notice: m['notice'] as String?,
   );
@@ -107,6 +109,10 @@ class PhoneCall {
   /// The other person asked to turn video on.
   final bool videoRequest;
   final bool backCamera;
+
+  /// The user turned the camera off. It stays off even when the carrier
+  /// refuses the change and the call still counts as sending video.
+  final bool cameraOff;
   final bool cameraAllowed;
 
   /// "rttFailed" or "videoFailed", for a few seconds.
@@ -114,7 +120,9 @@ class PhoneCall {
 
   bool get isVideo => VideoState.isVideo(videoState);
   bool get sendingVideo =>
-      videoState & VideoState.tx != 0 && videoState & VideoState.paused == 0;
+      !cameraOff &&
+      videoState & VideoState.tx != 0 &&
+      videoState & VideoState.paused == 0;
   bool get receivingVideo => videoState & VideoState.rx != 0;
 
   String get title => isConference

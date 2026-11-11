@@ -334,7 +334,15 @@ object CallManager {
     }
 
     fun videoCamera(id: String?, on: Boolean) {
-        (byId(id) ?: primary())?.let { VideoSessions.setCameraOn(it, on) }
+        (byId(id) ?: primary())?.let {
+            VideoSessions.setCameraOn(it, on)
+            if (on) {
+                // The carrier may have kept the call sending video while the
+                // camera was off: then no change arrives to start it again.
+                VideoSessions.sync(service, it)
+                notifyChanged()
+            }
+        }
     }
 
     fun videoSwitchCamera(id: String?) {
@@ -343,7 +351,16 @@ object CallManager {
     }
 
     fun videoRespond(id: String?, accept: Boolean) {
-        (byId(id) ?: primary())?.let { VideoSessions.respond(service, it, accept) }
+        (byId(id) ?: primary())?.let {
+            VideoSessions.respond(service, it, accept)
+            if (accept) {
+                // Accepting turns the camera back on. When the call was
+                // already sending video nothing changes at the carrier, so
+                // start the camera here.
+                VideoSessions.sync(service, it)
+                notifyChanged()
+            }
+        }
     }
 
     /** Camera access arrived: start the preview of a call already in video. */
