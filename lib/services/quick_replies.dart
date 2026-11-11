@@ -11,8 +11,9 @@ class QuickReplies extends AsyncNotifier<List<String>> {
   static const String key = 'quick_replies';
 
   /// The starting replies, in the app's language until the user edits them.
-  static List<String> get defaults {
-    final AppL10n l = currentL10n;
+  static List<String> get defaults => defaultsIn(currentL10n);
+
+  static List<String> defaultsIn(AppL10n l) {
     return <String>[
       l.replyCantTalk,
       l.replyDriving,
@@ -23,6 +24,10 @@ class QuickReplies extends AsyncNotifier<List<String>> {
 
   @override
   Future<List<String>> build() async {
+    // Unedited replies follow the language picked in Settings.
+    final List<String> defaults = defaultsIn(
+      appL10nFor(ref.watch(ztLanguageProvider)),
+    );
     final String? raw = await ref.read(ztPreferencesStoreProvider).read(key);
     if (raw == null) return defaults;
     try {
