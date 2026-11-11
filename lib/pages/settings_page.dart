@@ -6,11 +6,13 @@ import 'package:zerotrust_phone/app/history_retention.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
 import 'package:zerotrust_phone/pages/blocked_numbers_page.dart';
+import 'package:zerotrust_phone/pages/call_accessibility_page.dart';
 import 'package:zerotrust_phone/pages/call_protection_page.dart';
 import 'package:zerotrust_phone/pages/history_backup_page.dart';
 import 'package:zerotrust_phone/pages/quick_replies_page.dart';
 import 'package:zerotrust_phone/pages/speed_dial_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// The shared Zero-Trust settings screen, with Phone's own rows.
 class PhoneSettingsPage extends ConsumerWidget {
@@ -37,11 +39,11 @@ class PhoneSettingsPage extends ConsumerWidget {
       appSection: <Widget>[
         ListTile(
           leading: const Icon(Icons.phone_android_outlined),
-          title: const Text('Default Phone app'),
+          title: Text(context.l10n.defaultPhoneApp),
           subtitle: Text(
             isDefault
-                ? 'ZT Phone handles your calls'
-                : 'Another app handles calls. Tap to switch to ZT Phone',
+                ? context.l10n.defaultPhoneAppOn
+                : context.l10n.defaultPhoneAppOff,
           ),
           onTap: isDefault
               ? null
@@ -55,12 +57,8 @@ class PhoneSettingsPage extends ConsumerWidget {
         ),
         ListTile(
           leading: const Icon(Icons.contacts_outlined),
-          title: const Text('Names from ZT Contacts'),
-          subtitle: Text(
-            '$contactCount '
-            '${contactCount == 1 ? 'contact' : 'contacts'}, encrypted on '
-            'this phone. Edit them in ZT Contacts',
-          ),
+          title: Text(context.l10n.namesFromContacts),
+          subtitle: Text(context.l10n.namesFromContactsBody(contactCount)),
           onTap: () async {
             final ContactsMirror? mirror = ref
                 .read(contactsMirrorProvider)
@@ -70,76 +68,75 @@ class PhoneSettingsPage extends ConsumerWidget {
         ),
         ListTile(
           leading: const Icon(Icons.auto_delete_outlined),
-          title: const Text('Keep call history'),
+          title: Text(context.l10n.keepCallHistory),
           subtitle: Text(HistoryRetention.label(keepDays)),
           onTap: () => _pickRetention(context, ref, keepDays),
         ),
         ListTile(
           leading: const Icon(Icons.shield_outlined),
-          title: const Text('Call protection'),
+          title: Text(context.l10n.callProtection),
           subtitle: Text(_protectionSummary(protection)),
           onTap: () => push(const CallProtectionPage()),
         ),
         ListTile(
           leading: const Icon(Icons.block),
-          title: const Text('Blocked numbers'),
+          title: Text(context.l10n.blockedNumbers),
           onTap: () => push(const BlockedNumbersPage()),
         ),
         ListTile(
           leading: const Icon(Icons.message_outlined),
-          title: const Text('Quick replies'),
-          subtitle: const Text('Texts to send when you decline a call'),
+          title: Text(context.l10n.quickReplies),
+          subtitle: Text(context.l10n.quickRepliesBody),
           onTap: () => push(const QuickRepliesPage()),
         ),
         ListTile(
           leading: const Icon(Icons.speed),
-          title: const Text('Speed dial'),
-          subtitle: const Text('Hold 2 to 9 on the dialpad'),
+          title: Text(context.l10n.speedDial),
+          subtitle: Text(context.l10n.speedDialBody),
           onTap: () => push(const SpeedDialPage()),
         ),
         ListTile(
+          leading: const Icon(Icons.rtt),
+          title: Text(context.l10n.callAccessibility),
+          subtitle: Text(context.l10n.callAccessibilityBody),
+          onTap: () => push(const CallAccessibilityPage()),
+        ),
+        ListTile(
           leading: const Icon(Icons.voicemail),
-          title: const Text('Voicemail'),
-          subtitle: const Text(
-            'Hold 1 on the dialpad to call it. Tap for '
-            'your carrier\'s voicemail settings',
-          ),
+          title: Text(context.l10n.voicemail),
+          subtitle: Text(context.l10n.voicemailBody),
           onTap: () => ref.read(telecomProvider).voicemailSettings(),
         ),
         ListTile(
           leading: const Icon(Icons.cloud_sync_outlined),
-          title: const Text('Call history backup'),
+          title: Text(context.l10n.callHistoryBackup),
           subtitle: Text(
-            protection.backupHistory ? 'On, end-to-end encrypted' : 'Off',
+            protection.backupHistory ? context.l10n.backupOn : context.l10n.off,
           ),
           onTap: () => push(const HistoryBackupPage()),
         ),
-        const ListTile(
-          leading: Icon(Icons.do_not_disturb_on_outlined),
-          title: Text('Do Not Disturb and starred contacts'),
-          subtitle: Text(
-            'Android lets starred contacts through Do Not Disturb only if '
-            'it can see them. Turn on "Show in Phone and Messages" in ZT '
-            'Contacts settings for that.',
-          ),
+        ListTile(
+          leading: const Icon(Icons.do_not_disturb_on_outlined),
+          title: Text(context.l10n.dndStarred),
+          subtitle: Text(context.l10n.dndStarredBody),
         ),
       ],
     );
   }
 
   static String _protectionSummary(CallProtection p) {
+    final AppL10n l = currentL10n;
     final List<String> parts = <String>[
       if (p.unknownCallers != UnknownCallers.ring)
         p.unknownCallers == UnknownCallers.silence
-            ? 'Unknown callers silenced'
-            : 'Unknown callers to voicemail',
-      if (p.blockHidden) 'hidden numbers blocked',
+            ? l.unknownSilenced
+            : l.unknownToVoicemail,
+      if (p.blockHidden) l.hiddenBlocked,
       if (p.blockedPrefixes.isNotEmpty)
-        '${p.blockedPrefixes.length} blocked '
-            '${p.blockedPrefixes.length == 1 ? 'prefix' : 'prefixes'}',
+        l.prefixesBlocked(p.blockedPrefixes.length),
     ];
     if (parts.isEmpty) {
-      return 'Off. Silence unknown callers, block hidden numbers or prefixes';
+      return l.protectionOff;
     }
     final String s = parts.join(', ');
     return s[0].toUpperCase() + s.substring(1);
@@ -153,14 +150,11 @@ class PhoneSettingsPage extends ConsumerWidget {
     final int? picked = await showDialog<int>(
       context: context,
       builder: (BuildContext d) => SimpleDialog(
-        title: const Text('Keep call history'),
+        title: Text(d.l10n.keepCallHistory),
         children: <Widget>[
-          const Padding(
-            padding: EdgeInsets.fromLTRB(24, 0, 24, 8),
-            child: Text(
-              'Older calls are deleted from this phone\'s call '
-              'history, also for other apps.',
-            ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+            child: Text(d.l10n.retentionBody),
           ),
           RadioGroup<int>(
             groupValue: current ?? 0,

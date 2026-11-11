@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="private_number">מספר חסוי</string>
+    <string name="missed_call">שיחה שלא נענתה</string>
+    <string name="missed_calls">%d שיחות שלא נענו</string>
+    <string name="latest_from">האחרונה מ-%s</string>
+    <string name="call_back">חיוג חוזר</string>
+    <string name="message">הודעה</string>
+    <string name="add_to_contacts">הוספה לאנשי הקשר</string>
+    <string name="new_voicemail">הודעה קולית חדשה</string>
+    <string name="voicemail_messages">%d הודעות. אפשר להקיש כדי לחייג לתא הקולי</string>
+    <string name="tap_to_call_voicemail">אפשר להקיש כדי לחייג לתא הקולי</string>
+    <string name="call_voicemail">חיוג לתא הקולי</string>
+    <string name="missed_calls_channel">שיחות שלא נענו</string>
+    <string name="voicemail">תא קולי</string>
+    <string name="incoming_calls_channel">שיחות נכנסות</string>
+    <string name="ongoing_calls_channel">שיחות פעילות</string>
+    <string name="incoming_call">שיחה נכנסת</string>
+    <string name="ongoing_call">שיחה פעילה</string>
+    <string name="on_hold">בהמתנה</string>
+    <string name="calling">מחייג…</string>
+    <string name="hang_up">ניתוק</string>
+</resources>

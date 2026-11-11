@@ -18,9 +18,15 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
 
+    <!-- Carrier video calls (P12). Asked for only when a video call starts. -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+
     <uses-feature android:name="android.hardware.telephony" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.front" android:required="false"/>
 
     <application
+        android:supportsRtl="true"
         android:label="ZT Phone"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
@@ -116,6 +122,10 @@
             android:value="2" />
     </application>
     <queries>
+        <!-- The built-in Phone app's TTY / RTT settings (P12). -->
+        <intent>
+            <action android:name="android.telecom.action.SHOW_CALL_ACCESSIBILITY_SETTINGS"/>
+        </intent>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>

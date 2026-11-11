@@ -10,8 +10,10 @@ import android.os.Bundle
 import android.provider.BlockedNumberContract
 import android.media.RingtoneManager
 import android.provider.CallLog
+import android.telecom.PhoneAccount
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
+import android.telecom.VideoProfile
 import android.telephony.TelephonyManager
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -33,6 +35,7 @@ class MainActivity : FlutterFragmentActivity() {
     /** Opened from the missed-call notification. */
     private var pendingRecents = false
     private var pendingRingtone: MethodChannel.Result? = null
+    private var pendingCamera: MethodChannel.Result? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,9 +89,17 @@ class MainActivity : FlutterFragmentActivity() {
                         pendingDial = null
                     }
                     "placeCall" -> {
-                        placeCall(call.argument<String>("number") ?: "", call.argument<String>("account"))
+                        placeCall(
+                            call.argument<String>("number") ?: "",
+                            call.argument<String>("account"),
+                            rtt = call.argument<Boolean>("rtt") ?: false,
+                            video = call.argument<Boolean>("video") ?: false,
+                        )
                         result.success(null)
                     }
+                    "callFeatures" -> result.success(callFeatures())
+                    "openCallAccessibilitySettings" -> result.success(openCallAccessibilitySettings())
+                    "requestCamera" -> requestCamera(result)
                     "callVoicemail" -> {
                         callVoicemail()
                         result.success(null)
@@ -164,6 +175,11 @@ class MainActivity : FlutterFragmentActivity() {
                     "setVaultNames" -> {
                         @Suppress("UNCHECKED_CAST")
                         CallManager.setVaultNames(call.arguments as? Map<String, String> ?: emptyMap())
+                        result.success(null)
+                    }
+                    "setNativeStrings" -> {
+                        @Suppress("UNCHECKED_CAST")
+                        NativeStrings.set(this, call.arguments as? Map<String, String> ?: emptyMap())
                         result.success(null)
                     }
                     "clearVaultNames" -> {
@@ -279,17 +295,32 @@ class MainActivity : FlutterFragmentActivity() {
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CAMERA) {
+            pendingCamera?.success(has(Manifest.permission.CAMERA))
+            pendingCamera = null
+        }
         if (requestCode == REQUEST_PERMISSIONS) {
             pendingPermissions?.success(phonePermissions.all { has(it) })
             pendingPermissions = null
         }
     }
 
-    private fun placeCall(number: String, accountId: String? = null) {
+    private fun placeCall(
+        number: String, accountId: String? = null, rtt: Boolean = false, video: Boolean = false
+    ) {
         if (number.isBlank()) return
         val uri = Uri.fromParts("tel", number, null)
         if (has(Manifest.permission.CALL_PHONE)) {
             val extras = Bundle()
+            // P12: start with real-time text, or as a carrier video call.
+            if (rtt) extras.putBoolean(TelecomManager.EXTRA_START_CALL_WITH_RTT, true)
+            if (video) {
+                extras.putInt(
+                    TelecomManager.EXTRA_START_CALL_WITH_VIDEO_STATE,
+                    if (has(Manifest.permission.CAMERA)) VideoProfile.STATE_BIDIRECTIONAL
+                    else VideoProfile.STATE_RX_ENABLED,
+                )
+            }
             // The contact's SIM (P6), when this phone still has it.
             accountFor(accountId)?.let {
                 extras.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, it)
@@ -308,6 +339,55 @@ class MainActivity : FlutterFragmentActivity() {
         } else {
             startActivity(Intent(Intent.ACTION_DIAL, uri))
         }
+    }
+
+    /** What this phone's SIMs offer: RTT, carrier video calls (P12). */
+    private fun callFeatures(): Map<String, Boolean> {
+        val telecom = getSystemService(TelecomManager::class.java)
+        val accounts = callAccounts().mapNotNull {
+            try {
+                telecom.getPhoneAccount(it)
+            } catch (_: SecurityException) {
+                null
+            }
+        }
+        return mapOf(
+            "rtt" to accounts.any { it.hasCapabilities(PhoneAccount.CAPABILITY_RTT) },
+            "video" to accounts.any { it.hasCapabilities(PhoneAccount.CAPABILITY_VIDEO_CALLING) },
+            "systemSettings" to (callAccessibilityIntent() != null),
+        )
+    }
+
+    /**
+     * TTY mode and Android's own RTT switch can only be changed by the
+     * phone's built-in Phone app, so this opens its accessibility screen.
+     */
+    private fun callAccessibilityIntent(): Intent? {
+        val intent = Intent(TelecomManager.ACTION_SHOW_CALL_ACCESSIBILITY_SETTINGS)
+        val target = packageManager.queryIntentActivities(intent, 0)
+            .firstOrNull { it.activityInfo.packageName != packageName } ?: return null
+        return intent.setClassName(target.activityInfo.packageName, target.activityInfo.name)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    private fun openCallAccessibilitySettings(): Boolean {
+        val intent = callAccessibilityIntent() ?: return false
+        return try {
+            startActivity(intent)
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun requestCamera(result: MethodChannel.Result) {
+        if (has(Manifest.permission.CAMERA)) {
+            result.success(true)
+            return
+        }
+        pendingCamera?.success(false)
+        pendingCamera = result
+        requestPermissions(arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA)
     }
 
     private fun callAccounts(): List<PhoneAccountHandle> = try {
@@ -463,6 +543,7 @@ class MainActivity : FlutterFragmentActivity() {
 
     companion object {
         private const val REQUEST_ROLE = 3101
+        private const val REQUEST_CAMERA = 3104
         private const val REQUEST_PERMISSIONS = 3102
         private const val REQUEST_RINGTONE = 3103
         const val ACTION_SHOW_RECENTS = "dev.sagron.zerotrustphone.SHOW_RECENTS"

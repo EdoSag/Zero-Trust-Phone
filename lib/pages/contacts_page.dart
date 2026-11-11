@@ -7,6 +7,7 @@ import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/pages/call_actions.dart';
 import 'package:zerotrust_phone/pages/recents_page.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// Contacts from ZT Contacts, read-only. Editing happens in ZT Contacts.
 class ContactsPage extends ConsumerWidget {
@@ -24,7 +25,7 @@ class ContactsPage extends ConsumerWidget {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (Object e, _) => EmptyState(
         icon: Icons.contacts_outlined,
-        text: 'Couldn\'t open your contacts. ${ztErrorMessage(e)}',
+        text: context.l10n.couldntOpenContacts(ztErrorMessage(e)),
       ),
       data: (List<PhoneContact> all) {
         final List<PhoneContact> shown = all
@@ -39,15 +40,13 @@ class ContactsPage extends ConsumerWidget {
           if (query.isNotEmpty) {
             return EmptyState(
               icon: Icons.search_off,
-              text: 'No contacts match "$query"',
+              text: context.l10n.noContactsMatch(query),
             );
           }
           return favoritesOnly
-              ? const EmptyState(
+              ? EmptyState(
                   icon: Icons.star_outline,
-                  text:
-                      'No favorites yet.\nStar contacts in ZT Contacts and '
-                      'they show up here.',
+                  text: context.l10n.noFavoritesContacts,
                 )
               : const _NoContacts();
         }
@@ -80,11 +79,11 @@ class ContactsPage extends ConsumerWidget {
                   leading: ContactAvatar(label: c.name),
                   title: Text(c.name),
                   subtitle: Text(
-                    c.phones.first +
+                    ltr(c.phones.first) +
                         (c.phones.length > 1 ? ' +${c.phones.length - 1}' : ''),
                   ),
                   trailing: IconButton(
-                    tooltip: 'Call ${c.name}',
+                    tooltip: context.l10n.callName(c.name),
                     icon: const Icon(Icons.call_outlined),
                     onPressed: () => placeCall(ref, c.phones.first),
                   ),
@@ -130,7 +129,7 @@ class _FavoritesGrid extends ConsumerWidget {
             showNumberSheet(context, ref, number: c.phones.first, contact: c),
         child: Semantics(
           button: true,
-          label: 'Call ${c.name}',
+          label: context.l10n.callName(c.name),
           excludeSemantics: true,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -167,15 +166,11 @@ class _NoContacts extends StatelessWidget {
             color: Theme.of(context).colorScheme.outline,
           ),
           const SizedBox(height: 12),
-          const Text(
-            'Your contacts come from ZT Contacts, end-to-end encrypted '
-            'with the same account. Add some there and they show up here.',
-            textAlign: TextAlign.center,
-          ),
+          Text(context.l10n.contactsComeFrom, textAlign: TextAlign.center),
           const SizedBox(height: 16),
           OutlinedButton.icon(
             icon: const Icon(Icons.open_in_new),
-            label: const Text('Get ZT Contacts'),
+            label: Text(context.l10n.getZtContacts),
             onPressed: () => launchUrl(
               ZtSuite.contacts.marketUrl,
               mode: LaunchMode.externalApplication,

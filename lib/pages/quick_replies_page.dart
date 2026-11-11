@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zerotrust_phone/services/quick_replies.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// Edit the texts offered when declining a call (P3).
 class QuickRepliesPage extends ConsumerWidget {
@@ -14,17 +15,17 @@ class QuickRepliesPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quick replies'),
+        title: Text(context.l10n.quickReplies),
         actions: <Widget>[
           TextButton(
             onPressed: () => notifier.save(QuickReplies.defaults),
-            child: const Text('Reset'),
+            child: Text(context.l10n.reset),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.add),
-        label: const Text('Add'),
+        label: Text(context.l10n.add),
         onPressed: () async {
           final String? text = await _edit(context, '');
           if (text != null) await notifier.save(<String>[...replies, text]);
@@ -32,12 +33,9 @@ class QuickRepliesPage extends ConsumerWidget {
       ),
       body: ListView(
         children: <Widget>[
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'Offered when a call comes in. The text goes out through your '
-              'messaging app, from your number.',
-            ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(context.l10n.quickRepliesExplain),
           ),
           for (int i = 0; i < replies.length; i++)
             ListTile(
@@ -49,7 +47,7 @@ class QuickRepliesPage extends ConsumerWidget {
                 await notifier.save(<String>[...replies]..[i] = text);
               },
               trailing: IconButton(
-                tooltip: 'Delete',
+                tooltip: context.l10n.delete,
                 icon: const Icon(Icons.delete_outline),
                 onPressed: () =>
                     notifier.save(<String>[...replies]..removeAt(i)),
@@ -65,7 +63,7 @@ class QuickRepliesPage extends ConsumerWidget {
     final String? out = await showDialog<String>(
       context: context,
       builder: (BuildContext d) => AlertDialog(
-        title: Text(initial.isEmpty ? 'New reply' : 'Edit reply'),
+        title: Text(initial.isEmpty ? d.l10n.newReply : d.l10n.editReply),
         content: TextField(
           controller: c,
           autofocus: true,
@@ -75,11 +73,11 @@ class QuickRepliesPage extends ConsumerWidget {
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(d).pop(),
-            child: const Text('Cancel'),
+            child: Text(d.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(d).pop(c.text),
-            child: const Text('Save'),
+            child: Text(d.l10n.save),
           ),
         ],
       ),

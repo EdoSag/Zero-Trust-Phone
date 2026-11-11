@@ -31,6 +31,19 @@ object CallEngine {
 
     private fun wire(engine: FlutterEngine) {
         val messenger = engine.dartExecutor.binaryMessenger
+        // Carrier video calls draw into textures of this engine.
+        VideoSessions.textures = engine.renderer
+        EventChannel(messenger, "zt_phone/rtt_text").setStreamHandler(
+            object : EventChannel.StreamHandler {
+                override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
+                    RttSessions.setSink(events)
+                }
+
+                override fun onCancel(arguments: Any?) {
+                    RttSessions.setSink(null)
+                }
+            }
+        )
         EventChannel(messenger, "zt_phone/call_state").setStreamHandler(
             object : EventChannel.StreamHandler {
                 private var listener: CallManager.Listener? = null
@@ -48,8 +61,23 @@ object CallEngine {
         )
         MethodChannel(messenger, "zt_phone/call_control").setMethodCallHandler { call, result ->
             val id = call.argument<String>("id")
+            if (call.method == "requestCamera") {
+                val screen = activity
+                if (screen == null) result.success(false) else screen.requestCamera(result)
+                return@setMethodCallHandler
+            }
             when (call.method) {
                 "answer" -> CallManager.answer(id)
+                "answerVideo" -> CallManager.answerVideo(id)
+                "rttRequest" -> CallManager.rttRequest(id)
+                "rttRespond" -> CallManager.rttRespond(id, call.argument<Boolean>("accept") ?: false)
+                "rttStop" -> CallManager.rttStop(id)
+                "rttWrite" -> CallManager.rttWrite(id, call.argument<String>("text") ?: "")
+                "videoRequest" -> CallManager.videoRequest(id)
+                "videoStop" -> CallManager.videoStop(id)
+                "videoCamera" -> CallManager.videoCamera(id, call.argument<Boolean>("on") ?: true)
+                "videoSwitchCamera" -> CallManager.videoSwitchCamera(id)
+                "videoRespond" -> CallManager.videoRespond(id, call.argument<Boolean>("accept") ?: false)
                 "reject" -> CallManager.reject(id)
                 "rejectWithMessage" -> CallManager.rejectWithMessage(id, call.argument<String>("message") ?: "")
                 "endAndAnswer" -> CallManager.endAndAnswer(id)

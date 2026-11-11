@@ -11,6 +11,7 @@ import 'package:zerotrust_phone/services/screening_sync.dart';
 import 'package:zerotrust_phone/pages/dialpad_page.dart';
 import 'package:zerotrust_phone/pages/home_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// Routes between the shared account screens and the dialer.
 ///
@@ -65,14 +66,14 @@ class _AppGateState extends ConsumerState<AppGate> with WidgetsBindingObserver {
   Widget _withDialpad(Widget screen) => Stack(
     children: <Widget>[
       screen,
-      Positioned(
+      PositionedDirectional(
         top: 0,
-        left: 0,
+        start: 0,
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(8),
             child: IconButton.filledTonal(
-              tooltip: 'Dialpad, no unlock needed',
+              tooltip: context.l10n.dialpadNoUnlock,
               icon: const Icon(Icons.dialpad),
               onPressed: _openDialpad,
             ),

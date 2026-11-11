@@ -6,6 +6,7 @@ import 'package:zerotrust_phone/pages/favorites_page.dart';
 import 'package:zerotrust_phone/pages/recents_page.dart';
 import 'package:zerotrust_phone/pages/settings_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 enum HomeTab { favorites, recents, contacts }
 
@@ -67,14 +68,16 @@ class _HomePageState extends ConsumerState<HomePage> {
         titleSpacing: 12,
         title: SearchBar(
           controller: _search,
-          hintText: tab == HomeTab.recents ? 'Search calls' : 'Search contacts',
+          hintText: tab == HomeTab.recents
+              ? context.l10n.searchCalls
+              : context.l10n.searchContacts,
           leading: const Icon(Icons.search),
           elevation: const WidgetStatePropertyAll<double>(0),
           onChanged: (String v) => setState(() => _query = v.trim()),
           trailing: <Widget>[
             if (searching)
               IconButton(
-                tooltip: 'Clear search',
+                tooltip: context.l10n.clearSearch,
                 icon: const Icon(Icons.close),
                 onPressed: () => setState(() {
                   _search.clear();
@@ -85,7 +88,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         actions: <Widget>[
           IconButton(
-            tooltip: 'Settings',
+            tooltip: context.l10n.settings,
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
@@ -103,7 +106,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'dial',
-        tooltip: 'Dialpad',
+        tooltip: context.l10n.dialpad,
         onPressed: _openDialpad,
         child: const Icon(Icons.dialpad),
       ),
@@ -119,17 +122,20 @@ class _HomePageState extends ConsumerState<HomePage> {
             ref.read(telecomProvider).markMissedSeen().ignore();
           }
         },
-        destinations: const <NavigationDestination>[
+        destinations: <NavigationDestination>[
           NavigationDestination(
-            icon: Icon(Icons.star_outline),
-            selectedIcon: Icon(Icons.star),
-            label: 'Favorites',
+            icon: const Icon(Icons.star_outline),
+            selectedIcon: const Icon(Icons.star),
+            label: context.l10n.favorites,
           ),
-          NavigationDestination(icon: Icon(Icons.history), label: 'Recents'),
           NavigationDestination(
-            icon: Icon(Icons.contacts_outlined),
-            selectedIcon: Icon(Icons.contacts),
-            label: 'Contacts',
+            icon: const Icon(Icons.history),
+            label: context.l10n.recents,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.contacts_outlined),
+            selectedIcon: const Icon(Icons.contacts),
+            label: context.l10n.contacts,
           ),
         ],
       ),
@@ -152,10 +158,7 @@ class DefaultDialerBanner extends ConsumerWidget {
       if (alertsOk) return const SizedBox.shrink();
       return MaterialBanner(
         leading: const Icon(Icons.notifications_off_outlined),
-        content: const Text(
-          'Incoming calls can\'t show on the lock screen or as a '
-          'notification. Allow call notifications for ZT Phone.',
-        ),
+        content: Text(context.l10n.callAlertsOff),
         actions: <Widget>[
           TextButton(
             onPressed: () async {
@@ -167,17 +170,14 @@ class DefaultDialerBanner extends ConsumerWidget {
               }
               ref.invalidate(callAlertsReadyProvider);
             },
-            child: const Text('Allow'),
+            child: Text(context.l10n.allow),
           ),
         ],
       );
     }
     return MaterialBanner(
       leading: const Icon(Icons.phone_in_talk_outlined),
-      content: const Text(
-        'Make ZT Phone your Phone app to answer calls here, see your call '
-        'history and block numbers.',
-      ),
+      content: Text(context.l10n.makeDefault),
       actions: <Widget>[
         TextButton(
           onPressed: () async {
@@ -186,7 +186,7 @@ class DefaultDialerBanner extends ConsumerWidget {
             ref.invalidate(defaultDialerProvider);
             ref.invalidate(callLogProvider);
           },
-          child: const Text('Set as default'),
+          child: Text(context.l10n.setAsDefault),
         ),
       ],
     );

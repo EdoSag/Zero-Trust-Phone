@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zero_trust_core/zero_trust_core.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
+import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// How long the phone keeps call history. Older calls are deleted from
 /// Android's call log each time ZT Phone opens. Null keeps everything.
@@ -49,8 +50,8 @@ class HistoryRetention extends Notifier<int?> {
   }
 
   static String label(int? days) => switch (days) {
-    null => 'Forever',
-    1 => '24 hours',
-    _ => '$days days',
+    null => currentL10n.retentionForever,
+    1 => currentL10n.retention24h,
+    _ => currentL10n.retentionDays(days),
   };
 }
