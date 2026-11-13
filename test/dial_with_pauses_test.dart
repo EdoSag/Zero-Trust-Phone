@@ -21,6 +21,20 @@ void main() {
     );
   });
 
+  test('digits never join the number: a pause goes before them', () {
+    expect(
+      DialSequence.encode(const <DialStep>[DialStep.tones('1234')]),
+      ',1234',
+    );
+    expect(
+      DialSequence.encode(const <DialStep>[
+        DialStep.tones(''),
+        DialStep.tones('5#'),
+      ]),
+      ',5#',
+    );
+  });
+
   test('a saved sequence reads back as the same steps', () {
     const List<DialStep> steps = <DialStep>[
       DialStep.pause(3),

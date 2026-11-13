@@ -156,7 +156,7 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
             .where((SpeedDial s) => s.digit == n)
             .firstOrNull;
     if (dial != null) {
-      await placeCall(ref, dial.number);
+      await placeCall(ref, dial.number, hideCallerId: _hideCallerId);
       if (mounted) Navigator.of(context).maybePop();
       return;
     }
@@ -200,6 +200,7 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
     MaterialPageRoute<void>(
       builder: (_) => DialShortcutPage(
         number: _number.text,
+        hideCallerId: _hideCallerId,
         contact: ref
             .read(contactDirectoryProvider)
             .lookup(DialSequence.split(_number.text).$1),

@@ -17,7 +17,11 @@ class DialShortcutPage extends ConsumerStatefulWidget {
     this.shortcut,
     this.number = '',
     this.contact,
+    this.hideCallerId = false,
   });
+
+  /// "My number hidden" was on in the dialpad (P22): calls from here keep it.
+  final bool hideCallerId;
 
   /// The saved shortcut to edit; null for a new one.
   final DialShortcut? shortcut;
@@ -113,7 +117,11 @@ class _DialShortcutPageState extends ConsumerState<DialShortcutPage> {
 
   Future<void> _call() async {
     if (_cleanNumber.isEmpty) return;
-    await placeCall(ref, '$_cleanNumber$_postDial');
+    await placeCall(
+      ref,
+      '$_cleanNumber$_postDial',
+      hideCallerId: widget.hideCallerId,
+    );
   }
 
   Future<void> _delete() async {

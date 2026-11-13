@@ -57,7 +57,11 @@ abstract final class DialSequence {
         case DialStepKind.wait:
           out.write(';');
         case DialStepKind.tones:
-          out.write(cleanTones(s.tones));
+          final String tones = cleanTones(s.tones);
+          // Digits right after the number would become part of it: they
+          // need a pause or a wait before them.
+          if (tones.isNotEmpty && out.isEmpty) out.write(',');
+          out.write(tones);
       }
     }
     return out.toString();

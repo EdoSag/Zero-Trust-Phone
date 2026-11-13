@@ -339,7 +339,9 @@ class MainActivity : FlutterFragmentActivity() {
         hideCallerId: Boolean = false,
     ) {
         if (number.isBlank()) return
-        val dialled = if (hideCallerId) CallerId.hide(number, simCountry()) else number
+        val account = accountFor(accountId)
+        // The code depends on the SIM the call goes out on (dual SIM).
+        val dialled = if (hideCallerId) CallerId.hide(number, simCountry(account)) else number
         val uri = Uri.fromParts("tel", dialled, null)
         if (has(Manifest.permission.CALL_PHONE)) {
             val extras = Bundle()
@@ -353,7 +355,7 @@ class MainActivity : FlutterFragmentActivity() {
                 )
             }
             // The contact's SIM (P6), when this phone still has it.
-            accountFor(accountId)?.let {
+            account?.let {
                 extras.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, it)
             }
             getSystemService(TelecomManager::class.java).placeCall(uri, extras)
@@ -363,9 +365,19 @@ class MainActivity : FlutterFragmentActivity() {
         }
     }
 
-    /** The SIM's country ("il"), else the network's, else null. */
-    private fun simCountry(): String? {
-        val tm = getSystemService(TelephonyManager::class.java) ?: return null
+    /**
+     * The SIM's country ("il"), else the network's, else null. [account]
+     * picks one SIM on a dual-SIM phone; null is the default one.
+     */
+    private fun simCountry(account: PhoneAccountHandle? = null): String? {
+        val base = getSystemService(TelephonyManager::class.java) ?: return null
+        val tm = account?.let {
+            try {
+                base.createForPhoneAccountHandle(it)
+            } catch (_: Exception) {
+                null
+            }
+        } ?: base
         return tm.simCountryIso?.takeIf { it.isNotBlank() }
             ?: tm.networkCountryIso?.takeIf { it.isNotBlank() }
     }
