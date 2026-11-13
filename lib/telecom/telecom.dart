@@ -139,6 +139,10 @@ class Telecom {
   /// dialpad, null when it was opened normally.
   Future<String?> consumeDial() => _call<String>('consumeDial');
 
+  /// Text the app was opened with from another app's text menu or share
+  /// sheet, to find a number in (P13). Taken right after [consumeDial].
+  Future<String?> consumeDialText() => _call<String>('consumeDialText');
+
   /// Calls [number], on the SIM with [account] id when given (P6).
   /// [rtt] starts the call with real-time text, [video] as a carrier
   /// video call (P12); the carrier drops either if it can't.

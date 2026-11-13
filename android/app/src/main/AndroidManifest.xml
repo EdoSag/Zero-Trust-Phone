@@ -59,6 +59,18 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="tel"/>
             </intent-filter>
+            <!-- Paste and clean (P13): select text with a phone number in
+                 any app and pick "ZT Phone", or share text to it. -->
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
         </activity>
 
         <!-- The in-call screen: its own window and Flutter engine, so a call

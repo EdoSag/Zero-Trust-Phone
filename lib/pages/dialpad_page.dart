@@ -7,15 +7,20 @@ import 'package:zerotrust_phone/data/phone_items.dart';
 import 'package:zerotrust_phone/pages/call_actions.dart';
 import 'package:zerotrust_phone/pages/speed_dial_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
+import 'package:zerotrust_phone/util/pasted_numbers.dart';
 import 'package:zerotrust_phone/util/phone_numbers.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// The keypad. Typing digits also finds contacts by name (T9) or number.
 class DialpadPage extends ConsumerStatefulWidget {
-  const DialpadPage({super.key, this.initialNumber = ''});
+  const DialpadPage({super.key, this.initialNumber = '', this.initialText});
 
   final String initialNumber;
+
+  /// Text shared or selected in another app ("ZT Phone" in Android's text
+  /// menu or share sheet): the number in it is picked out, as on paste.
+  final String? initialText;
 
   @override
   ConsumerState<DialpadPage> createState() => _DialpadPageState();
@@ -27,9 +32,71 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
   );
 
   @override
+  void initState() {
+    super.initState();
+    final String? text = widget.initialText;
+    if (text != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _useText(text));
+    }
+  }
+
+  @override
   void dispose() {
     _number.dispose();
     super.dispose();
+  }
+
+  /// Paste and clean (P13): the clipboard is read only on this tap.
+  Future<void> _paste() async {
+    final ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
+    if (!mounted) return;
+    await _useText(data?.text ?? '');
+  }
+
+  /// Puts the number found in [text] on the dialpad, cleaned, ready to call
+  /// with one tap. Several numbers: the person picks one.
+  Future<void> _useText(String text) async {
+    final List<String> numbers = PastedNumbers.find(text);
+    if (numbers.isEmpty) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(context.l10n.noNumberInText)));
+      return;
+    }
+    final String? number = numbers.length == 1
+        ? numbers.single
+        : await showModalBottomSheet<String>(
+            context: context,
+            showDragHandle: true,
+            builder: (BuildContext sheet) => SafeArea(
+              child: ListView(
+                shrinkWrap: true,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+                    child: Text(
+                      sheet.l10n.whichNumber,
+                      style: Theme.of(sheet).textTheme.titleMedium,
+                    ),
+                  ),
+                  for (final String n in numbers)
+                    ListTile(
+                      leading: const Icon(Icons.call_outlined),
+                      title: Text(ltr(n)),
+                      onTap: () => Navigator.of(sheet).pop(n),
+                    ),
+                ],
+              ),
+            ),
+          );
+    if (number == null || !mounted) return;
+    HapticFeedback.selectionClick();
+    setState(() {
+      _number.value = TextEditingValue(
+        text: number,
+        selection: TextSelection.collapsed(offset: number.length),
+      );
+    });
   }
 
   void _type(String key) {
@@ -174,9 +241,35 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
                         border: InputBorder.none,
                         hintText: '',
                       ),
+                      // The field is typed on by the keypad, so Android's
+                      // own Paste is off; this Paste cleans the number.
+                      contextMenuBuilder:
+                          (BuildContext menu, EditableTextState state) =>
+                              AdaptiveTextSelectionToolbar.buttonItems(
+                                anchors: state.contextMenuAnchors,
+                                buttonItems: <ContextMenuButtonItem>[
+                                  ...state.contextMenuButtonItems.where(
+                                    (ContextMenuButtonItem b) =>
+                                        b.type != ContextMenuButtonType.paste,
+                                  ),
+                                  ContextMenuButtonItem(
+                                    type: ContextMenuButtonType.paste,
+                                    onPressed: () {
+                                      state.hideToolbar();
+                                      _paste();
+                                    },
+                                  ),
+                                ],
+                              ),
                     ),
                   ),
-                  if (_number.text.isNotEmpty)
+                  if (_number.text.isEmpty)
+                    IconButton(
+                      tooltip: context.l10n.pasteNumber,
+                      icon: const Icon(Icons.content_paste),
+                      onPressed: _paste,
+                    )
+                  else
                     GestureDetector(
                       onLongPress: () => setState(() => _number.clear()),
                       child: IconButton(

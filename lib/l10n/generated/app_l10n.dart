@@ -1476,6 +1476,24 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Real-time text and video go over your carrier\'s network, straight to the other person. ZT Phone never sends them to its servers or keeps them after the call.'**
   String get callAccessibilityPrivacy;
+
+  /// No description provided for @pasteNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a number'**
+  String get pasteNumber;
+
+  /// No description provided for @noNumberInText.
+  ///
+  /// In en, this message translates to:
+  /// **'No phone number found in the copied text'**
+  String get noNumberInText;
+
+  /// No description provided for @whichNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Which number?'**
+  String get whichNumber;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {
