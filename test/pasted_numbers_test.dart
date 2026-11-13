@@ -6,6 +6,9 @@ void main() {
     test('Israeli local formats keep their trunk zero', () {
       expect(PastedNumbers.find('054-123-4567'), <String>['0541234567']);
       expect(PastedNumbers.find('054 1234567'), <String>['0541234567']);
+      // Groups that start with 0 inside one number.
+      expect(PastedNumbers.find('054 123 0456'), <String>['0541230456']);
+      expect(PastedNumbers.find('054 0123456'), <String>['0540123456']);
       expect(PastedNumbers.find('(03) 123.4567'), <String>['031234567']);
       expect(PastedNumbers.find('077-1234567'), <String>['0771234567']);
       expect(PastedNumbers.find('1-800-200-300'), <String>['1800200300']);
@@ -34,6 +37,9 @@ void main() {
       ]);
       expect(PastedNumbers.find('+1 (415) 555-0100'), <String>['+14155550100']);
       expect(PastedNumbers.find('0049 30 1234567'), <String>['+49301234567']);
+      expect(PastedNumbers.find('0044 (0)20 7946 0000'), <String>[
+        '+442079460000',
+      ]);
     });
 
     test('numbers inside Hebrew and English text', () {

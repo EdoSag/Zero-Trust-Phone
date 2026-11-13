@@ -41,14 +41,12 @@ abstract final class PastedNumbers {
   static String clean(String raw) {
     String s = _plainText(raw).trim();
     if (RegExp(r'^\*\d{3,5}$').hasMatch(s)) return s;
+    // "0044 …" is "+44 …".
+    s = s.replaceFirst(RegExp(r'^00\s*'), '+');
     bool plus = s.startsWith('+');
     // "+44 (0)20 …": the bracketed zero is only for calls from inside.
     if (plus) s = s.replaceFirst(RegExp(r'\(\s*0\s*\)'), '');
     String digits = s.replaceAll(RegExp(r'[^0-9]'), '');
-    if (!plus && digits.startsWith('00')) {
-      plus = true;
-      digits = digits.substring(2);
-    }
     // A bare 972 + Israeli number (11 or 12 digits, or 13 with the zero).
     if (!plus &&
         digits.startsWith('972') &&
@@ -100,7 +98,12 @@ abstract final class PastedNumbers {
       final bool countryCodeOnly =
           (acc.startsWith('+') && accDigits.length <= 3) ||
           (accDigits.startsWith('00') && accDigits.length <= 5);
-      if (accDigits.length >= _expectedLength(acc)) {
+      final int expected = _expectedLength(acc);
+      final int pDigits = p.replaceAll(RegExp(r'[^0-9]'), '').length;
+      if (expected < 15 && accDigits.length + pDigits <= expected) {
+        // "054 123 0456": a group starting with 0 that still fits.
+        acc = '$acc $p';
+      } else if (accDigits.length >= expected) {
         out.add(acc);
         acc = p;
       } else if (startsNew && !countryCodeOnly) {
