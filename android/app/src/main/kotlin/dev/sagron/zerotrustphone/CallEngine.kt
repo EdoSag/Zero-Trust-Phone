@@ -69,6 +69,7 @@ object CallEngine {
             when (call.method) {
                 "answer" -> CallManager.answer(id)
                 "answerVideo" -> CallManager.answerVideo(id)
+                "postDialContinue" -> CallManager.postDialContinue(id, call.argument<Boolean>("send") ?: true)
                 "rttRequest" -> CallManager.rttRequest(id)
                 "rttRespond" -> CallManager.rttRespond(id, call.argument<Boolean>("accept") ?: false)
                 "rttStop" -> CallManager.rttStop(id)

@@ -5,11 +5,14 @@ import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
 import 'package:zerotrust_phone/pages/call_actions.dart';
+import 'package:zerotrust_phone/pages/dial_shortcut_page.dart';
 import 'package:zerotrust_phone/pages/speed_dial_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
+import 'package:zerotrust_phone/util/dial_sequence.dart';
 import 'package:zerotrust_phone/util/pasted_numbers.dart';
 import 'package:zerotrust_phone/util/phone_numbers.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
+import 'package:zerotrust_phone/widgets/country_time_hint.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// The keypad. Typing digits also finds contacts by name (T9) or number.
@@ -30,6 +33,9 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
   late final TextEditingController _number = TextEditingController(
     text: widget.initialNumber,
   );
+
+  /// P22: hide my number on this call.
+  bool _hideCallerId = false;
 
   @override
   void initState() {
@@ -131,9 +137,14 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
     });
   }
 
-  /// Long-press 1 calls voicemail (P5); 2 to 9 are speed dial (P8).
+  /// Long-press 1 calls voicemail (P5); 2 to 9 are speed dial (P8); * types
+  /// a pause and # a wait (P15).
   Future<void> _longPress(String digit) async {
     HapticFeedback.heavyImpact();
+    if (digit == '*' || digit == '#') {
+      _type(digit == '*' ? ',' : ';');
+      return;
+    }
     if (digit == '1') {
       await ref.read(telecomProvider).callVoicemail();
       if (mounted) Navigator.of(context).maybePop();
@@ -145,7 +156,7 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
             .where((SpeedDial s) => s.digit == n)
             .firstOrNull;
     if (dial != null) {
-      await placeCall(ref, dial.number);
+      await placeCall(ref, dial.number, hideCallerId: _hideCallerId);
       if (mounted) Navigator.of(context).maybePop();
       return;
     }
@@ -181,9 +192,21 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
       if (last != null) setState(() => _number.text = last.number);
       return;
     }
-    await placeCall(ref, number.trim());
+    await placeCall(ref, number.trim(), hideCallerId: _hideCallerId);
     if (mounted) Navigator.of(context).maybePop();
   }
+
+  void _openPauses() => Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => DialShortcutPage(
+        number: _number.text,
+        hideCallerId: _hideCallerId,
+        contact: ref
+            .read(contactDirectoryProvider)
+            .lookup(DialSequence.split(_number.text).$1),
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -204,8 +227,27 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
               .toList();
     final ThemeData theme = Theme.of(context);
 
+    final String? hint = countryHintText(context, ref, _number.text);
+
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: <Widget>[
+          IconButton(
+            tooltip: context.l10n.dialWithPauses,
+            icon: const Icon(Icons.more_time),
+            onPressed: _openPauses,
+          ),
+          IconButton(
+            tooltip: _hideCallerId
+                ? context.l10n.showMyNumber
+                : context.l10n.hideMyNumber,
+            isSelected: _hideCallerId,
+            icon: const Icon(Icons.visibility_off_outlined),
+            selectedIcon: const Icon(Icons.visibility_off),
+            onPressed: () => setState(() => _hideCallerId = !_hideCallerId),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: <Widget>[
@@ -281,6 +323,24 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
                 ],
               ),
             ),
+            // Country and time there (P16), and whether my number is hidden.
+            SizedBox(
+              height: 24,
+              child: Semantics(
+                liveRegion: true,
+                child: Text(
+                  <String>[
+                    ?hint,
+                    if (_hideCallerId) context.l10n.numberHidden,
+                  ].join(' · '),
+                  key: const ValueKey<String>('dial-hint'),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
             DialKeypad(onKey: _type, onLongKey: _longPress),
             const SizedBox(height: 12),
             SizedBox(
@@ -316,7 +376,8 @@ class DialKeypad extends StatelessWidget {
   final ValueChanged<String> onKey;
   final Color? foreground;
 
-  /// Long-press on 1 to 9 (voicemail and speed dial). Null in calls.
+  /// Long-press on 1 to 9 (voicemail and speed dial), * and # (pause and
+  /// wait). Null in calls.
   final ValueChanged<String>? onLongKey;
 
   static const List<(String, String)> keys = <(String, String)>[
@@ -346,6 +407,8 @@ class DialKeypad extends StatelessWidget {
                 label: switch (digit) {
                   '0' => context.l10n.keyZeroHold,
                   '1' when onLongKey != null => context.l10n.keyOneHold,
+                  '*' when onLongKey != null => context.l10n.keyStarHold,
+                  '#' when onLongKey != null => context.l10n.keyHashHold,
                   _ => digit,
                 },
                 excludeSemantics: true,
@@ -354,7 +417,8 @@ class DialKeypad extends StatelessWidget {
                   onTap: () => onKey(digit),
                   onLongPress: digit == '0'
                       ? () => onKey('+')
-                      : (onLongKey != null && RegExp(r'^[1-9]$').hasMatch(digit)
+                      : (onLongKey != null &&
+                                RegExp(r'^[1-9*#]$').hasMatch(digit)
                             ? () => onLongKey!(digit)
                             : null),
                   child: Column(

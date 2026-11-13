@@ -118,9 +118,11 @@ class MainActivity : FlutterFragmentActivity() {
                             call.argument<String>("account"),
                             rtt = call.argument<Boolean>("rtt") ?: false,
                             video = call.argument<Boolean>("video") ?: false,
+                            hideCallerId = call.argument<Boolean>("hideCallerId") ?: false,
                         )
                         result.success(null)
                     }
+                    "simCountry" -> result.success(simCountry())
                     "callFeatures" -> result.success(callFeatures())
                     "openCallAccessibilitySettings" -> result.success(openCallAccessibilitySettings())
                     "requestCamera" -> requestCamera(result)
@@ -330,10 +332,17 @@ class MainActivity : FlutterFragmentActivity() {
     }
 
     private fun placeCall(
-        number: String, accountId: String? = null, rtt: Boolean = false, video: Boolean = false
+        number: String,
+        accountId: String? = null,
+        rtt: Boolean = false,
+        video: Boolean = false,
+        hideCallerId: Boolean = false,
     ) {
         if (number.isBlank()) return
-        val uri = Uri.fromParts("tel", number, null)
+        val account = accountFor(accountId)
+        // The code depends on the SIM the call goes out on (dual SIM).
+        val dialled = if (hideCallerId) CallerId.hide(number, simCountry(account)) else number
+        val uri = Uri.fromParts("tel", dialled, null)
         if (has(Manifest.permission.CALL_PHONE)) {
             val extras = Bundle()
             // P12: start with real-time text, or as a carrier video call.
@@ -346,7 +355,7 @@ class MainActivity : FlutterFragmentActivity() {
                 )
             }
             // The contact's SIM (P6), when this phone still has it.
-            accountFor(accountId)?.let {
+            account?.let {
                 extras.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, it)
             }
             getSystemService(TelecomManager::class.java).placeCall(uri, extras)
@@ -354,6 +363,23 @@ class MainActivity : FlutterFragmentActivity() {
             // Without the permission, hand the number to the system dialer.
             startActivity(Intent(Intent.ACTION_DIAL, uri))
         }
+    }
+
+    /**
+     * The SIM's country ("il"), else the network's, else null. [account]
+     * picks one SIM on a dual-SIM phone; null is the default one.
+     */
+    private fun simCountry(account: PhoneAccountHandle? = null): String? {
+        val base = getSystemService(TelephonyManager::class.java) ?: return null
+        val tm = account?.let {
+            try {
+                base.createForPhoneAccountHandle(it)
+            } catch (_: Exception) {
+                null
+            }
+        } ?: base
+        return tm.simCountryIso?.takeIf { it.isNotBlank() }
+            ?: tm.networkCountryIso?.takeIf { it.isNotBlank() }
     }
 
     private fun callVoicemail() {

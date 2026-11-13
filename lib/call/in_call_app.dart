@@ -56,6 +56,10 @@ class CallControl {
   Future<void> close() => _do('close');
 
   // P12: real-time text and carrier video calls.
+  /// P15: send the tones after a "wait for my tap", or skip them.
+  Future<void> postDialContinue(String id, bool send) =>
+      _do('postDialContinue', {'id': id, 'send': send});
+
   Future<void> answerVideo(String id) => _do('answerVideo', {'id': id});
   Future<void> rttRequest(String id) => _do('rttRequest', {'id': id});
   Future<void> rttRespond(String id, bool accept) =>
@@ -229,6 +233,16 @@ class _InCallScreenState extends ConsumerState<InCallScreen> {
                       text: context.l10n.rttRequestBody,
                       onAccept: () => _control.rttRespond(call.id, true),
                       onDecline: () => _control.rttRespond(call.id, false),
+                    ),
+                  if (call.postDialWait case final String tones)
+                    _RequestBanner(
+                      icon: Icons.dialpad,
+                      text: context.l10n.sendTonesQuestion(ltr(tones)),
+                      acceptLabel: context.l10n.send,
+                      declineLabel: context.l10n.skip,
+                      onAccept: () => _control.postDialContinue(call.id, true),
+                      onDecline: () =>
+                          _control.postDialContinue(call.id, false),
                     ),
                   if (call.videoRequest)
                     _RequestBanner(
@@ -968,12 +982,16 @@ class _RequestBanner extends StatelessWidget {
     required this.text,
     required this.onAccept,
     required this.onDecline,
+    this.acceptLabel,
+    this.declineLabel,
   });
 
   final IconData icon;
   final String text;
   final VoidCallback onAccept;
   final VoidCallback onDecline;
+  final String? acceptLabel;
+  final String? declineLabel;
 
   @override
   Widget build(BuildContext context) => Material(
@@ -985,8 +1003,14 @@ class _RequestBanner extends StatelessWidget {
           Icon(icon),
           const SizedBox(width: 12),
           Expanded(child: Semantics(liveRegion: true, child: Text(text))),
-          TextButton(onPressed: onDecline, child: Text(context.l10n.decline)),
-          TextButton(onPressed: onAccept, child: Text(context.l10n.accept)),
+          TextButton(
+            onPressed: onDecline,
+            child: Text(declineLabel ?? context.l10n.decline),
+          ),
+          TextButton(
+            onPressed: onAccept,
+            child: Text(acceptLabel ?? context.l10n.accept),
+          ),
         ],
       ),
     ),

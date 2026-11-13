@@ -1494,6 +1494,210 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Which number?'**
   String get whichNumber;
+
+  /// No description provided for @dialWithPauses.
+  ///
+  /// In en, this message translates to:
+  /// **'Dial with pauses'**
+  String get dialWithPauses;
+
+  /// No description provided for @dialWithPausesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait, then send a code or menu choice'**
+  String get dialWithPausesShort;
+
+  /// No description provided for @dialWithPausesExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'For phone menus, conference codes and voicemail PINs: call, wait, then send the digits for you. Save it and it\'s one tap next time.'**
+  String get dialWithPausesExplain;
+
+  /// No description provided for @dialShortcutDefaultLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Call with code'**
+  String get dialShortcutDefaultLabel;
+
+  /// No description provided for @dialShortcutName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get dialShortcutName;
+
+  /// No description provided for @dialShortcutNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Voicemail PIN, Work conference…'**
+  String get dialShortcutNameHint;
+
+  /// No description provided for @numberToCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Number to call'**
+  String get numberToCall;
+
+  /// No description provided for @addPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait 3 seconds'**
+  String get addPause;
+
+  /// No description provided for @addWaitForTap.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait for my tap'**
+  String get addWaitForTap;
+
+  /// No description provided for @addTones.
+  ///
+  /// In en, this message translates to:
+  /// **'Send digits'**
+  String get addTones;
+
+  /// No description provided for @dialsAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Dials'**
+  String get dialsAs;
+
+  /// No description provided for @callNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Call now'**
+  String get callNow;
+
+  /// No description provided for @pauseSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait about {seconds} seconds'**
+  String pauseSeconds(int seconds);
+
+  /// No description provided for @shorterPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Shorter'**
+  String get shorterPause;
+
+  /// No description provided for @longerPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Longer'**
+  String get longerPause;
+
+  /// No description provided for @waitForTapStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait until I tap Send on the call screen'**
+  String get waitForTapStep;
+
+  /// No description provided for @tonesToSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Digits to send'**
+  String get tonesToSend;
+
+  /// No description provided for @removeStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove step'**
+  String get removeStep;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @hideMyNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide my number on this call'**
+  String get hideMyNumber;
+
+  /// No description provided for @showMyNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Show my number on this call'**
+  String get showMyNumber;
+
+  /// No description provided for @numberHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'My number hidden'**
+  String get numberHidden;
+
+  /// No description provided for @keyStarHold.
+  ///
+  /// In en, this message translates to:
+  /// **'Star, hold for a pause'**
+  String get keyStarHold;
+
+  /// No description provided for @keyHashHold.
+  ///
+  /// In en, this message translates to:
+  /// **'Hash, hold for wait'**
+  String get keyHashHold;
+
+  /// No description provided for @callWithNumberHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Call with my number hidden'**
+  String get callWithNumberHidden;
+
+  /// No description provided for @callWithNumberHiddenBody.
+  ///
+  /// In en, this message translates to:
+  /// **'They see \"Private number\", if your carrier allows it'**
+  String get callWithNumberHiddenBody;
+
+  /// No description provided for @hideMyNumberForContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide my number'**
+  String get hideMyNumberForContact;
+
+  /// No description provided for @hideMyNumberForContactBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every call to this contact shows \"Private number\", if your carrier allows it'**
+  String get hideMyNumberForContactBody;
+
+  /// No description provided for @timeTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'{time} tomorrow'**
+  String timeTomorrow(String time);
+
+  /// No description provided for @timeYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'{time} yesterday'**
+  String timeYesterday(String time);
+
+  /// No description provided for @timeRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{from}–{to}'**
+  String timeRange(String from, String to);
+
+  /// No description provided for @countryTimeThere.
+  ///
+  /// In en, this message translates to:
+  /// **'{country} · {time} there now'**
+  String countryTimeThere(String country, String time);
+
+  /// No description provided for @sendTonesQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Send {tones} now?'**
+  String sendTonesQuestion(String tones);
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

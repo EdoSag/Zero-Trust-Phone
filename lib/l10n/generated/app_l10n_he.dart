@@ -809,4 +809,121 @@ class AppL10nHe extends AppL10n {
 
   @override
   String get whichNumber => 'איזה מספר?';
+
+  @override
+  String get dialWithPauses => 'חיוג עם השהיות';
+
+  @override
+  String get dialWithPausesShort => 'המתנה, ואז שליחת קוד או בחירה בתפריט';
+
+  @override
+  String get dialWithPausesExplain =>
+      'לתפריטים טלפוניים, קודי שיחת ועידה וקוד לתא קולי: מחייגים, ממתינים, ואז שולחים את הספרות בשבילך. שומרים, ובפעם הבאה זו לחיצה אחת.';
+
+  @override
+  String get dialShortcutDefaultLabel => 'שיחה עם קוד';
+
+  @override
+  String get dialShortcutName => 'שם';
+
+  @override
+  String get dialShortcutNameHint => 'קוד תא קולי, ועידה בעבודה…';
+
+  @override
+  String get numberToCall => 'מספר לחיוג';
+
+  @override
+  String get addPause => 'המתנה של 3 שניות';
+
+  @override
+  String get addWaitForTap => 'המתנה ללחיצה שלי';
+
+  @override
+  String get addTones => 'שליחת ספרות';
+
+  @override
+  String get dialsAs => 'מחייג';
+
+  @override
+  String get callNow => 'חיוג עכשיו';
+
+  @override
+  String pauseSeconds(int seconds) {
+    return 'המתנה של כ-$seconds שניות';
+  }
+
+  @override
+  String get shorterPause => 'קצר יותר';
+
+  @override
+  String get longerPause => 'ארוך יותר';
+
+  @override
+  String get waitForTapStep => 'המתנה עד שאלחץ על \'שליחה\' במסך השיחה';
+
+  @override
+  String get tonesToSend => 'ספרות לשליחה';
+
+  @override
+  String get removeStep => 'הסרת שלב';
+
+  @override
+  String get edit => 'עריכה';
+
+  @override
+  String get hideMyNumber => 'הסתרת המספר שלי בשיחה הזו';
+
+  @override
+  String get showMyNumber => 'הצגת המספר שלי בשיחה הזו';
+
+  @override
+  String get numberHidden => 'המספר שלי מוסתר';
+
+  @override
+  String get keyStarHold => 'כוכבית, לחיצה ארוכה להשהיה';
+
+  @override
+  String get keyHashHold => 'סולמית, לחיצה ארוכה להמתנה';
+
+  @override
+  String get callWithNumberHidden => 'חיוג עם מספר מוסתר';
+
+  @override
+  String get callWithNumberHiddenBody =>
+      'יופיע אצלם \"מספר חסוי\", אם הספק שלך מאפשר';
+
+  @override
+  String get hideMyNumberForContact => 'הסתרת המספר שלי';
+
+  @override
+  String get hideMyNumberForContactBody =>
+      'כל שיחה לאיש הקשר הזה תופיע כ\"מספר חסוי\", אם הספק שלך מאפשר';
+
+  @override
+  String timeTomorrow(String time) {
+    return '$time מחר';
+  }
+
+  @override
+  String timeYesterday(String time) {
+    return '$time אתמול';
+  }
+
+  @override
+  String timeRange(String from, String to) {
+    return '$from–$to';
+  }
+
+  @override
+  String countryTimeThere(String country, String time) {
+    return '$country · שם עכשיו $time';
+  }
+
+  @override
+  String sendTonesQuestion(String tones) {
+    return 'לשלוח עכשיו $tones?';
+  }
+
+  @override
+  String get skip => 'דילוג';
 }
