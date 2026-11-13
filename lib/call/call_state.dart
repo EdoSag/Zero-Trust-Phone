@@ -28,6 +28,7 @@ class PhoneCall {
     this.cameraOff = false,
     this.cameraAllowed = false,
     this.notice,
+    this.postDialWait,
   });
 
   factory PhoneCall.fromMap(Map<Object?, Object?> m) => PhoneCall(
@@ -63,6 +64,7 @@ class PhoneCall {
     cameraOff: m['cameraOff'] == true,
     cameraAllowed: m['cameraAllowed'] == true,
     notice: m['notice'] as String?,
+    postDialWait: m['postDialWait'] as String?,
   );
 
   static (int, int)? _size(Object? w, Object? h) {
@@ -117,6 +119,9 @@ class PhoneCall {
 
   /// "rttFailed" or "videoFailed", for a few seconds.
   final String? notice;
+
+  /// P15: the call reached a "wait for my tap" (`;`); these tones are next.
+  final String? postDialWait;
 
   bool get isVideo => VideoState.isVideo(videoState);
   bool get sendingVideo =>

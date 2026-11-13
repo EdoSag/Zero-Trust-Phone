@@ -145,18 +145,28 @@ class Telecom {
 
   /// Calls [number], on the SIM with [account] id when given (P6).
   /// [rtt] starts the call with real-time text, [video] as a carrier
-  /// video call (P12); the carrier drops either if it can't.
+  /// video call (P12); the carrier drops either if it can't. [hideCallerId]
+  /// asks the carrier not to show my number for this call (P22). [number]
+  /// may carry pauses and tones after it (`,` `;`, P15).
   Future<void> placeCall(
     String number, {
     String? account,
     bool rtt = false,
     bool video = false,
+    bool hideCallerId = false,
   }) => _call<void>('placeCall', {
     'number': number,
     'account': account,
     'rtt': rtt,
     'video': video,
+    'hideCallerId': hideCallerId,
   });
+
+  /// The SIM's country as an ISO code ("IL"), or the network's, or null.
+  Future<String?> simCountry() async {
+    final String? iso = await _call<String>('simCountry');
+    return iso == null || iso.isEmpty ? null : iso.toUpperCase();
+  }
 
   /// What this phone's SIMs offer (P12).
   Future<CallFeatures> callFeatures() async {
@@ -308,6 +318,19 @@ final callFeaturesProvider = FutureProvider<CallFeatures>((ref) async {
     return await telecom.callFeatures();
   } on PlatformException {
     return const CallFeatures();
+  }
+});
+
+/// The country calls are made from (the SIM's), for the country hint
+/// (P16). Null when unknown.
+final homeCountryProvider = FutureProvider<String?>((ref) async {
+  final Telecom telecom = ref.watch(telecomProvider);
+  if (!telecom.isSupported) return null;
+  try {
+    return await telecom.simCountry();
+  } on Object {
+    // No SIM, or the platform side isn't there (tests).
+    return null;
   }
 });
 

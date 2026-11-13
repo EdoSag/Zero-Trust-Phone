@@ -35,6 +35,9 @@ object CallManager {
     /** Whether each call's SIM offers RTT (asked once per call). */
     private val rttCapable = mutableMapOf<Call, Boolean>()
 
+    /** P15: calls stopped at a "wait for my tap" (`;`), with the tones left. */
+    private val postDialWaits = mutableMapOf<Call, String>()
+
     /** A short message for the call screen ("rttFailed", "videoFailed"). */
     private val notices = mutableMapOf<Call, String>()
     private var nextId = 1
@@ -70,6 +73,10 @@ object CallManager {
             rttRequests[call] = id
             notifyChanged()
         }
+        override fun onPostDialWait(call: Call, remainingPostDialSequence: String?) {
+            postDialWaits[call] = remainingPostDialSequence ?: ""
+            notifyChanged()
+        }
         override fun onRttInitiationFailure(call: Call, reason: Int) = notice(call, "rttFailed")
         override fun onConferenceableCallsChanged(call: Call, conferenceableCalls: MutableList<Call>) =
             notifyChanged()
@@ -93,6 +100,7 @@ object CallManager {
         calls.remove(call)?.let { RttSessions.clear(it) }
         accountChoices.remove(call)
         rttRequests.remove(call)
+        postDialWaits.remove(call)
         rttCapable.remove(call)
         notices.remove(call)
         notifyChanged()
@@ -195,7 +203,7 @@ object CallManager {
 
     private fun describe(call: Call, id: String): Map<String, Any?> {
         val details = call.details
-        val number = details.handle?.schemeSpecificPart ?: ""
+        val number = PhoneNumbers.plain(details.handle?.schemeSpecificPart ?: "")
         val caps = details.callCapabilities
         return VideoSessions.describe(call, service) + mapOf(
             "id" to id,
@@ -217,6 +225,8 @@ object CallManager {
             "canVideo" to ((caps and Call.Details.CAPABILITY_SUPPORTS_VT_LOCAL_TX) != 0 &&
                 (caps and Call.Details.CAPABILITY_SUPPORTS_VT_REMOTE_RX) != 0),
             "notice" to notices[call],
+            // Only the tones up to the next pause or wait, as the screen asks.
+            "postDialWait" to postDialWaits[call]?.substringBefore(',')?.substringBefore(';'),
             "accounts" to if (call.stateCompat() == Call.STATE_SELECT_PHONE_ACCOUNT) {
                 accountsFor(call).map { accountLabel(it) }
             } else {
@@ -299,6 +309,14 @@ object CallManager {
                 else -> VideoProfile.STATE_AUDIO_ONLY
             }
         )
+    }
+
+    /** P15: sends the tones after a "wait for my tap", or skips the rest. */
+    fun postDialContinue(id: String?, send: Boolean) {
+        val call = byId(id) ?: primary() ?: return
+        if (postDialWaits.remove(call) == null) return
+        call.postDialContinue(send)
+        notifyChanged()
     }
 
     // Real-time text (P12).

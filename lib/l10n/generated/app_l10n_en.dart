@@ -809,4 +809,121 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get whichNumber => 'Which number?';
+
+  @override
+  String get dialWithPauses => 'Dial with pauses';
+
+  @override
+  String get dialWithPausesShort => 'Wait, then send a code or menu choice';
+
+  @override
+  String get dialWithPausesExplain =>
+      'For phone menus, conference codes and voicemail PINs: call, wait, then send the digits for you. Save it and it\'s one tap next time.';
+
+  @override
+  String get dialShortcutDefaultLabel => 'Call with code';
+
+  @override
+  String get dialShortcutName => 'Name';
+
+  @override
+  String get dialShortcutNameHint => 'Voicemail PIN, Work conference…';
+
+  @override
+  String get numberToCall => 'Number to call';
+
+  @override
+  String get addPause => 'Wait 3 seconds';
+
+  @override
+  String get addWaitForTap => 'Wait for my tap';
+
+  @override
+  String get addTones => 'Send digits';
+
+  @override
+  String get dialsAs => 'Dials';
+
+  @override
+  String get callNow => 'Call now';
+
+  @override
+  String pauseSeconds(int seconds) {
+    return 'Wait about $seconds seconds';
+  }
+
+  @override
+  String get shorterPause => 'Shorter';
+
+  @override
+  String get longerPause => 'Longer';
+
+  @override
+  String get waitForTapStep => 'Wait until I tap Send on the call screen';
+
+  @override
+  String get tonesToSend => 'Digits to send';
+
+  @override
+  String get removeStep => 'Remove step';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get hideMyNumber => 'Hide my number on this call';
+
+  @override
+  String get showMyNumber => 'Show my number on this call';
+
+  @override
+  String get numberHidden => 'My number hidden';
+
+  @override
+  String get keyStarHold => 'Star, hold for a pause';
+
+  @override
+  String get keyHashHold => 'Hash, hold for wait';
+
+  @override
+  String get callWithNumberHidden => 'Call with my number hidden';
+
+  @override
+  String get callWithNumberHiddenBody =>
+      'They see \"Private number\", if your carrier allows it';
+
+  @override
+  String get hideMyNumberForContact => 'Hide my number';
+
+  @override
+  String get hideMyNumberForContactBody =>
+      'Every call to this contact shows \"Private number\", if your carrier allows it';
+
+  @override
+  String timeTomorrow(String time) {
+    return '$time tomorrow';
+  }
+
+  @override
+  String timeYesterday(String time) {
+    return '$time yesterday';
+  }
+
+  @override
+  String timeRange(String from, String to) {
+    return '$from–$to';
+  }
+
+  @override
+  String countryTimeThere(String country, String time) {
+    return '$country · $time there now';
+  }
+
+  @override
+  String sendTonesQuestion(String tones) {
+    return 'Send $tones now?';
+  }
+
+  @override
+  String get skip => 'Skip';
 }

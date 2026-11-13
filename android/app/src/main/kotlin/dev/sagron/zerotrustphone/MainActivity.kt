@@ -118,9 +118,11 @@ class MainActivity : FlutterFragmentActivity() {
                             call.argument<String>("account"),
                             rtt = call.argument<Boolean>("rtt") ?: false,
                             video = call.argument<Boolean>("video") ?: false,
+                            hideCallerId = call.argument<Boolean>("hideCallerId") ?: false,
                         )
                         result.success(null)
                     }
+                    "simCountry" -> result.success(simCountry())
                     "callFeatures" -> result.success(callFeatures())
                     "openCallAccessibilitySettings" -> result.success(openCallAccessibilitySettings())
                     "requestCamera" -> requestCamera(result)
@@ -330,10 +332,15 @@ class MainActivity : FlutterFragmentActivity() {
     }
 
     private fun placeCall(
-        number: String, accountId: String? = null, rtt: Boolean = false, video: Boolean = false
+        number: String,
+        accountId: String? = null,
+        rtt: Boolean = false,
+        video: Boolean = false,
+        hideCallerId: Boolean = false,
     ) {
         if (number.isBlank()) return
-        val uri = Uri.fromParts("tel", number, null)
+        val dialled = if (hideCallerId) CallerId.hide(number, simCountry()) else number
+        val uri = Uri.fromParts("tel", dialled, null)
         if (has(Manifest.permission.CALL_PHONE)) {
             val extras = Bundle()
             // P12: start with real-time text, or as a carrier video call.
@@ -354,6 +361,13 @@ class MainActivity : FlutterFragmentActivity() {
             // Without the permission, hand the number to the system dialer.
             startActivity(Intent(Intent.ACTION_DIAL, uri))
         }
+    }
+
+    /** The SIM's country ("il"), else the network's, else null. */
+    private fun simCountry(): String? {
+        val tm = getSystemService(TelephonyManager::class.java) ?: return null
+        return tm.simCountryIso?.takeIf { it.isNotBlank() }
+            ?: tm.networkCountryIso?.takeIf { it.isNotBlank() }
     }
 
     private fun callVoicemail() {

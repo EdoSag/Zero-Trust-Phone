@@ -4,11 +4,13 @@ import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/pages/call_actions.dart';
 import 'package:zerotrust_phone/pages/contact_call_settings_page.dart';
+import 'package:zerotrust_phone/pages/dial_shortcut_page.dart';
 import 'package:zerotrust_phone/pages/recents_page.dart';
 import 'package:zerotrust_phone/services/history_backup.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/util/phone_numbers.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
+import 'package:zerotrust_phone/widgets/country_time_hint.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// Every call with one number, with its length, and what to do next (P4).
@@ -56,6 +58,18 @@ class CallDetailsPage extends ConsumerWidget {
             ),
           ),
           if (title != number) Center(child: Text(ltr(number))),
+          if (countryHintText(context, ref, number) case final String hint)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Center(
+                child: Text(
+                  hint,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
           const SizedBox(height: 16),
           Wrap(
             alignment: WrapAlignment.center,
@@ -101,7 +115,14 @@ class CallDetailsPage extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
+          DialShortcutTiles(
+            numbers: contact?.phones.isNotEmpty == true
+                ? contact!.phones
+                : <String>[number],
+            contact: contact,
+          ),
+          const SizedBox(height: 8),
           const Divider(),
           if (calls.isEmpty)
             Padding(

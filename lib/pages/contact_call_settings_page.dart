@@ -65,6 +65,14 @@ class ContactCallSettingsPage extends ConsumerWidget {
             onChanged: (bool on) =>
                 data.saveContactSettings(settings.copyWith(toVoicemail: on)),
           ),
+          SwitchListTile(
+            secondary: const Icon(Icons.visibility_off_outlined),
+            title: Text(context.l10n.hideMyNumberForContact),
+            subtitle: Text(context.l10n.hideMyNumberForContactBody),
+            value: settings.hideCallerId,
+            onChanged: (bool on) =>
+                data.saveContactSettings(settings.copyWith(hideCallerId: on)),
+          ),
           if (accounts.length > 1)
             ListTile(
               leading: const Icon(Icons.sim_card_outlined),

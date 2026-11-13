@@ -10,9 +10,13 @@ abstract final class PhoneNumbers {
 
   /// The key two spellings of one number share: its last 9 digits, so
   /// "+44 7700 900123" and "07700 900123" match. Short codes match whole.
-  /// Must stay the same as `PhoneNumbers.lookupKey` in the Android code.
+  /// Pauses and tones dialled after the number (",,1234#", P15) aren't
+  /// part of it. Must stay the same as `PhoneNumbers.lookupKey` in the
+  /// Android code.
   static String lookupKey(String number) {
-    final String digits = number.replaceAll(RegExp(r'[^0-9]'), '');
+    final int post = number.indexOf(RegExp('[,;]'));
+    final String digits = (post < 0 ? number : number.substring(0, post))
+        .replaceAll(RegExp(r'[^0-9]'), '');
     return digits.length > 9 ? digits.substring(digits.length - 9) : digits;
   }
 

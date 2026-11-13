@@ -368,5 +368,87 @@
   "callAccessibilityPrivacy": "Real-time text and video go over your carrier's network, straight to the other person. ZT Phone never sends them to its servers or keeps them after the call.",
   "pasteNumber": "Paste a number",
   "noNumberInText": "No phone number found in the copied text",
-  "whichNumber": "Which number?"
+  "whichNumber": "Which number?",
+  "dialWithPauses": "Dial with pauses",
+  "dialWithPausesShort": "Wait, then send a code or menu choice",
+  "dialWithPausesExplain": "For phone menus, conference codes and voicemail PINs: call, wait, then send the digits for you. Save it and it's one tap next time.",
+  "dialShortcutDefaultLabel": "Call with code",
+  "dialShortcutName": "Name",
+  "dialShortcutNameHint": "Voicemail PIN, Work conference…",
+  "numberToCall": "Number to call",
+  "addPause": "Wait 3 seconds",
+  "addWaitForTap": "Wait for my tap",
+  "addTones": "Send digits",
+  "dialsAs": "Dials",
+  "callNow": "Call now",
+  "pauseSeconds": "Wait about {seconds} seconds",
+  "@pauseSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "shorterPause": "Shorter",
+  "longerPause": "Longer",
+  "waitForTapStep": "Wait until I tap Send on the call screen",
+  "tonesToSend": "Digits to send",
+  "removeStep": "Remove step",
+  "edit": "Edit",
+  "hideMyNumber": "Hide my number on this call",
+  "showMyNumber": "Show my number on this call",
+  "numberHidden": "My number hidden",
+  "keyStarHold": "Star, hold for a pause",
+  "keyHashHold": "Hash, hold for wait",
+  "callWithNumberHidden": "Call with my number hidden",
+  "callWithNumberHiddenBody": "They see \"Private number\", if your carrier allows it",
+  "hideMyNumberForContact": "Hide my number",
+  "hideMyNumberForContactBody": "Every call to this contact shows \"Private number\", if your carrier allows it",
+  "timeTomorrow": "{time} tomorrow",
+  "@timeTomorrow": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "timeYesterday": "{time} yesterday",
+  "@timeYesterday": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "timeRange": "{from}–{to}",
+  "@timeRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "countryTimeThere": "{country} · {time} there now",
+  "@countryTimeThere": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sendTonesQuestion": "Send {tones} now?",
+  "@sendTonesQuestion": {
+    "placeholders": {
+      "tones": {
+        "type": "String"
+      }
+    }
+  },
+  "skip": "Skip"
 }

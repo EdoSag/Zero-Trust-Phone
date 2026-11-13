@@ -8,6 +8,7 @@ import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
 import 'package:zerotrust_phone/pages/call_details_page.dart';
 import 'package:zerotrust_phone/pages/contact_call_settings_page.dart';
+import 'package:zerotrust_phone/pages/dial_shortcut_page.dart';
 import 'package:zerotrust_phone/pages/dialpad_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
@@ -15,21 +16,28 @@ import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// Calls [number], on the contact's own SIM when one is set (P6), with
 /// real-time text when that's switched on (P12). [video] makes it a
-/// carrier video call.
+/// carrier video call. [hideCallerId] hides my number for this call; a
+/// contact set to "Hide my number" always gets it (P22). [number] may end
+/// in pauses and tones (P15).
 Future<void> placeCall(
   WidgetRef ref,
   String number, {
   bool video = false,
+  bool hideCallerId = false,
 }) async {
   final PhoneContact? contact = ref
       .read(contactDirectoryProvider)
       .lookup(number);
   String? account;
+  bool hide = hideCallerId;
   if (contact != null) {
     for (final ContactCallSettings s
         in ref.read(contactSettingsProvider).value ??
             const <ContactCallSettings>[]) {
-      if (s.contactId == contact.id) account = s.accountId;
+      if (s.contactId == contact.id) {
+        account = s.accountId;
+        hide = hide || s.hideCallerId;
+      }
     }
   }
   final StartWithRtt rtt = ref.read(startWithRttProvider.notifier);
@@ -42,6 +50,7 @@ Future<void> placeCall(
     account: account,
     rtt: ref.read(startWithRttProvider),
     video: video,
+    hideCallerId: hide,
   );
 }
 
@@ -98,6 +107,35 @@ Future<void> showNumberSheet(
                     : const SizedBox.shrink(),
               ),
             ),
+          // P15: saved "dial with pauses" shortcuts, one tap each.
+          DialShortcutTiles(
+            numbers: numbers,
+            contact: contact,
+            onBeforeCall: () => Navigator.of(sheet).pop(),
+          ),
+          ListTile(
+            leading: const Icon(Icons.visibility_off_outlined),
+            title: Text(context.l10n.callWithNumberHidden),
+            subtitle: Text(context.l10n.callWithNumberHiddenBody),
+            onTap: () {
+              Navigator.of(sheet).pop();
+              placeCall(ref, number, hideCallerId: true);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.more_time),
+            title: Text(context.l10n.dialWithPauses),
+            subtitle: Text(context.l10n.dialWithPausesShort),
+            onTap: () {
+              Navigator.of(sheet).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) =>
+                      DialShortcutPage(number: number, contact: contact),
+                ),
+              );
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.message_outlined),
             title: Text(context.l10n.sendAMessage),
