@@ -365,5 +365,8 @@
   "ttySettings": "TTY mode and RTT settings",
   "ttySettingsBody": "Opens your phone's built-in call accessibility settings. Android lets only the built-in Phone app change TTY mode.",
   "ttySettingsMissing": "This phone has no built-in screen for TTY mode, and Android doesn't let other apps change it.",
-  "callAccessibilityPrivacy": "Real-time text and video go over your carrier's network, straight to the other person. ZT Phone never sends them to its servers or keeps them after the call."
+  "callAccessibilityPrivacy": "Real-time text and video go over your carrier's network, straight to the other person. ZT Phone never sends them to its servers or keeps them after the call.",
+  "pasteNumber": "Paste a number",
+  "noNumberInText": "No phone number found in the copied text",
+  "whichNumber": "Which number?"
 }

@@ -54,12 +54,17 @@ class _AppGateState extends ConsumerState<AppGate> with WidgetsBindingObserver {
   Future<void> _onDialRequest() async {
     final String? number = await _telecom.consumeDial();
     if (number == null || !mounted) return;
-    _openDialpad(number);
+    final String? text = await _telecom.consumeDialText();
+    if (!mounted) return;
+    _openDialpad(number, text);
   }
 
-  void _openDialpad([String number = '']) => Navigator.of(context).push(
-    MaterialPageRoute<void>(builder: (_) => DialpadPage(initialNumber: number)),
-  );
+  void _openDialpad([String number = '', String? text]) =>
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => DialpadPage(initialNumber: number, initialText: text),
+        ),
+      );
 
   /// Sign-in and unlock screens get a dialpad button, so a call (including
   /// an emergency call) never needs the password.

@@ -32,6 +32,9 @@ class MainActivity : FlutterFragmentActivity() {
     /** A number from a DIAL / tel: intent, "" for an empty dialpad. */
     private var pendingDial: String? = null
 
+    /** Text selected or shared from another app, to pick a number from (P13). */
+    private var pendingDialText: String? = null
+
     /** Opened from the missed-call notification. */
     private var pendingRecents = false
     private var pendingRingtone: MethodChannel.Result? = null
@@ -40,6 +43,7 @@ class MainActivity : FlutterFragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pendingDial = dialNumber(intent)
+        pendingDialText = dialText(intent)
         pendingRecents = intent?.action == ACTION_SHOW_RECENTS
     }
 
@@ -53,14 +57,30 @@ class MainActivity : FlutterFragmentActivity() {
         // Kept until the unlocked dialer takes it (consumeDial), so a number
         // that arrives while the vault is locked isn't lost.
         pendingDial = dialNumber(intent) ?: return
+        pendingDialText = dialText(intent)
         channel?.invokeMethod("dialPending", null)
     }
 
     private fun dialNumber(intent: Intent?): String? {
         if (intent == null) return null
+        // "ZT Phone" in another app's text menu or share sheet: an empty
+        // dialpad, and the text goes to Dart to find the number in (P13).
+        if (dialText(intent) != null) return ""
         if (intent.action != Intent.ACTION_DIAL && intent.action != Intent.ACTION_VIEW) return null
         val data = intent.data ?: return ""
         return if (data.scheme == "tel") Uri.decode(data.schemeSpecificPart) else ""
+    }
+
+    private fun dialText(intent: Intent?): String? {
+        val text = when (intent?.action) {
+            Intent.ACTION_PROCESS_TEXT ->
+                intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)
+            Intent.ACTION_SEND ->
+                if (intent.type == "text/plain") intent.getCharSequenceExtra(Intent.EXTRA_TEXT) else null
+            else -> null
+        } ?: return null
+        // A number is short; a whole pasted page isn't kept or passed on.
+        return text.toString().take(4000)
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -87,6 +107,10 @@ class MainActivity : FlutterFragmentActivity() {
                     "consumeDial" -> {
                         result.success(pendingDial)
                         pendingDial = null
+                    }
+                    "consumeDialText" -> {
+                        result.success(pendingDialText)
+                        pendingDialText = null
                     }
                     "placeCall" -> {
                         placeCall(

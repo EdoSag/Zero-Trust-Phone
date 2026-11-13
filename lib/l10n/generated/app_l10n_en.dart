@@ -800,4 +800,13 @@ class AppL10nEn extends AppL10n {
   @override
   String get callAccessibilityPrivacy =>
       'Real-time text and video go over your carrier\'s network, straight to the other person. ZT Phone never sends them to its servers or keeps them after the call.';
+
+  @override
+  String get pasteNumber => 'Paste a number';
+
+  @override
+  String get noNumberInText => 'No phone number found in the copied text';
+
+  @override
+  String get whichNumber => 'Which number?';
 }
