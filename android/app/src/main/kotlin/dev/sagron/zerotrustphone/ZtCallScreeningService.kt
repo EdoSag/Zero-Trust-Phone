@@ -46,6 +46,13 @@ class ZtCallScreeningService : CallScreeningService() {
                 .setSkipNotification(true)
         }
         respondToCall(details, response.build())
+        // P23: a private contact's call that never rings (sent to voicemail)
+        // is still logged by Telecom; take it out of the shared log too.
+        if (decision != Decision.ALLOW && decision != Decision.SILENCE &&
+            number.isNotBlank() && store.isPrivate(number)
+        ) {
+            PrivateCallLog.scrubSoon(this, number, System.currentTimeMillis())
+        }
     }
 
     private fun canRingItself(): Boolean {

@@ -22,4 +22,7 @@
     <string name="on_hold">On hold</string>
     <string name="calling">Calling…</string>
     <string name="hang_up">Hang up</string>
+    <string name="call_back_reminder">Call back %s</string>
+    <string name="call_back_channel">Call back reminders</string>
+    <string name="remind_me">Remind me</string>
 </resources>

@@ -21,6 +21,9 @@
     <!-- Carrier video calls (P12). Asked for only when a video call starts. -->
     <uses-permission android:name="android.permission.CAMERA"/>
 
+    <!-- Call back reminders (P25) come back after a restart. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
     <uses-feature android:name="android.hardware.telephony" android:required="false"/>
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.camera.front" android:required="false"/>
@@ -107,6 +110,16 @@
         <receiver
             android:name=".CallBackReceiver"
             android:exported="false"/>
+        <!-- Call back reminders (P25): the alarm, and putting them back
+             after a restart or app update. -->
+        <receiver
+            android:name=".CallBackAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+            </intent-filter>
+        </receiver>
 
         <!-- Telecom asks the default Phone app to show missed-call and
              voicemail notifications (P2, P5). -->

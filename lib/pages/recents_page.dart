@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/pages/call_actions.dart';
+import 'package:zerotrust_phone/pages/call_back_sheet.dart';
 import 'package:zerotrust_phone/pages/call_details_page.dart';
-import 'package:zerotrust_phone/services/history_backup.dart';
+import 'package:zerotrust_phone/pages/call_stats_page.dart';
+import 'package:zerotrust_phone/services/private_calls.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/util/phone_numbers.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
@@ -105,7 +107,7 @@ class _RecentsPageState extends ConsumerState<RecentsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<List<CallLogEntry>> log = ref.watch(callLogProvider);
+    final AsyncValue<List<CallLogEntry>> log = ref.watch(allCallsProvider);
     final ContactDirectory directory = ref.watch(contactDirectoryProvider);
 
     final Widget chips = SingleChildScrollView(
@@ -122,6 +124,14 @@ class _RecentsPageState extends ConsumerState<RecentsPage> {
                 onSelected: (_) => setState(() => _filter = f),
               ),
             ),
+          // P28.
+          ActionChip(
+            avatar: const Icon(Icons.insights_outlined, size: 18),
+            label: Text(context.l10n.callStats),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const CallStatsPage()),
+            ),
+          ),
         ],
       ),
     );
@@ -143,6 +153,8 @@ class _RecentsPageState extends ConsumerState<RecentsPage> {
         return Column(
           children: <Widget>[
             chips,
+            // P25: reminders to call someone back.
+            const CallBackList(),
             Expanded(
               child: groups.isEmpty
                   ? _Empty(
@@ -233,6 +245,15 @@ class _CallRow extends ConsumerWidget {
                     : theme.colorScheme.onSurfaceVariant,
                 semanticLabel: label,
               ),
+              if (call.isPrivate) ...<Widget>[
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.lock_outline,
+                  size: 14,
+                  color: theme.colorScheme.onSurfaceVariant,
+                  semanticLabel: context.l10n.privateCallLog,
+                ),
+              ],
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
@@ -286,14 +307,7 @@ class _CallRow extends ConsumerWidget {
       ),
     );
     if (ok != true) return;
-    await ref.read(telecomProvider).deleteCalls(<int>[
-      for (final CallLogEntry c in group.calls) c.id,
-    ]);
-    await ref
-        .read(historyBackupProvider)
-        .forget(group.calls)
-        .catchError((_) {});
-    ref.invalidate(callLogProvider);
+    await ref.read(privateCallsServiceProvider).delete(group.calls);
   }
 }
 

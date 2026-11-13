@@ -20,4 +20,7 @@
     <string name="on_hold">בהמתנה</string>
     <string name="calling">מחייג…</string>
     <string name="hang_up">ניתוק</string>
+    <string name="call_back_reminder">לחזור אל %s</string>
+    <string name="call_back_channel">תזכורות לחזור בשיחה</string>
+    <string name="remind_me">תזכורת</string>
 </resources>

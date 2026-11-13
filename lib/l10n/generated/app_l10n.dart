@@ -1698,6 +1698,234 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Skip'**
   String get skip;
+
+  /// No description provided for @privateCallLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Private call log'**
+  String get privateCallLog;
+
+  /// No description provided for @privateCallLogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Calls with this contact are kept only in your encrypted vault, not in Android\'s shared call history that other apps can read'**
+  String get privateCallLogBody;
+
+  /// No description provided for @movedToVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Moved {count} past calls into the vault'**
+  String movedToVault(int count);
+
+  /// No description provided for @callStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Call stats'**
+  String get callStats;
+
+  /// No description provided for @statsWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'7 days'**
+  String get statsWeek;
+
+  /// No description provided for @statsMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'30 days'**
+  String get statsMonth;
+
+  /// No description provided for @statsYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get statsYear;
+
+  /// No description provided for @statsCalls.
+  ///
+  /// In en, this message translates to:
+  /// **'Calls'**
+  String get statsCalls;
+
+  /// No description provided for @statsInOut.
+  ///
+  /// In en, this message translates to:
+  /// **'{incoming} in · {outgoing} out'**
+  String statsInOut(int incoming, int outgoing);
+
+  /// No description provided for @statsTalkTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk time'**
+  String get statsTalkTime;
+
+  /// No description provided for @statsAverageCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Average call'**
+  String get statsAverageCall;
+
+  /// No description provided for @statsLastWeeks.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 8 weeks'**
+  String get statsLastWeeks;
+
+  /// No description provided for @statsMostTalked.
+  ///
+  /// In en, this message translates to:
+  /// **'Who you talk to most'**
+  String get statsMostTalked;
+
+  /// No description provided for @statsPersonLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{calls} calls · {talk}'**
+  String statsPersonLine(int calls, String talk);
+
+  /// No description provided for @statsWeekBar.
+  ///
+  /// In en, this message translates to:
+  /// **'Week of {start}: {calls} calls, {talk}'**
+  String statsWeekBar(String start, int calls, String talk);
+
+  /// No description provided for @statsPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Worked out on this phone from your call history. Nothing is sent anywhere.'**
+  String get statsPrivacy;
+
+  /// No description provided for @talkMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String talkMinutes(int minutes);
+
+  /// No description provided for @talkHoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h {minutes} min'**
+  String talkHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @remindMeToCallBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me to call {name} back'**
+  String remindMeToCallBack(String name);
+
+  /// No description provided for @remindMeToCallBackShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me to call back'**
+  String get remindMeToCallBackShort;
+
+  /// No description provided for @remindMeToCallBackBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A reminder here, and a task in ZT Tasks'**
+  String get remindMeToCallBackBody;
+
+  /// No description provided for @callBackLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Call back later'**
+  String get callBackLater;
+
+  /// No description provided for @in15Minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'In 15 minutes'**
+  String get in15Minutes;
+
+  /// No description provided for @in1Hour.
+  ///
+  /// In en, this message translates to:
+  /// **'In 1 hour'**
+  String get in1Hour;
+
+  /// No description provided for @in3Hours.
+  ///
+  /// In en, this message translates to:
+  /// **'In 3 hours'**
+  String get in3Hours;
+
+  /// No description provided for @tonight.
+  ///
+  /// In en, this message translates to:
+  /// **'Tonight'**
+  String get tonight;
+
+  /// No description provided for @tomorrowMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow morning'**
+  String get tomorrowMorning;
+
+  /// No description provided for @pickATime.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a date and time'**
+  String get pickATime;
+
+  /// No description provided for @callBackExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'ZT Phone reminds you at that time and adds a task to ZT Tasks. Both are done once you call back.'**
+  String get callBackExplain;
+
+  /// No description provided for @callBackSetWithTask.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ll remind you at {time}. Added to ZT Tasks.'**
+  String callBackSetWithTask(String time);
+
+  /// No description provided for @callBackSetNoTask.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ll remind you at {time}. ZT Tasks couldn\'t be reached, so no task was added.'**
+  String callBackSetNoTask(String time);
+
+  /// No description provided for @callBackTaskTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Call {name} back'**
+  String callBackTaskTitle(String name);
+
+  /// No description provided for @callBackName.
+  ///
+  /// In en, this message translates to:
+  /// **'Call back {name}'**
+  String callBackName(String name);
+
+  /// No description provided for @callBackDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due since {time}'**
+  String callBackDue(String time);
+
+  /// No description provided for @cancelReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel reminder'**
+  String get cancelReminder;
+
+  /// No description provided for @nativeCallBackReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Call back %s'**
+  String get nativeCallBackReminder;
+
+  /// No description provided for @nativeCallBackChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Call back reminders'**
+  String get nativeCallBackChannel;
+
+  /// No description provided for @nativeRemindMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me'**
+  String get nativeRemindMe;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

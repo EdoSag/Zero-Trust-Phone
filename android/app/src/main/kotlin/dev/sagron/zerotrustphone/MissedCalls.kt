@@ -60,6 +60,14 @@ class MissedCallReceiver : BroadcastReceiver() {
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             ))
+            // P25: pick a time in the app; it reminds and adds a ZT Task.
+            builder.addAction(0, NativeStrings.get(context, "nativeRemindMe", R.string.remind_me), PendingIntent.getActivity(
+                context, 14, Intent(context, MainActivity::class.java)
+                    .setAction(MainActivity.ACTION_CALL_BACK_LATER)
+                    .putExtra(EXTRA_NUMBER, number)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            ))
             if (name == null) {
                 builder.addAction(0, NativeStrings.get(context, "addToContacts", R.string.add_to_contacts), PendingIntent.getActivity(
                     context, 12, addContactIntent(number),
@@ -100,6 +108,7 @@ class MissedCallReceiver : BroadcastReceiver() {
     companion object {
         const val ACTION_CALL_BACK = "dev.sagron.zerotrustphone.CALL_BACK"
         const val EXTRA_NUMBER = "number"
+        const val EXTRA_NOTIFICATION_ID = "notificationId"
         private const val MISSED_CHANNEL = "missed_calls"
         private const val VOICEMAIL_CHANNEL = "voicemail"
         const val MISSED_ID = 4300
@@ -151,6 +160,8 @@ class CallBackReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != MissedCallReceiver.ACTION_CALL_BACK) return
         MissedCallReceiver.cancel(context, MissedCallReceiver.MISSED_ID)
+        intent.getIntExtra(MissedCallReceiver.EXTRA_NOTIFICATION_ID, 0).takeIf { it != 0 }
+            ?.let { MissedCallReceiver.cancel(context, it) }
         val number = intent.getStringExtra(MissedCallReceiver.EXTRA_NUMBER) ?: return
         val uri = if (number == "voicemail") {
             Uri.fromParts("voicemail", "", null)

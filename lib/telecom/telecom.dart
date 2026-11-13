@@ -12,6 +12,7 @@ class CallLogEntry {
     required this.duration,
     this.cachedName,
     this.isNew = false,
+    this.privateId,
   });
 
   factory CallLogEntry.fromMap(Map<Object?, Object?> m) => CallLogEntry(
@@ -44,6 +45,12 @@ class CallLogEntry {
   /// The name Android saved with the call (from the phone's contacts).
   final String? cachedName;
   final bool isNew;
+
+  /// P23: a private contact's call, kept only in the vault under this id
+  /// (not in Android's call log; [id] is then 0).
+  final String? privateId;
+
+  bool get isPrivate => privateId != null;
 }
 
 enum CallType {
@@ -109,12 +116,16 @@ class Telecom {
   /// Ticks when the missed-call notification is tapped while the app is open.
   final ValueNotifier<int> recentsRequests = ValueNotifier<int>(0);
 
+  /// Ticks when "Remind me" on a missed call is tapped while the app is open.
+  final ValueNotifier<int> callBackRequests = ValueNotifier<int>(0);
+
   bool get isSupported => defaultTargetPlatform == TargetPlatform.android;
 
   void listenForDials() {
     _channel.setMethodCallHandler((MethodCall call) async {
       if (call.method == 'dialPending') dialRequests.value++;
       if (call.method == 'recentsPending') recentsRequests.value++;
+      if (call.method == 'callBackPending') callBackRequests.value++;
     });
   }
 
@@ -215,6 +226,7 @@ class Telecom {
     required List<String> contactKeys,
     required List<String> voicemailKeys,
     required Map<String, String> ringtones,
+    List<String> privateKeys = const <String>[],
   }) => _call<void>('setScreening', {
     'unknownMode': unknownMode,
     'blockHidden': blockHidden,
@@ -222,7 +234,34 @@ class Telecom {
     'contactKeys': contactKeys,
     'voicemailKeys': voicemailKeys,
     'ringtones': ringtones,
+    'privateKeys': privateKeys,
   });
+
+  /// P23: private contacts' calls the Android side took out of the shared
+  /// call log, to move into the vault. Each is handed over once.
+  Future<List<Map<Object?, Object?>>> takePrivateCalls() async =>
+      <Map<Object?, Object?>>[
+        for (final Object? c
+            in await _call<List<Object?>>('takePrivateCalls') ?? <Object?>[])
+          if (c is Map<Object?, Object?>) c,
+      ];
+
+  /// P25: a reminder notification at [at] to call [number] back.
+  /// Replaces one with the same [id].
+  Future<void> scheduleCallBack(String id, String number, DateTime at) =>
+      _call<void>('scheduleCallBack', {
+        'id': id,
+        'number': number,
+        'at': at.millisecondsSinceEpoch,
+      });
+
+  Future<void> cancelCallBack(String id) =>
+      _call<void>('cancelCallBack', {'id': id});
+
+  /// A number from the missed-call notification's "Remind me" button, to
+  /// pick a time for (P25). Null when there's none.
+  Future<String?> consumeCallBackLater() =>
+      _call<String>('consumeCallBackLater');
 
   Future<void> clearScreeningContacts() =>
       _call<void>('clearScreeningContacts');

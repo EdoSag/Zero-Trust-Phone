@@ -926,4 +926,146 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get skip => 'Skip';
+
+  @override
+  String get privateCallLog => 'Private call log';
+
+  @override
+  String get privateCallLogBody =>
+      'Calls with this contact are kept only in your encrypted vault, not in Android\'s shared call history that other apps can read';
+
+  @override
+  String movedToVault(int count) {
+    return 'Moved $count past calls into the vault';
+  }
+
+  @override
+  String get callStats => 'Call stats';
+
+  @override
+  String get statsWeek => '7 days';
+
+  @override
+  String get statsMonth => '30 days';
+
+  @override
+  String get statsYear => 'Year';
+
+  @override
+  String get statsCalls => 'Calls';
+
+  @override
+  String statsInOut(int incoming, int outgoing) {
+    return '$incoming in · $outgoing out';
+  }
+
+  @override
+  String get statsTalkTime => 'Talk time';
+
+  @override
+  String get statsAverageCall => 'Average call';
+
+  @override
+  String get statsLastWeeks => 'Last 8 weeks';
+
+  @override
+  String get statsMostTalked => 'Who you talk to most';
+
+  @override
+  String statsPersonLine(int calls, String talk) {
+    return '$calls calls · $talk';
+  }
+
+  @override
+  String statsWeekBar(String start, int calls, String talk) {
+    return 'Week of $start: $calls calls, $talk';
+  }
+
+  @override
+  String get statsPrivacy =>
+      'Worked out on this phone from your call history. Nothing is sent anywhere.';
+
+  @override
+  String talkMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String talkHoursMinutes(int hours, int minutes) {
+    return '$hours h $minutes min';
+  }
+
+  @override
+  String remindMeToCallBack(String name) {
+    return 'Remind me to call $name back';
+  }
+
+  @override
+  String get remindMeToCallBackShort => 'Remind me to call back';
+
+  @override
+  String get remindMeToCallBackBody =>
+      'A reminder here, and a task in ZT Tasks';
+
+  @override
+  String get callBackLater => 'Call back later';
+
+  @override
+  String get in15Minutes => 'In 15 minutes';
+
+  @override
+  String get in1Hour => 'In 1 hour';
+
+  @override
+  String get in3Hours => 'In 3 hours';
+
+  @override
+  String get tonight => 'Tonight';
+
+  @override
+  String get tomorrowMorning => 'Tomorrow morning';
+
+  @override
+  String get pickATime => 'Pick a date and time';
+
+  @override
+  String get callBackExplain =>
+      'ZT Phone reminds you at that time and adds a task to ZT Tasks. Both are done once you call back.';
+
+  @override
+  String callBackSetWithTask(String time) {
+    return 'I\'ll remind you at $time. Added to ZT Tasks.';
+  }
+
+  @override
+  String callBackSetNoTask(String time) {
+    return 'I\'ll remind you at $time. ZT Tasks couldn\'t be reached, so no task was added.';
+  }
+
+  @override
+  String callBackTaskTitle(String name) {
+    return 'Call $name back';
+  }
+
+  @override
+  String callBackName(String name) {
+    return 'Call back $name';
+  }
+
+  @override
+  String callBackDue(String time) {
+    return 'Due since $time';
+  }
+
+  @override
+  String get cancelReminder => 'Cancel reminder';
+
+  @override
+  String get nativeCallBackReminder => 'Call back %s';
+
+  @override
+  String get nativeCallBackChannel => 'Call back reminders';
+
+  @override
+  String get nativeRemindMe => 'Remind me';
 }

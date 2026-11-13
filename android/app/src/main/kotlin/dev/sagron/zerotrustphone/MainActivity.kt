@@ -37,6 +37,9 @@ class MainActivity : FlutterFragmentActivity() {
 
     /** Opened from the missed-call notification. */
     private var pendingRecents = false
+
+    /** P25: "Remind me" on a missed call, with its number. */
+    private var pendingCallBackLater: String? = null
     private var pendingRingtone: MethodChannel.Result? = null
     private var pendingCamera: MethodChannel.Result? = null
 
@@ -45,13 +48,26 @@ class MainActivity : FlutterFragmentActivity() {
         pendingDial = dialNumber(intent)
         pendingDialText = dialText(intent)
         pendingRecents = intent?.action == ACTION_SHOW_RECENTS
+        pendingCallBackLater = callBackLater(intent)
     }
+
+    private fun callBackLater(intent: Intent?): String? =
+        if (intent?.action == ACTION_CALL_BACK_LATER) {
+            intent.getStringExtra(MissedCallReceiver.EXTRA_NUMBER)?.takeIf { it.isNotBlank() }
+        } else {
+            null
+        }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         if (intent.action == ACTION_SHOW_RECENTS) {
             pendingRecents = true
             channel?.invokeMethod("recentsPending", null)
+            return
+        }
+        if (intent.action == ACTION_CALL_BACK_LATER) {
+            pendingCallBackLater = callBackLater(intent) ?: return
+            channel?.invokeMethod("callBackPending", null)
             return
         }
         // Kept until the unlocked dialer takes it (consumeDial), so a number
@@ -144,11 +160,32 @@ class MainActivity : FlutterFragmentActivity() {
                             contactKeys = call.argument<List<String>>("contactKeys") ?: emptyList(),
                             voicemailKeys = call.argument<List<String>>("voicemailKeys") ?: emptyList(),
                             ringtones = call.argument<Map<String, String>>("ringtones") ?: emptyMap(),
+                            privateKeys = call.argument<List<String>>("privateKeys") ?: emptyList(),
                         )
                         result.success(null)
                     }
+                    "takePrivateCalls" -> result.success(PrivateCallLog.take(this))
+                    "scheduleCallBack" -> {
+                        CallBackAlarms.schedule(
+                            this,
+                            call.argument<String>("id") ?: "",
+                            call.argument<String>("number") ?: "",
+                            (call.argument<Number>("at") ?: 0).toLong(),
+                        )
+                        result.success(null)
+                    }
+                    "cancelCallBack" -> {
+                        CallBackAlarms.cancel(this, call.argument<String>("id") ?: "")
+                        result.success(null)
+                    }
+                    "consumeCallBackLater" -> {
+                        result.success(pendingCallBackLater)
+                        pendingCallBackLater = null
+                    }
                     "clearScreeningContacts" -> {
                         ScreeningStore(this).clearContacts()
+                        PrivateCallLog.clear(this)
+                        CallBackAlarms.cancelAll(this)
                         result.success(null)
                     }
                     "insertCalls" -> result.success(
@@ -585,5 +622,6 @@ class MainActivity : FlutterFragmentActivity() {
         private const val REQUEST_PERMISSIONS = 3102
         private const val REQUEST_RINGTONE = 3103
         const val ACTION_SHOW_RECENTS = "dev.sagron.zerotrustphone.SHOW_RECENTS"
+        const val ACTION_CALL_BACK_LATER = "dev.sagron.zerotrustphone.CALL_BACK_LATER"
     }
 }
