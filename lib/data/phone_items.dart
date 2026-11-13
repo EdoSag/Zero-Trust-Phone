@@ -17,6 +17,7 @@ class ContactCallSettings {
     this.accountId,
     this.accountLabel,
     this.hideCallerId = false,
+    this.privateLog = false,
   });
 
   final String contactId;
@@ -35,8 +36,16 @@ class ContactCallSettings {
   /// P22: calls to this contact hide my number (where the carrier allows).
   final bool hideCallerId;
 
+  /// P23: this contact's calls stay out of Android's shared call log and
+  /// are kept only in the vault.
+  final bool privateLog;
+
   bool get isEmpty =>
-      ringtone == null && !toVoicemail && accountId == null && !hideCallerId;
+      ringtone == null &&
+      !toVoicemail &&
+      accountId == null &&
+      !hideCallerId &&
+      !privateLog;
 
   ContactCallSettings copyWith({
     String? Function()? ringtone,
@@ -45,6 +54,7 @@ class ContactCallSettings {
     String? Function()? accountId,
     String? Function()? accountLabel,
     bool? hideCallerId,
+    bool? privateLog,
   }) => ContactCallSettings(
     contactId: contactId,
     ringtone: ringtone != null ? ringtone() : this.ringtone,
@@ -53,6 +63,7 @@ class ContactCallSettings {
     accountId: accountId != null ? accountId() : this.accountId,
     accountLabel: accountLabel != null ? accountLabel() : this.accountLabel,
     hideCallerId: hideCallerId ?? this.hideCallerId,
+    privateLog: privateLog ?? this.privateLog,
   );
 }
 
@@ -69,6 +80,7 @@ final ZtCollection<ContactCallSettings> contactSettingsCollection =
             accountId: j['accountId'] as String?,
             accountLabel: j['accountLabel'] as String?,
             hideCallerId: j['hideCallerId'] == true,
+            privateLog: j['privateLog'] == true,
           ),
       toJson: (ContactCallSettings s) => <String, Object?>{
         'ringtone': s.ringtone,
@@ -77,6 +89,7 @@ final ZtCollection<ContactCallSettings> contactSettingsCollection =
         'accountId': s.accountId,
         'accountLabel': s.accountLabel,
         'hideCallerId': s.hideCallerId,
+        'privateLog': s.privateLog,
       },
       idOf: (ContactCallSettings s) => s.contactId,
     );
@@ -272,6 +285,67 @@ final ZtCollection<BackedUpCall> backedUpCallsCollection =
       idOf: (BackedUpCall c) => c.id,
     );
 
+/// A private contact's call (P23), kept only in the vault. Same fields as
+/// [BackedUpCall], in its own collection so turning the history backup off
+/// never deletes it.
+final ZtCollection<BackedUpCall> privateCallsCollection =
+    ZtCollection<BackedUpCall>(
+      kind: 'private_call',
+      version: 1,
+      fromJson: backedUpCallsCollection.fromJson,
+      toJson: backedUpCallsCollection.toJson,
+      idOf: (BackedUpCall c) => c.id,
+    );
+
+/// "Call back in 1 hour" (P25): ZT Phone reminds at [at] and a matching ZT
+/// Tasks task ([taskId]) is created. Done once I call the number.
+class CallBack {
+  const CallBack({
+    required this.id,
+    required this.number,
+    required this.name,
+    required this.at,
+    required this.createdAt,
+    this.contactId,
+    this.taskId,
+  });
+
+  final String id;
+  final String number;
+
+  /// The name when it was set, for the list (the address book wins).
+  final String name;
+  final DateTime at;
+  final DateTime createdAt;
+  final String? contactId;
+  final String? taskId;
+}
+
+final ZtCollection<CallBack> callBackCollection = ZtCollection<CallBack>(
+  kind: 'call_back',
+  version: 1,
+  fromJson: (String id, Map<String, Object?> j, DateTime _) => CallBack(
+    id: id,
+    number: j['number'] as String? ?? '',
+    name: j['name'] as String? ?? '',
+    at: DateTime.fromMillisecondsSinceEpoch((j['at'] as num).toInt()),
+    createdAt: DateTime.fromMillisecondsSinceEpoch(
+      (j['createdAt'] as num? ?? j['at'] as num).toInt(),
+    ),
+    contactId: j['contactId'] as String?,
+    taskId: j['taskId'] as String?,
+  ),
+  toJson: (CallBack c) => <String, Object?>{
+    'number': c.number,
+    'name': c.name,
+    'at': c.at.millisecondsSinceEpoch,
+    'createdAt': c.createdAt.millisecondsSinceEpoch,
+    'contactId': c.contactId,
+    'taskId': c.taskId,
+  },
+  idOf: (CallBack c) => c.id,
+);
+
 /// Phone's own store, open while unlocked.
 final phoneStoreProvider = FutureProvider<ZtLocalStore>(
   (ref) async => (await ref.watch(ztLocalStoreProvider.future)) as ZtLocalStore,
@@ -286,6 +360,8 @@ StreamProvider<List<T>> _watch<T>(ZtCollection<T> c) =>
 final contactSettingsProvider = _watch(contactSettingsCollection);
 final speedDialsProvider = _watch(speedDialCollection);
 final dialShortcutsProvider = _watch(dialShortcutCollection);
+final privateCallsProvider = _watch(privateCallsCollection);
+final callBacksProvider = _watch(callBackCollection);
 final _protectionList = _watch(protectionCollection);
 
 final callProtectionProvider = Provider<CallProtection>((ref) {
@@ -330,6 +406,25 @@ class PhoneData {
 
   /// The saved protection settings, read straight from the store (the
   /// provider may not have loaded yet right after unlock).
+  Future<void> savePrivateCall(BackedUpCall c) =>
+      _save(privateCallsCollection, c);
+
+  Future<void> deletePrivateCall(String id) =>
+      _delete(privateCallsCollection, id);
+
+  Future<List<BackedUpCall>> privateCalls() async =>
+      privateCallsCollection.list(await ref.read(phoneStoreProvider.future));
+
+  Future<void> saveCallBack(CallBack c) => _save(callBackCollection, c);
+
+  Future<void> deleteCallBack(String id) => _delete(callBackCollection, id);
+
+  Future<List<CallBack>> callBacks() async =>
+      callBackCollection.list(await ref.read(phoneStoreProvider.future));
+
+  Future<List<ContactCallSettings>> contactSettings() async =>
+      contactSettingsCollection.list(await ref.read(phoneStoreProvider.future));
+
   Future<CallProtection> protection() async =>
       await protectionCollection.get(
         await ref.read(phoneStoreProvider.future),

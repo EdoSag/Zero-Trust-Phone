@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
+import 'package:zerotrust_phone/services/private_calls.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
 
@@ -72,6 +73,24 @@ class ContactCallSettingsPage extends ConsumerWidget {
             value: settings.hideCallerId,
             onChanged: (bool on) =>
                 data.saveContactSettings(settings.copyWith(hideCallerId: on)),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.lock_outline),
+            title: Text(context.l10n.privateCallLog),
+            subtitle: Text(context.l10n.privateCallLogBody),
+            value: settings.privateLog,
+            onChanged: (bool on) async {
+              await data.saveContactSettings(settings.copyWith(privateLog: on));
+              if (!on) return;
+              final int moved = await ref
+                  .read(privateCallsServiceProvider)
+                  .moveExisting(contact);
+              if (moved > 0 && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(context.l10n.movedToVault(moved))),
+                );
+              }
+            },
           ),
           if (accounts.length > 1)
             ListTile(

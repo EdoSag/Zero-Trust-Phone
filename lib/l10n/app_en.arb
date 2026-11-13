@@ -450,5 +450,142 @@
       }
     }
   },
-  "skip": "Skip"
+  "skip": "Skip",
+  "privateCallLog": "Private call log",
+  "privateCallLogBody": "Calls with this contact are kept only in your encrypted vault, not in Android's shared call history that other apps can read",
+  "movedToVault": "Moved {count} past calls into the vault",
+  "@movedToVault": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "callStats": "Call stats",
+  "statsWeek": "7 days",
+  "statsMonth": "30 days",
+  "statsYear": "Year",
+  "statsCalls": "Calls",
+  "statsInOut": "{incoming} in · {outgoing} out",
+  "@statsInOut": {
+    "placeholders": {
+      "incoming": {
+        "type": "int"
+      },
+      "outgoing": {
+        "type": "int"
+      }
+    }
+  },
+  "statsTalkTime": "Talk time",
+  "statsAverageCall": "Average call",
+  "statsLastWeeks": "Last 8 weeks",
+  "statsMostTalked": "Who you talk to most",
+  "statsPersonLine": "{calls} calls · {talk}",
+  "@statsPersonLine": {
+    "placeholders": {
+      "calls": {
+        "type": "int"
+      },
+      "talk": {
+        "type": "String"
+      }
+    }
+  },
+  "statsWeekBar": "Week of {start}: {calls} calls, {talk}",
+  "@statsWeekBar": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "calls": {
+        "type": "int"
+      },
+      "talk": {
+        "type": "String"
+      }
+    }
+  },
+  "statsPrivacy": "Worked out on this phone from your call history. Nothing is sent anywhere.",
+  "talkMinutes": "{minutes} min",
+  "@talkMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "talkHoursMinutes": "{hours} h {minutes} min",
+  "@talkHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "remindMeToCallBack": "Remind me to call {name} back",
+  "@remindMeToCallBack": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remindMeToCallBackShort": "Remind me to call back",
+  "remindMeToCallBackBody": "A reminder here, and a task in ZT Tasks",
+  "callBackLater": "Call back later",
+  "in15Minutes": "In 15 minutes",
+  "in1Hour": "In 1 hour",
+  "in3Hours": "In 3 hours",
+  "tonight": "Tonight",
+  "tomorrowMorning": "Tomorrow morning",
+  "pickATime": "Pick a date and time",
+  "callBackExplain": "ZT Phone reminds you at that time and adds a task to ZT Tasks. Both are done once you call back.",
+  "callBackSetWithTask": "I'll remind you at {time}. Added to ZT Tasks.",
+  "@callBackSetWithTask": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "callBackSetNoTask": "I'll remind you at {time}. ZT Tasks couldn't be reached, so no task was added.",
+  "@callBackSetNoTask": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "callBackTaskTitle": "Call {name} back",
+  "@callBackTaskTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "callBackName": "Call back {name}",
+  "@callBackName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "callBackDue": "Due since {time}",
+  "@callBackDue": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelReminder": "Cancel reminder",
+  "nativeCallBackReminder": "Call back %s",
+  "nativeCallBackChannel": "Call back reminders",
+  "nativeRemindMe": "Remind me"
 }

@@ -6,7 +6,11 @@ import 'package:zerotrust_phone/app/history_retention.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
+import 'package:zerotrust_phone/pages/call_back_sheet.dart';
+import 'package:zerotrust_phone/services/call_backs.dart';
 import 'package:zerotrust_phone/services/history_backup.dart';
+import 'package:zerotrust_phone/services/tasks_bridge.dart';
+import 'package:zerotrust_phone/services/private_calls.dart';
 import 'package:zerotrust_phone/services/screening_sync.dart';
 import 'package:zerotrust_phone/pages/dialpad_page.dart';
 import 'package:zerotrust_phone/pages/home_page.dart';
@@ -106,6 +110,8 @@ class _AppGateState extends ConsumerState<AppGate> with WidgetsBindingObserver {
     // Phone reads the address book ZT Contacts keeps in the same account,
     // so it also derives the Contacts key while it holds the account key.
     await ref.read(contactsKeyProvider.notifier).deriveFrom(result.dek);
+    // And the Tasks key, to add call back tasks (P25).
+    await ref.read(tasksKeyProvider.notifier).deriveFrom(result.dek);
     if (!mounted) return;
     if (result.newRecoveryKey != null) {
       setState(() {
@@ -210,11 +216,13 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _telecom.recentsRequests.addListener(_onRecentsRequest);
+    _telecom.callBackRequests.addListener(_onCallBackRequest);
     WidgetsBinding.instance.addPostFrameCallback((_) => _start());
   }
 
   Future<void> _start() async {
     await _onRecentsRequest();
+    await _onCallBackRequest();
     // Made default from Android's settings or Phone's own Settings row:
     // the permissions (notifications above all, which the incoming-call
     // card needs) were never asked for.
@@ -228,7 +236,25 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
 
   Future<void> _backUp() async {
     try {
+      // P23: private contacts' calls go into the vault first.
+      await ref.read(privateCallsServiceProvider).collect();
+      final int? keepDays = ref.read(historyRetentionProvider);
+      if (keepDays != null) {
+        await ref
+            .read(privateCallsServiceProvider)
+            .deleteBefore(DateTime.now().subtract(Duration(days: keepDays)));
+      }
       await ref.read(historyBackupProvider).backUp();
+      // P25: done reminders tick off their task; the rest are scheduled.
+      final List<CallLogEntry> shared = await _telecom.callLog();
+      final List<BackedUpCall> private = await ref
+          .read(phoneDataProvider)
+          .privateCalls();
+      await ref
+          .read(callBacksServiceProvider)
+          .refresh(mergeCalls(shared, private));
+      // ZT Tasks writes made offline go out now.
+      await ref.read(tasksBridgeProvider).flush();
     } on Object {
       // Locked meanwhile, or offline: the next open tries again.
     }
@@ -238,6 +264,7 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _telecom.recentsRequests.removeListener(_onRecentsRequest);
+    _telecom.callBackRequests.removeListener(_onCallBackRequest);
     _telecom.clearVaultNames().ignore();
     super.dispose();
   }
@@ -258,6 +285,15 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
       Navigator.of(context).popUntil((Route<dynamic> r) => r.isFirst);
       ref.read(homeTabProvider.notifier).show(HomeTab.recents);
     }
+  }
+
+  /// "Remind me" on a missed call (P25): pick when.
+  Future<void> _onCallBackRequest() async {
+    final String? number = await _telecom.consumeCallBackLater();
+    if (number == null || !mounted) return;
+    Navigator.of(context).popUntil((Route<dynamic> r) => r.isFirst);
+    ref.read(homeTabProvider.notifier).show(HomeTab.recents);
+    await showCallBackSheet(context, ref, number: number);
   }
 
   void _syncScreening() {
@@ -283,6 +319,7 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
           contactKeys: rules.contactKeys,
           voicemailKeys: rules.voicemailKeys,
           ringtones: rules.ringtones,
+          privateKeys: rules.privateKeys,
         )
         .ignore();
   }

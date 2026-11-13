@@ -926,4 +926,145 @@ class AppL10nHe extends AppL10n {
 
   @override
   String get skip => 'דילוג';
+
+  @override
+  String get privateCallLog => 'יומן שיחות פרטי';
+
+  @override
+  String get privateCallLogBody =>
+      'שיחות עם איש הקשר הזה נשמרות רק בכספת המוצפנת שלך, ולא בהיסטוריית השיחות המשותפת של Android שאפליקציות אחרות יכולות לקרוא';
+
+  @override
+  String movedToVault(int count) {
+    return '$count שיחות קודמות הועברו לכספת';
+  }
+
+  @override
+  String get callStats => 'סטטיסטיקת שיחות';
+
+  @override
+  String get statsWeek => '7 ימים';
+
+  @override
+  String get statsMonth => '30 יום';
+
+  @override
+  String get statsYear => 'שנה';
+
+  @override
+  String get statsCalls => 'שיחות';
+
+  @override
+  String statsInOut(int incoming, int outgoing) {
+    return '$incoming נכנסות · $outgoing יוצאות';
+  }
+
+  @override
+  String get statsTalkTime => 'זמן דיבור';
+
+  @override
+  String get statsAverageCall => 'שיחה ממוצעת';
+
+  @override
+  String get statsLastWeeks => '8 השבועות האחרונים';
+
+  @override
+  String get statsMostTalked => 'עם מי דיברת הכי הרבה';
+
+  @override
+  String statsPersonLine(int calls, String talk) {
+    return '$calls שיחות · $talk';
+  }
+
+  @override
+  String statsWeekBar(String start, int calls, String talk) {
+    return 'השבוע של $start: $calls שיחות, $talk';
+  }
+
+  @override
+  String get statsPrivacy =>
+      'מחושב בטלפון הזה מתוך היסטוריית השיחות שלך. שום דבר לא נשלח לשום מקום.';
+
+  @override
+  String talkMinutes(int minutes) {
+    return '$minutes דק׳';
+  }
+
+  @override
+  String talkHoursMinutes(int hours, int minutes) {
+    return '$hours שע׳ $minutes דק׳';
+  }
+
+  @override
+  String remindMeToCallBack(String name) {
+    return 'תזכורת לחזור אל $name';
+  }
+
+  @override
+  String get remindMeToCallBackShort => 'תזכורת לחזור בשיחה';
+
+  @override
+  String get remindMeToCallBackBody => 'תזכורת כאן, ומשימה ב-ZT Tasks';
+
+  @override
+  String get callBackLater => 'לחזור מאוחר יותר';
+
+  @override
+  String get in15Minutes => 'בעוד 15 דקות';
+
+  @override
+  String get in1Hour => 'בעוד שעה';
+
+  @override
+  String get in3Hours => 'בעוד 3 שעות';
+
+  @override
+  String get tonight => 'הערב';
+
+  @override
+  String get tomorrowMorning => 'מחר בבוקר';
+
+  @override
+  String get pickATime => 'בחירת תאריך ושעה';
+
+  @override
+  String get callBackExplain =>
+      'ZT Phone יזכיר לך בזמן הזה ויוסיף משימה ל-ZT Tasks. שתיהן מסתיימות ברגע שחוזרים בשיחה.';
+
+  @override
+  String callBackSetWithTask(String time) {
+    return 'אזכיר לך ב-$time. נוסף ל-ZT Tasks.';
+  }
+
+  @override
+  String callBackSetNoTask(String time) {
+    return 'אזכיר לך ב-$time. לא הצלחתי להגיע ל-ZT Tasks, ולכן לא נוספה משימה.';
+  }
+
+  @override
+  String callBackTaskTitle(String name) {
+    return 'לחזור אל $name';
+  }
+
+  @override
+  String callBackName(String name) {
+    return 'לחזור אל $name';
+  }
+
+  @override
+  String callBackDue(String time) {
+    return 'היה אמור ב-$time';
+  }
+
+  @override
+  String get cancelReminder => 'ביטול התזכורת';
+
+  @override
+  String get nativeCallBackReminder => 'לחזור אל %s';
+
+  @override
+  String get nativeCallBackChannel => 'תזכורות לחזור בשיחה';
+
+  @override
+  String get nativeRemindMe => 'תזכורת';
 }

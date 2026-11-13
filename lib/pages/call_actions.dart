@@ -6,6 +6,7 @@ import 'package:zerotrust_phone/app/rtt_preference.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
+import 'package:zerotrust_phone/pages/call_back_sheet.dart';
 import 'package:zerotrust_phone/pages/call_details_page.dart';
 import 'package:zerotrust_phone/pages/contact_call_settings_page.dart';
 import 'package:zerotrust_phone/pages/dial_shortcut_page.dart';
@@ -134,6 +135,15 @@ Future<void> showNumberSheet(
                       DialShortcutPage(number: number, contact: contact),
                 ),
               );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.alarm_add_outlined),
+            title: Text(context.l10n.remindMeToCallBackShort),
+            subtitle: Text(context.l10n.remindMeToCallBackBody),
+            onTap: () {
+              Navigator.of(sheet).pop();
+              showCallBackSheet(context, ref, number: number, contact: contact);
             },
           ),
           ListTile(

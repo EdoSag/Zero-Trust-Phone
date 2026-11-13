@@ -29,6 +29,9 @@ class ScreeningStore(context: Context) {
 
     fun isContact(number: String): Boolean = hashOf(number)?.let { it in (prefs.getStringSet(KEY_CONTACTS, emptySet()) ?: emptySet()) } ?: false
     fun sendsToVoicemail(number: String): Boolean = hashOf(number)?.let { it in (prefs.getStringSet(KEY_VOICEMAIL, emptySet()) ?: emptySet()) } ?: false
+    /** P23: this number's calls stay out of Android's shared call log. */
+    fun isPrivate(number: String): Boolean = hashOf(number)?.let { it in (prefs.getStringSet(KEY_PRIVATE, emptySet()) ?: emptySet()) } ?: false
+    fun hasPrivate(): Boolean = !(prefs.getStringSet(KEY_PRIVATE, emptySet()) ?: emptySet()).isEmpty()
     fun ringtoneFor(number: String): String? = hashOf(number)?.let { prefs.getString("$KEY_RINGTONE$it", null) }
 
     /** Replaces everything from the unlocked app. */
@@ -39,6 +42,7 @@ class ScreeningStore(context: Context) {
         contactKeys: List<String>,
         voicemailKeys: List<String>,
         ringtones: Map<String, String>,
+        privateKeys: List<String> = emptyList(),
     ) {
         val edit = prefs.edit()
         prefs.all.keys.filter { it.startsWith(KEY_RINGTONE) }.forEach { edit.remove(it) }
@@ -47,6 +51,7 @@ class ScreeningStore(context: Context) {
             .putStringSet(KEY_PREFIXES, prefixes.map { PhoneNumbersPrefix.normalize(it) }.filter { it.isNotEmpty() }.toSet())
             .putStringSet(KEY_CONTACTS, contactKeys.mapNotNull { hashKey(it) }.toSet())
             .putStringSet(KEY_VOICEMAIL, voicemailKeys.mapNotNull { hashKey(it) }.toSet())
+            .putStringSet(KEY_PRIVATE, privateKeys.mapNotNull { hashKey(it) }.toSet())
         for ((key, uri) in ringtones) hashKey(key)?.let { edit.putString("$KEY_RINGTONE$it", uri) }
         edit.apply()
     }
@@ -55,7 +60,7 @@ class ScreeningStore(context: Context) {
     fun clearContacts() {
         val edit = prefs.edit()
         prefs.all.keys.filter { it.startsWith(KEY_RINGTONE) }.forEach { edit.remove(it) }
-        edit.remove(KEY_CONTACTS).remove(KEY_VOICEMAIL).apply()
+        edit.remove(KEY_CONTACTS).remove(KEY_VOICEMAIL).remove(KEY_PRIVATE).apply()
     }
 
     private fun hashOf(number: String): String? = hashKey(PhoneNumbers.lookupKey(number))
@@ -87,6 +92,7 @@ class ScreeningStore(context: Context) {
         private const val KEY_CONTACTS = "contacts"
         private const val KEY_VOICEMAIL = "to_voicemail"
         private const val KEY_RINGTONE = "ringtone_"
+        private const val KEY_PRIVATE = "private_log"
     }
 }
 

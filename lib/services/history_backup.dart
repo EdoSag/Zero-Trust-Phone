@@ -4,6 +4,7 @@ import 'package:cryptography/cryptography.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zerotrust_phone/app/history_retention.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
+import 'package:zerotrust_phone/services/private_calls.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/util/phone_numbers.dart';
 
@@ -74,9 +75,15 @@ class HistoryBackup {
   /// Writes the backup into this phone's call history. Returns how many
   /// calls were added.
   Future<int> restore() async {
-    final List<BackedUpCall> calls = await ref
-        .read(phoneDataProvider)
-        .backedUpCalls();
+    // Private contacts' calls (P23) stay out of the shared call log.
+    final Set<String> private = await ref
+        .read(privateCallsServiceProvider)
+        .privateKeys();
+    final List<BackedUpCall> calls = <BackedUpCall>[
+      for (final BackedUpCall c
+          in await ref.read(phoneDataProvider).backedUpCalls())
+        if (!private.contains(PhoneNumbers.lookupKey(c.number))) c,
+    ];
     final int added = await ref.read(telecomProvider).insertCalls(
       <Map<String, Object?>>[
         for (final BackedUpCall c in calls)
