@@ -164,7 +164,11 @@ class MainActivity : FlutterFragmentActivity() {
                         )
                         result.success(null)
                     }
-                    "takePrivateCalls" -> result.success(PrivateCallLog.take(this))
+                    "takePrivateCalls" -> result.success(PrivateCallLog.pending(this))
+                    "ackPrivateCalls" -> {
+                        PrivateCallLog.acknowledge(this, call.argument<List<String>>("keys") ?: emptyList())
+                        result.success(null)
+                    }
                     "scheduleCallBack" -> {
                         CallBackAlarms.schedule(
                             this,

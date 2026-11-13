@@ -126,6 +126,15 @@ class TasksBridge {
     }
   }
 
+  /// Pushes call back tasks (or ticks) saved while offline. Opens the
+  /// store only when there's something to send.
+  Future<void> flush() async {
+    if (ref.read(tasksKeyProvider) == null) return;
+    await _withEngine((ItemSyncEngine engine, ZtLocalStore store) async {
+      if ((await store.dirtyItems()).isNotEmpty) await _push(engine);
+    });
+  }
+
   /// Adds "Call Dana back" due at [due]. Returns the task id.
   Future<String> addCallBack({
     required String title,

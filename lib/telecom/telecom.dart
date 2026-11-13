@@ -238,13 +238,19 @@ class Telecom {
   });
 
   /// P23: private contacts' calls the Android side took out of the shared
-  /// call log, to move into the vault. Each is handed over once.
+  /// call log, to move into the vault. They're kept there until
+  /// [ackPrivateCalls] confirms the vault has them.
   Future<List<Map<Object?, Object?>>> takePrivateCalls() async =>
       <Map<Object?, Object?>>[
         for (final Object? c
             in await _call<List<Object?>>('takePrivateCalls') ?? <Object?>[])
           if (c is Map<Object?, Object?>) c,
       ];
+
+  /// Tells the Android side these private calls ("number|date") are saved
+  /// in the vault, so it can forget them.
+  Future<void> ackPrivateCalls(List<String> keys) =>
+      _call<void>('ackPrivateCalls', {'keys': keys});
 
   /// P25: a reminder notification at [at] to call [number] back.
   /// Replaces one with the same [id].

@@ -20,12 +20,12 @@ class PrivateCalls {
         .read(telecomProvider)
         .takePrivateCalls();
     final PhoneData data = ref.read(phoneDataProvider);
+    final List<String> saved = <String>[];
     for (final Map<Object?, Object?> m in taken) {
       final String number = m['number'] as String? ?? '';
       final int type = (m['type'] as num?)?.toInt() ?? 1;
-      final DateTime date = DateTime.fromMillisecondsSinceEpoch(
-        (m['date'] as num? ?? 0).toInt(),
-      );
+      final int millis = (m['date'] as num? ?? 0).toInt();
+      final DateTime date = DateTime.fromMillisecondsSinceEpoch(millis);
       await data.savePrivateCall(
         BackedUpCall(
           id: await HistoryBackup.idFor(number, date, type),
@@ -35,6 +35,13 @@ class PrivateCalls {
           durationSeconds: (m['duration'] as num?)?.toInt() ?? 0,
         ),
       );
+      saved.add('$number|$millis');
+    }
+    if (taken.isNotEmpty) {
+      // Same ids every time, so saving again after a failure is harmless.
+      await ref.read(telecomProvider).ackPrivateCalls(saved);
+      // The sweep changed Android's log: drop its cached copy.
+      ref.invalidate(callLogProvider);
     }
     return taken.length;
   }

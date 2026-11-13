@@ -46,12 +46,14 @@ object PrivateCallLog {
         scrub(context, 0) { store.isPrivate(it) }
     }
 
-    /** The calls waiting for the vault, and forgets them here. */
-    fun take(context: Context): List<Map<String, Any?>> {
+    /**
+     * The calls waiting for the vault. They stay here until [acknowledge]
+     * says the vault has them, so a failed save loses nothing.
+     */
+    fun pending(context: Context): List<Map<String, Any?>> {
         sweep(context)
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val calls = read(prefs.getString(KEY_QUEUE, null))
-        prefs.edit().remove(KEY_QUEUE).apply()
         return (0 until calls.length()).map { i ->
             val o = calls.getJSONObject(i)
             mapOf(
@@ -61,6 +63,23 @@ object PrivateCallLog {
                 "duration" to o.optLong("duration"),
             )
         }
+    }
+
+    /** Forgets the calls the vault now holds, by "number|date". */
+    @Synchronized
+    fun acknowledge(context: Context, saved: Collection<String>) {
+        if (saved.isEmpty()) return
+        val keys = saved.toHashSet()
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val queue = read(prefs.getString(KEY_QUEUE, null))
+        val left = JSONArray()
+        for (i in 0 until queue.length()) {
+            val o = queue.getJSONObject(i)
+            if ("${o.optString("number")}|${o.optLong("date")}" !in keys) left.put(o)
+        }
+        val edit = prefs.edit()
+        if (left.length() == 0) edit.remove(KEY_QUEUE) else edit.putString(KEY_QUEUE, LocalSealer.seal(left.toString()))
+        edit.commit()
     }
 
     /** Signing out: the waiting calls go too. */

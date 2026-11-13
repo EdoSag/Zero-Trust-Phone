@@ -253,6 +253,8 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
       await ref
           .read(callBacksServiceProvider)
           .refresh(mergeCalls(shared, private));
+      // ZT Tasks writes made offline go out now.
+      await ref.read(tasksBridgeProvider).flush();
     } on Object {
       // Locked meanwhile, or offline: the next open tries again.
     }
