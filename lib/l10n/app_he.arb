@@ -304,5 +304,10 @@
   "cancelReminder": "ביטול התזכורת",
   "nativeCallBackReminder": "לחזור אל %s",
   "nativeCallBackChannel": "תזכורות לחזור בשיחה",
-  "nativeRemindMe": "תזכורת"
+  "nativeRemindMe": "תזכורת",
+  "notNow": "לא עכשיו",
+  "exactRemindersTitle": "להזכיר בדיוק בזמן?",
+  "exactRemindersBody": "Android מאפשר ל-ZT Phone להזכיר בדיוק בדקה שבחרת רק אם מאשרים לו \"שעונים מעוררים ותזכורות\". בלי זה התזכורות עדיין מגיעות, אבל יכולות לאחר בכמה דקות.",
+  "callBackMayBeLate": "תזכורות יכולות לאחר בכמה דקות",
+  "callBackMayBeLateBody": "יש להקיש כדי לאשר \"שעונים מעוררים ותזכורות\" לזמנים מדויקים"
 }

@@ -8,6 +8,9 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import org.json.JSONObject
 
@@ -96,14 +99,51 @@ object CallBackAlarms {
         }
     }
 
+    /**
+     * Whether reminders can ring on the minute. Android 12+ needs the
+     * "Alarms & reminders" special access for that, off by default on
+     * Android 14+; without it they're inexact (a few minutes late at most).
+     */
+    fun canBeExact(context: Context): Boolean =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarms(context).canScheduleExactAlarms()
+
+    /** Whether ZT Phone already asked for "Alarms & reminders" (asks once). */
+    fun askedForExact(context: Context): Boolean =
+        meta(context).getBoolean(KEY_ASKED_EXACT, false)
+
+    fun markAskedForExact(context: Context) {
+        meta(context).edit().putBoolean(KEY_ASKED_EXACT, true).apply()
+    }
+
+    /** Android's "Alarms & reminders" page for ZT Phone. False if none. */
+    fun openExactSettings(context: Context): Boolean {
+        markAskedForExact(context)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return false
+        return try {
+            context.startActivity(
+                Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}"))
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
     private fun setAlarm(context: Context, id: String, at: Long) {
+        val whenMs = maxOf(at, System.currentTimeMillis() + 1000)
+        val intent = alarmIntent(context, id)
+        if (canBeExact(context)) {
+            try {
+                alarms(context).setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, whenMs, intent)
+                return
+            } catch (_: SecurityException) {
+                // Access taken away just now: fall back below.
+            }
+        }
         // Inexact but allowed while the phone dozes: on time to a few
-        // minutes, without the "Alarms & reminders" special permission.
-        alarms(context).setAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            maxOf(at, System.currentTimeMillis() + 1000),
-            alarmIntent(context, id),
-        )
+        // minutes, without the "Alarms & reminders" special access.
+        alarms(context).setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, whenMs, intent)
     }
 
     private fun alarmIntent(context: Context, id: String): PendingIntent = PendingIntent.getBroadcast(
@@ -115,6 +155,12 @@ object CallBackAlarms {
     private fun notificationId(id: String) = 5000 + (id.hashCode() and 0xffff)
 
     private fun alarms(context: Context) = context.getSystemService(AlarmManager::class.java)
+
+    private const val KEY_ASKED_EXACT = "asked_exact"
+
+    /** Kept apart from [prefs], whose keys are all reminder ids. */
+    private fun meta(context: Context) =
+        context.applicationContext.getSharedPreferences("zt_call_back_meta", Context.MODE_PRIVATE)
 
     private fun prefs(context: Context) =
         context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -136,7 +182,10 @@ class CallBackAlarmReceiver : BroadcastReceiver() {
         when (intent.action) {
             CallBackAlarms.ACTION_FIRE ->
                 intent.getStringExtra(CallBackAlarms.EXTRA_ID)?.let { CallBackAlarms.fire(context, it) }
-            Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED ->
+            // After a restart, an update, or "Alarms & reminders" being
+            // allowed (so waiting reminders become exact).
+            Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED,
+            AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED ->
                 CallBackAlarms.rescheduleAll(context)
         }
     }
