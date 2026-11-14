@@ -1,7 +1,7 @@
 name: zerotrust_phone
 description: "Zero-Trust Phone: a private dialer for Android, with names from your encrypted ZT Contacts."
 publish_to: none
-version: 0.4.0+5
+version: 0.4.1+6
 
 environment:
   sdk: ^3.9.0
@@ -24,7 +24,7 @@ dependencies:
     git:
       url: https://github.com/EdoSag/Zero-Trust-Core.git
       path: packages/zero_trust_core
-      ref: v0.10.0
+      ref: 52f53dae085fb247ec1b8fa34b95f3231dc0421b
   intl: any
   flutter_riverpod: ^3.5.0
   supabase_flutter: ^2.9.0
