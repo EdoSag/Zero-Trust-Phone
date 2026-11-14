@@ -45,6 +45,10 @@ class MainActivity : FlutterFragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Taking "Alarms & reminders" away stops the app and cancels its
+        // exact alarms, with no broadcast. Set them again (inexact now);
+        // any that came due meanwhile ring right away, late but not lost.
+        CallBackAlarms.rescheduleAll(this)
         pendingDial = dialNumber(intent)
         pendingDialText = dialText(intent)
         pendingRecents = intent?.action == ACTION_SHOW_RECENTS

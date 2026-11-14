@@ -14,6 +14,7 @@ class FakeTelecom extends Telecom {
   ExactAlarmState? state;
   int opened = 0;
   int marked = 0;
+  bool grantOnOpen = false;
 
   @override
   Future<ExactAlarmState?> exactAlarmState() async => state;
@@ -28,6 +29,9 @@ class FakeTelecom extends Telecom {
   @override
   Future<bool> openExactAlarmSettings() async {
     opened++;
+    // Like Android: opening the page counts as asked; [grantOnOpen]
+    // stands for the user switching it on there.
+    state = ExactAlarmState(exact: grantOnOpen, asked: true);
     return true;
   }
 }
@@ -175,5 +179,31 @@ void main() {
     await tester.tap(find.text('בעוד שעה'));
     await tester.pumpAndSettle();
     expect(find.text('להזכיר בדיוק בזמן?'), findsOneWidget);
+  });
+
+  testWidgets('allowed from the note in the sheet: no second ask', (
+    WidgetTester tester,
+  ) async {
+    await pump(tester, const ExactAlarmState(exact: false, asked: false));
+    telecom.grantOnOpen = true;
+    await tester.tap(inexact);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('In 1 hour'));
+    await tester.pumpAndSettle();
+    expect(callBacks.added, hasLength(1));
+    expect(find.text('Remind you on the minute?'), findsNothing);
+    expect(telecom.opened, 1);
+  });
+
+  testWidgets('note opened but left off: still no second ask', (
+    WidgetTester tester,
+  ) async {
+    await pump(tester, const ExactAlarmState(exact: false, asked: false));
+    await tester.tap(inexact);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('In 1 hour'));
+    await tester.pumpAndSettle();
+    expect(find.text('Remind you on the minute?'), findsNothing);
+    expect(telecom.opened, 1);
   });
 }

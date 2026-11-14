@@ -46,7 +46,11 @@ object CallBackAlarms {
         for (id in prefs(context).all.keys.toList()) cancel(context, id)
     }
 
-    /** After a restart Android has forgotten every alarm. */
+    /**
+     * After a restart Android has forgotten every alarm; after "Alarms &
+     * reminders" is taken away, the exact ones. Reminders not yet shown
+     * are set again, and ones already due ring at once.
+     */
     fun rescheduleAll(context: Context) {
         for ((id, value) in prefs(context).all) {
             val json = (value as? String)?.let { LocalSealer.open(it) } ?: continue

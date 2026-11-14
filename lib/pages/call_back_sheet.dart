@@ -114,8 +114,12 @@ Future<void> showCallBackSheet(
       .read(callBacksServiceProvider)
       .add(number: number, at: at, contact: who);
   // The first reminder without "Alarms & reminders": ask, once. Allowing
-  // it later also makes this one exact (Android tells ZT Phone).
-  if (alarm != null && !alarm.exact && !alarm.asked && context.mounted) {
+  // it later also makes this one exact (Android tells ZT Phone). Read
+  // again: the note in the sheet may have opened Settings meanwhile.
+  final ExactAlarmState? latest = alarm == null || alarm.exact
+      ? alarm
+      : await telecom.exactAlarmState();
+  if (latest != null && !latest.exact && !latest.asked && context.mounted) {
     await telecom.markExactAlarmsAsked();
     if (!context.mounted) return;
     final bool? allow = await showDialog<bool>(
