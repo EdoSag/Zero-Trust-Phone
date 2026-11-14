@@ -8,14 +8,15 @@ import 'package:zerotrust_phone/pages/call_actions.dart';
 import 'package:zerotrust_phone/pages/dial_shortcut_page.dart';
 import 'package:zerotrust_phone/pages/speed_dial_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
+import 'package:zerotrust_phone/util/dial_search.dart';
 import 'package:zerotrust_phone/util/dial_sequence.dart';
 import 'package:zerotrust_phone/util/pasted_numbers.dart';
-import 'package:zerotrust_phone/util/phone_numbers.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
 import 'package:zerotrust_phone/widgets/country_time_hint.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
 
-/// The keypad. Typing digits also finds contacts by name (T9) or number.
+/// The keypad. Typing digits also finds contacts by name or company, in
+/// English or Hebrew, or by number (P14, see [DialSearch]).
 class DialpadPage extends ConsumerStatefulWidget {
   const DialpadPage({super.key, this.initialNumber = '', this.initialText});
 
@@ -213,18 +214,7 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
     final String digits = _number.text.replaceAll(RegExp(r'[^0-9]'), '');
     final List<PhoneContact> contacts =
         ref.watch(phoneContactsProvider).value ?? const <PhoneContact>[];
-    final List<PhoneContact> matches = digits.isEmpty
-        ? const <PhoneContact>[]
-        : contacts
-              .where(
-                (PhoneContact c) =>
-                    PhoneNumbers.t9Matches(c.name, digits) ||
-                    c.phones.any(
-                      (String p) => PhoneNumbers.normalize(p).contains(digits),
-                    ),
-              )
-              .take(20)
-              .toList();
+    final List<DialMatch> matches = DialSearch.search(contacts, digits);
     final ThemeData theme = Theme.of(context);
 
     final String? hint = countryHintText(context, ref, _number.text);
@@ -265,12 +255,18 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
             Expanded(
               child: ListView(
                 children: <Widget>[
-                  for (final PhoneContact c in matches)
-                    for (final String p in c.phones)
+                  for (final DialMatch m in matches)
+                    for (final String p in m.phones)
                       ListTile(
-                        leading: ContactAvatar(label: c.name),
-                        title: Text(c.name),
-                        subtitle: Text(ltr(p)),
+                        leading: ContactAvatar(label: m.contact.name),
+                        title: Text(m.contact.name),
+                        // Found by company: say which, so it's clear why.
+                        subtitle: Text(
+                          m.kind == DialMatchKind.company &&
+                                  m.contact.company != m.contact.name
+                              ? '${m.contact.company} · ${ltr(p)}'
+                              : ltr(p),
+                        ),
                         onTap: () => _call(p),
                       ),
                 ],
@@ -401,6 +397,7 @@ class DialKeypad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final bool hebrew = Localizations.localeOf(context).languageCode == 'he';
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
       // A phone keypad is the same in every language: 1 2 3 left to right.
@@ -450,7 +447,11 @@ class DialKeypad extends StatelessWidget {
                         )
                       else
                         Text(
-                          letters,
+                          // Hebrew letters too when the app is in Hebrew,
+                          // where they sit on Israeli keypads.
+                          hebrew && DialSearch.hebrewKeys[digit] != null
+                              ? '$letters ${DialSearch.hebrewKeys[digit]}'
+                              : letters,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color:
                                 foreground ??
