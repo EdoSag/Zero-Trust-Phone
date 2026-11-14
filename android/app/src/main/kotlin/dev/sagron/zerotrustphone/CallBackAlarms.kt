@@ -70,6 +70,7 @@ object CallBackAlarms {
         val call = PendingIntent.getBroadcast(
             context, nid, Intent(context, CallBackReceiver::class.java)
                 .setAction(MissedCallReceiver.ACTION_CALL_BACK)
+                .setData(reminderUri(id))
                 .putExtra(MissedCallReceiver.EXTRA_NUMBER, number)
                 .putExtra(MissedCallReceiver.EXTRA_NOTIFICATION_ID, nid),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -152,9 +153,20 @@ object CallBackAlarms {
 
     private fun alarmIntent(context: Context, id: String): PendingIntent = PendingIntent.getBroadcast(
         context, notificationId(id),
-        Intent(context, CallBackAlarmReceiver::class.java).setAction(ACTION_FIRE).putExtra(EXTRA_ID, id),
+        Intent(context, CallBackAlarmReceiver::class.java)
+            .setAction(ACTION_FIRE)
+            .setData(reminderUri(id))
+            .putExtra(EXTRA_ID, id),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
+
+    /**
+     * Makes each reminder's PendingIntents its own: the request code is a
+     * 16-bit hash, so two ids can share it, and Android would then treat
+     * their alarms (and Call back buttons) as one.
+     */
+    private fun reminderUri(id: String): Uri =
+        Uri.Builder().scheme("ztphone").authority("call-back").appendPath(id).build()
 
     private fun notificationId(id: String) = 5000 + (id.hashCode() and 0xffff)
 

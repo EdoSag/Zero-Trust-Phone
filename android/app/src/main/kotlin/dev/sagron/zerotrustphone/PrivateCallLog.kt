@@ -23,16 +23,29 @@ object PrivateCallLog {
     private const val KEY_QUEUE = "queue"
     private val main = Handler(Looper.getMainLooper())
 
+    /** Bumped on sign-out, so scrubs queued before it do nothing. */
+    @Volatile
+    private var generation = 0
+
     /** After a private contact's call ends: look for its row a few times. */
     fun scrubSoon(context: Context, number: String, since: Long) {
         val app = context.applicationContext
         val key = PhoneNumbers.lookupKey(number)
         if (key.isEmpty()) return
+        val scheduledIn = generation
         // Telecom logs the call on its own thread after the call is removed.
         for (delay in longArrayOf(1500, 4000, 10000, 30000)) {
             main.postDelayed({
                 try {
-                    scrub(app, since - 60_000) { PhoneNumbers.lookupKey(it) == key }
+                    // Signed out meanwhile, or no longer private: leave the
+                    // call in the shared log, so it can't reach another
+                    // account's vault.
+                    if (scheduledIn == generation) {
+                        val store = ScreeningStore(app)
+                        scrub(app, since - 60_000) {
+                            PhoneNumbers.lookupKey(it) == key && store.isPrivate(it)
+                        }
+                    }
                 } catch (_: Exception) {
                 }
             }, delay)
@@ -82,9 +95,11 @@ object PrivateCallLog {
         edit.commit()
     }
 
-    /** Signing out: the waiting calls go too. */
+    /** Signing out: the waiting calls go too, and scrubs still queued. */
+    @Synchronized
     fun clear(context: Context) {
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().clear().apply()
+        generation++
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().clear().commit()
     }
 
     @Synchronized
@@ -121,7 +136,9 @@ object PrivateCallLog {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val queue = read(prefs.getString(KEY_QUEUE, null))
         for (i in 0 until found.length()) queue.put(found.get(i))
-        prefs.edit().putString(KEY_QUEUE, LocalSealer.seal(queue.toString())).commit()
+        // Not stored (storage full): leave the calls in the shared log for
+        // the next try instead of losing them.
+        if (!prefs.edit().putString(KEY_QUEUE, LocalSealer.seal(queue.toString())).commit()) return
         for (chunk in ids.chunked(200)) {
             context.contentResolver.delete(
                 CallLog.Calls.CONTENT_URI,
