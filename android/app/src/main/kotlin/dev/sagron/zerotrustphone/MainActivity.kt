@@ -45,6 +45,10 @@ class MainActivity : FlutterFragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Taking "Alarms & reminders" away stops the app and cancels its
+        // exact alarms, with no broadcast. Set them again (inexact now);
+        // any that came due meanwhile ring right away, late but not lost.
+        CallBackAlarms.rescheduleAll(this)
         pendingDial = dialNumber(intent)
         pendingDialText = dialText(intent)
         pendingRecents = intent?.action == ACTION_SHOW_RECENTS
@@ -178,6 +182,17 @@ class MainActivity : FlutterFragmentActivity() {
                         )
                         result.success(null)
                     }
+                    "exactAlarmState" -> result.success(
+                        mapOf(
+                            "exact" to CallBackAlarms.canBeExact(this),
+                            "asked" to CallBackAlarms.askedForExact(this),
+                        )
+                    )
+                    "markExactAlarmsAsked" -> {
+                        CallBackAlarms.markAskedForExact(this)
+                        result.success(null)
+                    }
+                    "openExactAlarmSettings" -> result.success(CallBackAlarms.openExactSettings(this))
                     "cancelCallBack" -> {
                         CallBackAlarms.cancel(this, call.argument<String>("id") ?: "")
                         result.success(null)

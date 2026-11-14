@@ -1968,6 +1968,36 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Turn on'**
   String get turnOn;
+
+  /// No description provided for @notNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get notNow;
+
+  /// No description provided for @exactRemindersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind you on the minute?'**
+  String get exactRemindersTitle;
+
+  /// No description provided for @exactRemindersBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Android lets ZT Phone ring a reminder at the exact minute only if you allow \"Alarms & reminders\" for it. Without that, reminders still come, but can be a few minutes late.'**
+  String get exactRemindersBody;
+
+  /// No description provided for @callBackMayBeLate.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders can be a few minutes late'**
+  String get callBackMayBeLate;
+
+  /// No description provided for @callBackMayBeLateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to allow \"Alarms & reminders\" for exact times'**
+  String get callBackMayBeLateBody;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

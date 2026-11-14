@@ -261,6 +261,29 @@ class Telecom {
         'at': at.millisecondsSinceEpoch,
       });
 
+  /// Whether call back reminders ring on the minute ("Alarms & reminders"
+  /// allowed), and whether ZT Phone already asked. Null when unknown.
+  Future<ExactAlarmState?> exactAlarmState() async {
+    try {
+      final Map<Object?, Object?>? m = await _call<Map<Object?, Object?>>(
+        'exactAlarmState',
+      );
+      if (m == null) return null;
+      return ExactAlarmState(
+        exact: m['exact'] == true,
+        asked: m['asked'] == true,
+      );
+    } on Object {
+      return null;
+    }
+  }
+
+  Future<void> markExactAlarmsAsked() => _call<void>('markExactAlarmsAsked');
+
+  /// Opens Android's "Alarms & reminders" page for ZT Phone.
+  Future<bool> openExactAlarmSettings() async =>
+      await _call<bool>('openExactAlarmSettings') ?? false;
+
   Future<void> cancelCallBack(String id) =>
       _call<void>('cancelCallBack', {'id': id});
 
@@ -383,3 +406,10 @@ final homeCountryProvider = FutureProvider<String?>((ref) async {
 final callLogProvider = FutureProvider<List<CallLogEntry>>(
   (ref) => ref.watch(telecomProvider).callLog(),
 );
+
+/// See [Telecom.exactAlarmState].
+class ExactAlarmState {
+  const ExactAlarmState({required this.exact, required this.asked});
+  final bool exact;
+  final bool asked;
+}
