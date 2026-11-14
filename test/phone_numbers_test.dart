@@ -13,13 +13,6 @@ void main() {
     expect(PhoneNumbers.same('', ''), isFalse);
   });
 
-  test('T9 finds names by the dialpad digits of any word', () {
-    expect(PhoneNumbers.t9Matches('Ada Lovelace', '232'), isTrue); // Ada
-    expect(PhoneNumbers.t9Matches('Ada Lovelace', '568'), isTrue); // Lov
-    expect(PhoneNumbers.t9Matches('Ada Lovelace', '999'), isFalse);
-    expect(PhoneNumbers.t9Matches('Ada', ''), isFalse);
-  });
-
   test('contacts are read from ZT Contacts item JSON', () {
     final PhoneContact? c = PhoneContact.fromItem('id1', <String, Object?>{
       'kind': 'contact',

@@ -365,5 +365,239 @@
   "ttySettings": "TTY mode and RTT settings",
   "ttySettingsBody": "Opens your phone's built-in call accessibility settings. Android lets only the built-in Phone app change TTY mode.",
   "ttySettingsMissing": "This phone has no built-in screen for TTY mode, and Android doesn't let other apps change it.",
-  "callAccessibilityPrivacy": "Real-time text and video go over your carrier's network, straight to the other person. ZT Phone never sends them to its servers or keeps them after the call."
+  "callAccessibilityPrivacy": "Real-time text and video go over your carrier's network, straight to the other person. ZT Phone never sends them to its servers or keeps them after the call.",
+  "pasteNumber": "Paste a number",
+  "noNumberInText": "No phone number found in the copied text",
+  "whichNumber": "Which number?",
+  "dialWithPauses": "Dial with pauses",
+  "dialWithPausesShort": "Wait, then send a code or menu choice",
+  "dialWithPausesExplain": "For phone menus, conference codes and voicemail PINs: call, wait, then send the digits for you. Save it and it's one tap next time.",
+  "dialShortcutDefaultLabel": "Call with code",
+  "dialShortcutName": "Name",
+  "dialShortcutNameHint": "Voicemail PIN, Work conference…",
+  "numberToCall": "Number to call",
+  "addPause": "Wait 3 seconds",
+  "addWaitForTap": "Wait for my tap",
+  "addTones": "Send digits",
+  "dialsAs": "Dials",
+  "callNow": "Call now",
+  "pauseSeconds": "Wait about {seconds} seconds",
+  "@pauseSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "shorterPause": "Shorter",
+  "longerPause": "Longer",
+  "waitForTapStep": "Wait until I tap Send on the call screen",
+  "tonesToSend": "Digits to send",
+  "removeStep": "Remove step",
+  "edit": "Edit",
+  "hideMyNumber": "Hide my number on this call",
+  "showMyNumber": "Show my number on this call",
+  "numberHidden": "My number hidden",
+  "keyStarHold": "Star, hold for a pause",
+  "keyHashHold": "Hash, hold for wait",
+  "callWithNumberHidden": "Call with my number hidden",
+  "callWithNumberHiddenBody": "They see \"Private number\", if your carrier allows it. Emergency numbers always see your number.",
+  "hideMyNumberForContact": "Hide my number",
+  "hideMyNumberForContactBody": "Every call to this contact shows \"Private number\", if your carrier allows it. Emergency numbers always see your number.",
+  "timeTomorrow": "{time} tomorrow",
+  "@timeTomorrow": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "timeYesterday": "{time} yesterday",
+  "@timeYesterday": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "timeRange": "{from}–{to}",
+  "@timeRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "countryTimeThere": "{country} · {time} there now",
+  "@countryTimeThere": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sendTonesQuestion": "Send {tones} now?",
+  "@sendTonesQuestion": {
+    "placeholders": {
+      "tones": {
+        "type": "String"
+      }
+    }
+  },
+  "skip": "Skip",
+  "privateCallLog": "Private call log",
+  "privateCallLogBody": "Calls with this contact are kept only in your encrypted vault, not in Android's shared call history that other apps can read. Your carrier still keeps its own record.",
+  "movedToVault": "Moved {count} past calls into the vault",
+  "@movedToVault": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "callStats": "Call stats",
+  "statsWeek": "7 days",
+  "statsMonth": "30 days",
+  "statsYear": "Year",
+  "statsCalls": "Calls",
+  "statsInOut": "{incoming} in · {outgoing} out",
+  "@statsInOut": {
+    "placeholders": {
+      "incoming": {
+        "type": "int"
+      },
+      "outgoing": {
+        "type": "int"
+      }
+    }
+  },
+  "statsTalkTime": "Talk time",
+  "statsAverageCall": "Average call",
+  "statsLastWeeks": "Last 8 weeks",
+  "statsMostTalked": "Who you talk to most",
+  "statsPersonLine": "{calls} calls · {talk}",
+  "@statsPersonLine": {
+    "placeholders": {
+      "calls": {
+        "type": "int"
+      },
+      "talk": {
+        "type": "String"
+      }
+    }
+  },
+  "statsWeekBar": "Week of {start}: {calls} calls, {talk}",
+  "@statsWeekBar": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "calls": {
+        "type": "int"
+      },
+      "talk": {
+        "type": "String"
+      }
+    }
+  },
+  "statsPrivacy": "Worked out on this phone from your call history. Nothing is sent anywhere.",
+  "talkMinutes": "{minutes} min",
+  "@talkMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "talkHoursMinutes": "{hours} h {minutes} min",
+  "@talkHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "remindMeToCallBack": "Remind me to call {name} back",
+  "@remindMeToCallBack": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remindMeToCallBackShort": "Remind me to call back",
+  "remindMeToCallBackBody": "A reminder here, and a task in ZT Tasks",
+  "callBackLater": "Call back later",
+  "in15Minutes": "In 15 minutes",
+  "in1Hour": "In 1 hour",
+  "in3Hours": "In 3 hours",
+  "tonight": "Tonight",
+  "tomorrowMorning": "Tomorrow morning",
+  "pickATime": "Pick a date and time",
+  "callBackExplain": "ZT Phone reminds you at that time and adds a task to ZT Tasks. Both are done once you call back.",
+  "callBackSetWithTask": "I'll remind you at {time}. Added to ZT Tasks.",
+  "@callBackSetWithTask": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "callBackSetNoTask": "I'll remind you at {time}. ZT Tasks couldn't be reached, so no task was added.",
+  "@callBackSetNoTask": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "callBackTaskTitle": "Call {name} back",
+  "@callBackTaskTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "callBackName": "Call back {name}",
+  "@callBackName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "callBackDue": "Due since {time}",
+  "@callBackDue": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelReminder": "Cancel reminder",
+  "nativeCallBackReminder": "Call back %s",
+  "nativeCallBackChannel": "Call back reminders",
+  "nativeRemindMe": "Remind me",
+  "numberHiddenNotice": "Your number is hidden on this call if your carrier allows it. Emergency numbers always see it.",
+  "privateLogLimitsTitle": "Before you turn it on",
+  "privateLogLimitsIntro": "ZT Phone moves these calls into your vault, but Android doesn't let any Phone app keep a call out of its shared history entirely:",
+  "privateLogLimitSeconds": "Each call shows in Android's shared history for a few seconds after it ends, until ZT Phone moves it.",
+  "privateLogLimitDefault": "If ZT Phone isn't your default Phone app, calls stay there until you next open ZT Phone.",
+  "privateLogLimitCarrier": "Your carrier's records and bill still list every call.",
+  "turnOn": "Turn on",
+  "notNow": "Not now",
+  "exactRemindersTitle": "Remind you on the minute?",
+  "exactRemindersBody": "Android lets ZT Phone ring a reminder at the exact minute only if you allow \"Alarms & reminders\" for it. Without that, reminders still come, but can be a few minutes late.",
+  "callBackMayBeLate": "Reminders can be a few minutes late",
+  "callBackMayBeLateBody": "Tap to allow \"Alarms & reminders\" for exact times"
 }

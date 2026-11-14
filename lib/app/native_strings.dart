@@ -28,6 +28,9 @@ Map<String, String> nativeStrings(AppL10n l) => <String, String>{
   'onHold': l.onHold,
   'calling': l.calling,
   'nativeHangUp': l.nativeHangUp,
+  'nativeCallBackReminder': l.nativeCallBackReminder,
+  'nativeCallBackChannel': l.nativeCallBackChannel,
+  'nativeRemindMe': l.nativeRemindMe,
 };
 
 /// Sends [nativeStrings] to Android whenever the app's language changes.

@@ -12,6 +12,7 @@ class CallLogEntry {
     required this.duration,
     this.cachedName,
     this.isNew = false,
+    this.privateId,
   });
 
   factory CallLogEntry.fromMap(Map<Object?, Object?> m) => CallLogEntry(
@@ -44,6 +45,12 @@ class CallLogEntry {
   /// The name Android saved with the call (from the phone's contacts).
   final String? cachedName;
   final bool isNew;
+
+  /// P23: a private contact's call, kept only in the vault under this id
+  /// (not in Android's call log; [id] is then 0).
+  final String? privateId;
+
+  bool get isPrivate => privateId != null;
 }
 
 enum CallType {
@@ -109,12 +116,16 @@ class Telecom {
   /// Ticks when the missed-call notification is tapped while the app is open.
   final ValueNotifier<int> recentsRequests = ValueNotifier<int>(0);
 
+  /// Ticks when "Remind me" on a missed call is tapped while the app is open.
+  final ValueNotifier<int> callBackRequests = ValueNotifier<int>(0);
+
   bool get isSupported => defaultTargetPlatform == TargetPlatform.android;
 
   void listenForDials() {
     _channel.setMethodCallHandler((MethodCall call) async {
       if (call.method == 'dialPending') dialRequests.value++;
       if (call.method == 'recentsPending') recentsRequests.value++;
+      if (call.method == 'callBackPending') callBackRequests.value++;
     });
   }
 
@@ -139,20 +150,34 @@ class Telecom {
   /// dialpad, null when it was opened normally.
   Future<String?> consumeDial() => _call<String>('consumeDial');
 
+  /// Text the app was opened with from another app's text menu or share
+  /// sheet, to find a number in (P13). Taken right after [consumeDial].
+  Future<String?> consumeDialText() => _call<String>('consumeDialText');
+
   /// Calls [number], on the SIM with [account] id when given (P6).
   /// [rtt] starts the call with real-time text, [video] as a carrier
-  /// video call (P12); the carrier drops either if it can't.
+  /// video call (P12); the carrier drops either if it can't. [hideCallerId]
+  /// asks the carrier not to show my number for this call (P22). [number]
+  /// may carry pauses and tones after it (`,` `;`, P15).
   Future<void> placeCall(
     String number, {
     String? account,
     bool rtt = false,
     bool video = false,
+    bool hideCallerId = false,
   }) => _call<void>('placeCall', {
     'number': number,
     'account': account,
     'rtt': rtt,
     'video': video,
+    'hideCallerId': hideCallerId,
   });
+
+  /// The SIM's country as an ISO code ("IL"), or the network's, or null.
+  Future<String?> simCountry() async {
+    final String? iso = await _call<String>('simCountry');
+    return iso == null || iso.isEmpty ? null : iso.toUpperCase();
+  }
 
   /// What this phone's SIMs offer (P12).
   Future<CallFeatures> callFeatures() async {
@@ -201,6 +226,7 @@ class Telecom {
     required List<String> contactKeys,
     required List<String> voicemailKeys,
     required Map<String, String> ringtones,
+    List<String> privateKeys = const <String>[],
   }) => _call<void>('setScreening', {
     'unknownMode': unknownMode,
     'blockHidden': blockHidden,
@@ -208,7 +234,63 @@ class Telecom {
     'contactKeys': contactKeys,
     'voicemailKeys': voicemailKeys,
     'ringtones': ringtones,
+    'privateKeys': privateKeys,
   });
+
+  /// P23: private contacts' calls the Android side took out of the shared
+  /// call log, to move into the vault. They're kept there until
+  /// [ackPrivateCalls] confirms the vault has them.
+  Future<List<Map<Object?, Object?>>> takePrivateCalls() async =>
+      <Map<Object?, Object?>>[
+        for (final Object? c
+            in await _call<List<Object?>>('takePrivateCalls') ?? <Object?>[])
+          if (c is Map<Object?, Object?>) c,
+      ];
+
+  /// Tells the Android side these private calls ("number|date") are saved
+  /// in the vault, so it can forget them.
+  Future<void> ackPrivateCalls(List<String> keys) =>
+      _call<void>('ackPrivateCalls', {'keys': keys});
+
+  /// P25: a reminder notification at [at] to call [number] back.
+  /// Replaces one with the same [id].
+  Future<void> scheduleCallBack(String id, String number, DateTime at) =>
+      _call<void>('scheduleCallBack', {
+        'id': id,
+        'number': number,
+        'at': at.millisecondsSinceEpoch,
+      });
+
+  /// Whether call back reminders ring on the minute ("Alarms & reminders"
+  /// allowed), and whether ZT Phone already asked. Null when unknown.
+  Future<ExactAlarmState?> exactAlarmState() async {
+    try {
+      final Map<Object?, Object?>? m = await _call<Map<Object?, Object?>>(
+        'exactAlarmState',
+      );
+      if (m == null) return null;
+      return ExactAlarmState(
+        exact: m['exact'] == true,
+        asked: m['asked'] == true,
+      );
+    } on Object {
+      return null;
+    }
+  }
+
+  Future<void> markExactAlarmsAsked() => _call<void>('markExactAlarmsAsked');
+
+  /// Opens Android's "Alarms & reminders" page for ZT Phone.
+  Future<bool> openExactAlarmSettings() async =>
+      await _call<bool>('openExactAlarmSettings') ?? false;
+
+  Future<void> cancelCallBack(String id) =>
+      _call<void>('cancelCallBack', {'id': id});
+
+  /// A number from the missed-call notification's "Remind me" button, to
+  /// pick a time for (P25). Null when there's none.
+  Future<String?> consumeCallBackLater() =>
+      _call<String>('consumeCallBackLater');
 
   Future<void> clearScreeningContacts() =>
       _call<void>('clearScreeningContacts');
@@ -307,7 +389,27 @@ final callFeaturesProvider = FutureProvider<CallFeatures>((ref) async {
   }
 });
 
+/// The country calls are made from (the SIM's), for the country hint
+/// (P16). Null when unknown.
+final homeCountryProvider = FutureProvider<String?>((ref) async {
+  final Telecom telecom = ref.watch(telecomProvider);
+  if (!telecom.isSupported) return null;
+  try {
+    return await telecom.simCountry();
+  } on Object {
+    // No SIM, or the platform side isn't there (tests).
+    return null;
+  }
+});
+
 /// The call history, newest first. Refresh with `ref.invalidate`.
 final callLogProvider = FutureProvider<List<CallLogEntry>>(
   (ref) => ref.watch(telecomProvider).callLog(),
 );
+
+/// See [Telecom.exactAlarmState].
+class ExactAlarmState {
+  const ExactAlarmState({required this.exact, required this.asked});
+  final bool exact;
+  final bool asked;
+}

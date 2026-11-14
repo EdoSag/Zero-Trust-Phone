@@ -800,4 +800,314 @@ class AppL10nHe extends AppL10n {
   @override
   String get callAccessibilityPrivacy =>
       'טקסט בזמן אמת ווידאו עוברים ברשת של הספק, ישירות לצד השני. ZT Phone אף פעם לא שולח אותם לשרתים שלו ולא שומר אותם אחרי השיחה.';
+
+  @override
+  String get pasteNumber => 'הדבקת מספר';
+
+  @override
+  String get noNumberInText => 'לא נמצא מספר טלפון בטקסט שהועתק';
+
+  @override
+  String get whichNumber => 'איזה מספר?';
+
+  @override
+  String get dialWithPauses => 'חיוג עם השהיות';
+
+  @override
+  String get dialWithPausesShort => 'המתנה, ואז שליחת קוד או בחירה בתפריט';
+
+  @override
+  String get dialWithPausesExplain =>
+      'לתפריטים טלפוניים, קודי שיחת ועידה וקוד לתא קולי: מחייגים, ממתינים, ואז שולחים את הספרות בשבילך. שומרים, ובפעם הבאה זו לחיצה אחת.';
+
+  @override
+  String get dialShortcutDefaultLabel => 'שיחה עם קוד';
+
+  @override
+  String get dialShortcutName => 'שם';
+
+  @override
+  String get dialShortcutNameHint => 'קוד תא קולי, ועידה בעבודה…';
+
+  @override
+  String get numberToCall => 'מספר לחיוג';
+
+  @override
+  String get addPause => 'המתנה של 3 שניות';
+
+  @override
+  String get addWaitForTap => 'המתנה ללחיצה שלי';
+
+  @override
+  String get addTones => 'שליחת ספרות';
+
+  @override
+  String get dialsAs => 'מחייג';
+
+  @override
+  String get callNow => 'חיוג עכשיו';
+
+  @override
+  String pauseSeconds(int seconds) {
+    return 'המתנה של כ-$seconds שניות';
+  }
+
+  @override
+  String get shorterPause => 'קצר יותר';
+
+  @override
+  String get longerPause => 'ארוך יותר';
+
+  @override
+  String get waitForTapStep => 'המתנה עד שאלחץ על \'שליחה\' במסך השיחה';
+
+  @override
+  String get tonesToSend => 'ספרות לשליחה';
+
+  @override
+  String get removeStep => 'הסרת שלב';
+
+  @override
+  String get edit => 'עריכה';
+
+  @override
+  String get hideMyNumber => 'הסתרת המספר שלי בשיחה הזו';
+
+  @override
+  String get showMyNumber => 'הצגת המספר שלי בשיחה הזו';
+
+  @override
+  String get numberHidden => 'המספר שלי מוסתר';
+
+  @override
+  String get keyStarHold => 'כוכבית, לחיצה ארוכה להשהיה';
+
+  @override
+  String get keyHashHold => 'סולמית, לחיצה ארוכה להמתנה';
+
+  @override
+  String get callWithNumberHidden => 'חיוג עם מספר מוסתר';
+
+  @override
+  String get callWithNumberHiddenBody =>
+      'יופיע אצלם \"מספר חסוי\", אם הספק שלך מאפשר. מספרי חירום תמיד רואים את המספר שלך.';
+
+  @override
+  String get hideMyNumberForContact => 'הסתרת המספר שלי';
+
+  @override
+  String get hideMyNumberForContactBody =>
+      'כל שיחה לאיש הקשר הזה תופיע כ\"מספר חסוי\", אם הספק שלך מאפשר. מספרי חירום תמיד רואים את המספר שלך.';
+
+  @override
+  String timeTomorrow(String time) {
+    return '$time מחר';
+  }
+
+  @override
+  String timeYesterday(String time) {
+    return '$time אתמול';
+  }
+
+  @override
+  String timeRange(String from, String to) {
+    return '$from–$to';
+  }
+
+  @override
+  String countryTimeThere(String country, String time) {
+    return '$country · שם עכשיו $time';
+  }
+
+  @override
+  String sendTonesQuestion(String tones) {
+    return 'לשלוח עכשיו $tones?';
+  }
+
+  @override
+  String get skip => 'דילוג';
+
+  @override
+  String get privateCallLog => 'יומן שיחות פרטי';
+
+  @override
+  String get privateCallLogBody =>
+      'שיחות עם איש הקשר הזה נשמרות רק בכספת המוצפנת שלך, ולא בהיסטוריית השיחות המשותפת של Android שאפליקציות אחרות יכולות לקרוא. הספק שלך עדיין שומר רישום משלו.';
+
+  @override
+  String movedToVault(int count) {
+    return '$count שיחות קודמות הועברו לכספת';
+  }
+
+  @override
+  String get callStats => 'סטטיסטיקת שיחות';
+
+  @override
+  String get statsWeek => '7 ימים';
+
+  @override
+  String get statsMonth => '30 יום';
+
+  @override
+  String get statsYear => 'שנה';
+
+  @override
+  String get statsCalls => 'שיחות';
+
+  @override
+  String statsInOut(int incoming, int outgoing) {
+    return '$incoming נכנסות · $outgoing יוצאות';
+  }
+
+  @override
+  String get statsTalkTime => 'זמן דיבור';
+
+  @override
+  String get statsAverageCall => 'שיחה ממוצעת';
+
+  @override
+  String get statsLastWeeks => '8 השבועות האחרונים';
+
+  @override
+  String get statsMostTalked => 'עם מי דיברת הכי הרבה';
+
+  @override
+  String statsPersonLine(int calls, String talk) {
+    return '$calls שיחות · $talk';
+  }
+
+  @override
+  String statsWeekBar(String start, int calls, String talk) {
+    return 'השבוע של $start: $calls שיחות, $talk';
+  }
+
+  @override
+  String get statsPrivacy =>
+      'מחושב בטלפון הזה מתוך היסטוריית השיחות שלך. שום דבר לא נשלח לשום מקום.';
+
+  @override
+  String talkMinutes(int minutes) {
+    return '$minutes דק׳';
+  }
+
+  @override
+  String talkHoursMinutes(int hours, int minutes) {
+    return '$hours שע׳ $minutes דק׳';
+  }
+
+  @override
+  String remindMeToCallBack(String name) {
+    return 'תזכורת לחזור אל $name';
+  }
+
+  @override
+  String get remindMeToCallBackShort => 'תזכורת לחזור בשיחה';
+
+  @override
+  String get remindMeToCallBackBody => 'תזכורת כאן, ומשימה ב-ZT Tasks';
+
+  @override
+  String get callBackLater => 'לחזור מאוחר יותר';
+
+  @override
+  String get in15Minutes => 'בעוד 15 דקות';
+
+  @override
+  String get in1Hour => 'בעוד שעה';
+
+  @override
+  String get in3Hours => 'בעוד 3 שעות';
+
+  @override
+  String get tonight => 'הערב';
+
+  @override
+  String get tomorrowMorning => 'מחר בבוקר';
+
+  @override
+  String get pickATime => 'בחירת תאריך ושעה';
+
+  @override
+  String get callBackExplain =>
+      'ZT Phone יזכיר לך בזמן הזה ויוסיף משימה ל-ZT Tasks. שתיהן מסתיימות ברגע שחוזרים בשיחה.';
+
+  @override
+  String callBackSetWithTask(String time) {
+    return 'אזכיר לך ב-$time. נוסף ל-ZT Tasks.';
+  }
+
+  @override
+  String callBackSetNoTask(String time) {
+    return 'אזכיר לך ב-$time. לא הצלחתי להגיע ל-ZT Tasks, ולכן לא נוספה משימה.';
+  }
+
+  @override
+  String callBackTaskTitle(String name) {
+    return 'לחזור אל $name';
+  }
+
+  @override
+  String callBackName(String name) {
+    return 'לחזור אל $name';
+  }
+
+  @override
+  String callBackDue(String time) {
+    return 'היה אמור ב-$time';
+  }
+
+  @override
+  String get cancelReminder => 'ביטול התזכורת';
+
+  @override
+  String get nativeCallBackReminder => 'לחזור אל %s';
+
+  @override
+  String get nativeCallBackChannel => 'תזכורות לחזור בשיחה';
+
+  @override
+  String get nativeRemindMe => 'תזכורת';
+
+  @override
+  String get numberHiddenNotice =>
+      'המספר שלך מוסתר בשיחה הזו אם הספק שלך מאפשר. מספרי חירום תמיד רואים אותו.';
+
+  @override
+  String get privateLogLimitsTitle => 'לפני שמפעילים';
+
+  @override
+  String get privateLogLimitsIntro =>
+      'ZT Phone מעביר את השיחות האלה לכספת שלך, אבל Android לא מאפשר לאף אפליקציית טלפון למנוע לגמרי את רישום השיחה בהיסטוריה המשותפת:';
+
+  @override
+  String get privateLogLimitSeconds =>
+      'כל שיחה מופיעה בהיסטוריה המשותפת של Android לכמה שניות אחרי שהיא מסתיימת, עד ש-ZT Phone מעביר אותה.';
+
+  @override
+  String get privateLogLimitDefault =>
+      'אם ZT Phone אינו אפליקציית הטלפון שמוגדרת כברירת מחדל, השיחות נשארות שם עד הפעם הבאה שפותחים את ZT Phone.';
+
+  @override
+  String get privateLogLimitCarrier =>
+      'הרישומים והחשבון של הספק שלך עדיין מציגים כל שיחה.';
+
+  @override
+  String get turnOn => 'הפעלה';
+
+  @override
+  String get notNow => 'לא עכשיו';
+
+  @override
+  String get exactRemindersTitle => 'להזכיר בדיוק בזמן?';
+
+  @override
+  String get exactRemindersBody =>
+      'Android מאפשר ל-ZT Phone להזכיר בדיוק בדקה שבחרת רק אם מאשרים לו \"שעונים מעוררים ותזכורות\". בלי זה התזכורות עדיין מגיעות, אבל יכולות לאחר בכמה דקות.';
+
+  @override
+  String get callBackMayBeLate => 'תזכורות יכולות לאחר בכמה דקות';
+
+  @override
+  String get callBackMayBeLateBody =>
+      'יש להקיש כדי לאשר \"שעונים מעוררים ותזכורות\" לזמנים מדויקים';
 }

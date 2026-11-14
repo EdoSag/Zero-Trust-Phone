@@ -21,6 +21,13 @@
     <!-- Carrier video calls (P12). Asked for only when a video call starts. -->
     <uses-permission android:name="android.permission.CAMERA"/>
 
+    <!-- Call back reminders (P25) come back after a restart. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- Call back reminders on the minute, once the user allows "Alarms &
+         reminders"; inexact without it. Not USE_EXACT_ALARM, which Play
+         keeps for alarm clock and calendar apps. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+
     <uses-feature android:name="android.hardware.telephony" android:required="false"/>
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.camera.front" android:required="false"/>
@@ -59,6 +66,18 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="tel"/>
             </intent-filter>
+            <!-- Paste and clean (P13): select text with a phone number in
+                 any app and pick "ZT Phone", or share text to it. -->
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
         </activity>
 
         <!-- The in-call screen: its own window and Flutter engine, so a call
@@ -95,6 +114,17 @@
         <receiver
             android:name=".CallBackReceiver"
             android:exported="false"/>
+        <!-- Call back reminders (P25): the alarm, and putting them back
+             after a restart or app update. -->
+        <receiver
+            android:name=".CallBackAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED"/>
+            </intent-filter>
+        </receiver>
 
         <!-- Telecom asks the default Phone app to show missed-call and
              voicemail notifications (P2, P5). -->

@@ -1,7 +1,7 @@
 name: zerotrust_phone
 description: "Zero-Trust Phone: a private dialer for Android, with names from your encrypted ZT Contacts."
 publish_to: none
-version: 0.3.0+4
+version: 0.4.0+5
 
 environment:
   sdk: ^3.9.0
@@ -32,8 +32,16 @@ dependencies:
   url_launcher: ^6.3.1
   share_plus: ^13.3.1
   cryptography: ^2.7.0
+  timezone: ^0.11.2
 
 dev_dependencies:
+  # Release checks every Zero-Trust app runs in CI (keys, sync, sign-in, app
+  # setup, database). Independent of zero_trust_core, so it may be newer.
+  zt_release_checks:
+    git:
+      url: https://github.com/EdoSag/Zero-Trust-Core.git
+      path: packages/zt_release_checks
+      ref: b43fcd045722bc364ef2eaa739db181f9dac144f
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0

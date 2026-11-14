@@ -800,4 +800,315 @@ class AppL10nEn extends AppL10n {
   @override
   String get callAccessibilityPrivacy =>
       'Real-time text and video go over your carrier\'s network, straight to the other person. ZT Phone never sends them to its servers or keeps them after the call.';
+
+  @override
+  String get pasteNumber => 'Paste a number';
+
+  @override
+  String get noNumberInText => 'No phone number found in the copied text';
+
+  @override
+  String get whichNumber => 'Which number?';
+
+  @override
+  String get dialWithPauses => 'Dial with pauses';
+
+  @override
+  String get dialWithPausesShort => 'Wait, then send a code or menu choice';
+
+  @override
+  String get dialWithPausesExplain =>
+      'For phone menus, conference codes and voicemail PINs: call, wait, then send the digits for you. Save it and it\'s one tap next time.';
+
+  @override
+  String get dialShortcutDefaultLabel => 'Call with code';
+
+  @override
+  String get dialShortcutName => 'Name';
+
+  @override
+  String get dialShortcutNameHint => 'Voicemail PIN, Work conference…';
+
+  @override
+  String get numberToCall => 'Number to call';
+
+  @override
+  String get addPause => 'Wait 3 seconds';
+
+  @override
+  String get addWaitForTap => 'Wait for my tap';
+
+  @override
+  String get addTones => 'Send digits';
+
+  @override
+  String get dialsAs => 'Dials';
+
+  @override
+  String get callNow => 'Call now';
+
+  @override
+  String pauseSeconds(int seconds) {
+    return 'Wait about $seconds seconds';
+  }
+
+  @override
+  String get shorterPause => 'Shorter';
+
+  @override
+  String get longerPause => 'Longer';
+
+  @override
+  String get waitForTapStep => 'Wait until I tap Send on the call screen';
+
+  @override
+  String get tonesToSend => 'Digits to send';
+
+  @override
+  String get removeStep => 'Remove step';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get hideMyNumber => 'Hide my number on this call';
+
+  @override
+  String get showMyNumber => 'Show my number on this call';
+
+  @override
+  String get numberHidden => 'My number hidden';
+
+  @override
+  String get keyStarHold => 'Star, hold for a pause';
+
+  @override
+  String get keyHashHold => 'Hash, hold for wait';
+
+  @override
+  String get callWithNumberHidden => 'Call with my number hidden';
+
+  @override
+  String get callWithNumberHiddenBody =>
+      'They see \"Private number\", if your carrier allows it. Emergency numbers always see your number.';
+
+  @override
+  String get hideMyNumberForContact => 'Hide my number';
+
+  @override
+  String get hideMyNumberForContactBody =>
+      'Every call to this contact shows \"Private number\", if your carrier allows it. Emergency numbers always see your number.';
+
+  @override
+  String timeTomorrow(String time) {
+    return '$time tomorrow';
+  }
+
+  @override
+  String timeYesterday(String time) {
+    return '$time yesterday';
+  }
+
+  @override
+  String timeRange(String from, String to) {
+    return '$from–$to';
+  }
+
+  @override
+  String countryTimeThere(String country, String time) {
+    return '$country · $time there now';
+  }
+
+  @override
+  String sendTonesQuestion(String tones) {
+    return 'Send $tones now?';
+  }
+
+  @override
+  String get skip => 'Skip';
+
+  @override
+  String get privateCallLog => 'Private call log';
+
+  @override
+  String get privateCallLogBody =>
+      'Calls with this contact are kept only in your encrypted vault, not in Android\'s shared call history that other apps can read. Your carrier still keeps its own record.';
+
+  @override
+  String movedToVault(int count) {
+    return 'Moved $count past calls into the vault';
+  }
+
+  @override
+  String get callStats => 'Call stats';
+
+  @override
+  String get statsWeek => '7 days';
+
+  @override
+  String get statsMonth => '30 days';
+
+  @override
+  String get statsYear => 'Year';
+
+  @override
+  String get statsCalls => 'Calls';
+
+  @override
+  String statsInOut(int incoming, int outgoing) {
+    return '$incoming in · $outgoing out';
+  }
+
+  @override
+  String get statsTalkTime => 'Talk time';
+
+  @override
+  String get statsAverageCall => 'Average call';
+
+  @override
+  String get statsLastWeeks => 'Last 8 weeks';
+
+  @override
+  String get statsMostTalked => 'Who you talk to most';
+
+  @override
+  String statsPersonLine(int calls, String talk) {
+    return '$calls calls · $talk';
+  }
+
+  @override
+  String statsWeekBar(String start, int calls, String talk) {
+    return 'Week of $start: $calls calls, $talk';
+  }
+
+  @override
+  String get statsPrivacy =>
+      'Worked out on this phone from your call history. Nothing is sent anywhere.';
+
+  @override
+  String talkMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String talkHoursMinutes(int hours, int minutes) {
+    return '$hours h $minutes min';
+  }
+
+  @override
+  String remindMeToCallBack(String name) {
+    return 'Remind me to call $name back';
+  }
+
+  @override
+  String get remindMeToCallBackShort => 'Remind me to call back';
+
+  @override
+  String get remindMeToCallBackBody =>
+      'A reminder here, and a task in ZT Tasks';
+
+  @override
+  String get callBackLater => 'Call back later';
+
+  @override
+  String get in15Minutes => 'In 15 minutes';
+
+  @override
+  String get in1Hour => 'In 1 hour';
+
+  @override
+  String get in3Hours => 'In 3 hours';
+
+  @override
+  String get tonight => 'Tonight';
+
+  @override
+  String get tomorrowMorning => 'Tomorrow morning';
+
+  @override
+  String get pickATime => 'Pick a date and time';
+
+  @override
+  String get callBackExplain =>
+      'ZT Phone reminds you at that time and adds a task to ZT Tasks. Both are done once you call back.';
+
+  @override
+  String callBackSetWithTask(String time) {
+    return 'I\'ll remind you at $time. Added to ZT Tasks.';
+  }
+
+  @override
+  String callBackSetNoTask(String time) {
+    return 'I\'ll remind you at $time. ZT Tasks couldn\'t be reached, so no task was added.';
+  }
+
+  @override
+  String callBackTaskTitle(String name) {
+    return 'Call $name back';
+  }
+
+  @override
+  String callBackName(String name) {
+    return 'Call back $name';
+  }
+
+  @override
+  String callBackDue(String time) {
+    return 'Due since $time';
+  }
+
+  @override
+  String get cancelReminder => 'Cancel reminder';
+
+  @override
+  String get nativeCallBackReminder => 'Call back %s';
+
+  @override
+  String get nativeCallBackChannel => 'Call back reminders';
+
+  @override
+  String get nativeRemindMe => 'Remind me';
+
+  @override
+  String get numberHiddenNotice =>
+      'Your number is hidden on this call if your carrier allows it. Emergency numbers always see it.';
+
+  @override
+  String get privateLogLimitsTitle => 'Before you turn it on';
+
+  @override
+  String get privateLogLimitsIntro =>
+      'ZT Phone moves these calls into your vault, but Android doesn\'t let any Phone app keep a call out of its shared history entirely:';
+
+  @override
+  String get privateLogLimitSeconds =>
+      'Each call shows in Android\'s shared history for a few seconds after it ends, until ZT Phone moves it.';
+
+  @override
+  String get privateLogLimitDefault =>
+      'If ZT Phone isn\'t your default Phone app, calls stay there until you next open ZT Phone.';
+
+  @override
+  String get privateLogLimitCarrier =>
+      'Your carrier\'s records and bill still list every call.';
+
+  @override
+  String get turnOn => 'Turn on';
+
+  @override
+  String get notNow => 'Not now';
+
+  @override
+  String get exactRemindersTitle => 'Remind you on the minute?';
+
+  @override
+  String get exactRemindersBody =>
+      'Android lets ZT Phone ring a reminder at the exact minute only if you allow \"Alarms & reminders\" for it. Without that, reminders still come, but can be a few minutes late.';
+
+  @override
+  String get callBackMayBeLate => 'Reminders can be a few minutes late';
+
+  @override
+  String get callBackMayBeLateBody =>
+      'Tap to allow \"Alarms & reminders\" for exact times';
 }

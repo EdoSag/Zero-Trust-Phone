@@ -3,12 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/pages/call_actions.dart';
+import 'package:zerotrust_phone/pages/call_back_sheet.dart';
+import 'package:zerotrust_phone/pages/call_stats_page.dart';
 import 'package:zerotrust_phone/pages/contact_call_settings_page.dart';
+import 'package:zerotrust_phone/pages/dial_shortcut_page.dart';
 import 'package:zerotrust_phone/pages/recents_page.dart';
-import 'package:zerotrust_phone/services/history_backup.dart';
+import 'package:zerotrust_phone/services/private_calls.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/util/phone_numbers.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
+import 'package:zerotrust_phone/widgets/country_time_hint.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// Every call with one number, with its length, and what to do next (P4).
@@ -23,7 +27,7 @@ class CallDetailsPage extends ConsumerWidget {
         .watch(contactDirectoryProvider)
         .lookup(number);
     final List<CallLogEntry> calls =
-        (ref.watch(callLogProvider).value ?? const <CallLogEntry>[])
+        (ref.watch(allCallsProvider).value ?? const <CallLogEntry>[])
             .where((CallLogEntry e) => PhoneNumbers.same(e.number, number))
             .toList();
     final String title =
@@ -56,6 +60,18 @@ class CallDetailsPage extends ConsumerWidget {
             ),
           ),
           if (title != number) Center(child: Text(ltr(number))),
+          if (countryHintText(context, ref, number) case final String hint)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Center(
+                child: Text(
+                  hint,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
           const SizedBox(height: 16),
           Wrap(
             alignment: WrapAlignment.center,
@@ -73,6 +89,16 @@ class CallDetailsPage extends ConsumerWidget {
                   label: Text(context.l10n.videoCall),
                   onPressed: () => placeCall(ref, number, video: true),
                 ),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.alarm_add_outlined),
+                label: Text(context.l10n.callBackLater),
+                onPressed: () => showCallBackSheet(
+                  context,
+                  ref,
+                  number: number,
+                  contact: contact,
+                ),
+              ),
               OutlinedButton.icon(
                 icon: const Icon(Icons.message_outlined),
                 label: Text(context.l10n.message),
@@ -101,8 +127,23 @@ class CallDetailsPage extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
+          DialShortcutTiles(
+            numbers: contact?.phones.isNotEmpty == true
+                ? contact!.phones
+                : <String>[number],
+            contact: contact,
+          ),
+          const SizedBox(height: 8),
           const Divider(),
+          if (calls.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+              child: Text(
+                personSummary(context.l10n, calls),
+                style: theme.textTheme.titleSmall,
+              ),
+            ),
           if (calls.isEmpty)
             Padding(
               padding: const EdgeInsets.all(24),
@@ -119,7 +160,19 @@ class CallDetailsPage extends ConsumerWidget {
                     ? theme.colorScheme.error
                     : null,
               ),
-              title: Text(callTypeIcon(c.type).$2),
+              title: Row(
+                children: <Widget>[
+                  Flexible(child: Text(callTypeIcon(c.type).$2)),
+                  if (c.isPrivate) ...<Widget>[
+                    const SizedBox(width: 6),
+                    Icon(
+                      Icons.lock_outline,
+                      size: 14,
+                      semanticLabel: context.l10n.privateCallLog,
+                    ),
+                  ],
+                ],
+              ),
               subtitle: Text(
                 context.l10n.dayAndTime(
                   dayLabel(c.date, DateTime.now()),
@@ -157,11 +210,7 @@ class CallDetailsPage extends ConsumerWidget {
       ),
     );
     if (ok != true) return;
-    await ref.read(telecomProvider).deleteCalls(<int>[
-      for (final CallLogEntry c in calls) c.id,
-    ]);
-    await ref.read(historyBackupProvider).forget(calls).catchError((_) {});
-    ref.invalidate(callLogProvider);
+    await ref.read(privateCallsServiceProvider).delete(calls);
     if (context.mounted) Navigator.of(context).pop();
   }
 }

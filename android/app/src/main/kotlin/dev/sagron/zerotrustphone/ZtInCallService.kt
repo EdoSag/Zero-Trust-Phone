@@ -44,6 +44,11 @@ class ZtInCallService : InCallService() {
 
     override fun onCallRemoved(call: Call) {
         super.onCallRemoved(call)
+        // P23: a private contact's call leaves Android's shared call log.
+        val number = call.details.handle?.schemeSpecificPart ?: ""
+        if (number.isNotBlank() && ScreeningStore(this).isPrivate(number)) {
+            PrivateCallLog.scrubSoon(this, number, call.details.creationTimeMillis)
+        }
         CallManager.remove(call)
         if (!CallManager.hasCalls) CallNotifications.cancel(this)
     }

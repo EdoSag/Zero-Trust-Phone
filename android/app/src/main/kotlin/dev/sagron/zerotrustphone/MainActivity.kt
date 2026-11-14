@@ -32,16 +32,35 @@ class MainActivity : FlutterFragmentActivity() {
     /** A number from a DIAL / tel: intent, "" for an empty dialpad. */
     private var pendingDial: String? = null
 
+    /** Text selected or shared from another app, to pick a number from (P13). */
+    private var pendingDialText: String? = null
+
     /** Opened from the missed-call notification. */
     private var pendingRecents = false
+
+    /** P25: "Remind me" on a missed call, with its number. */
+    private var pendingCallBackLater: String? = null
     private var pendingRingtone: MethodChannel.Result? = null
     private var pendingCamera: MethodChannel.Result? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Taking "Alarms & reminders" away stops the app and cancels its
+        // exact alarms, with no broadcast. Set them again (inexact now);
+        // any that came due meanwhile ring right away, late but not lost.
+        CallBackAlarms.rescheduleAll(this)
         pendingDial = dialNumber(intent)
+        pendingDialText = dialText(intent)
         pendingRecents = intent?.action == ACTION_SHOW_RECENTS
+        pendingCallBackLater = callBackLater(intent)
     }
+
+    private fun callBackLater(intent: Intent?): String? =
+        if (intent?.action == ACTION_CALL_BACK_LATER) {
+            intent.getStringExtra(MissedCallReceiver.EXTRA_NUMBER)?.takeIf { it.isNotBlank() }
+        } else {
+            null
+        }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -50,17 +69,38 @@ class MainActivity : FlutterFragmentActivity() {
             channel?.invokeMethod("recentsPending", null)
             return
         }
+        if (intent.action == ACTION_CALL_BACK_LATER) {
+            pendingCallBackLater = callBackLater(intent) ?: return
+            channel?.invokeMethod("callBackPending", null)
+            return
+        }
         // Kept until the unlocked dialer takes it (consumeDial), so a number
         // that arrives while the vault is locked isn't lost.
         pendingDial = dialNumber(intent) ?: return
+        pendingDialText = dialText(intent)
         channel?.invokeMethod("dialPending", null)
     }
 
     private fun dialNumber(intent: Intent?): String? {
         if (intent == null) return null
+        // "ZT Phone" in another app's text menu or share sheet: an empty
+        // dialpad, and the text goes to Dart to find the number in (P13).
+        if (dialText(intent) != null) return ""
         if (intent.action != Intent.ACTION_DIAL && intent.action != Intent.ACTION_VIEW) return null
         val data = intent.data ?: return ""
         return if (data.scheme == "tel") Uri.decode(data.schemeSpecificPart) else ""
+    }
+
+    private fun dialText(intent: Intent?): String? {
+        val text = when (intent?.action) {
+            Intent.ACTION_PROCESS_TEXT ->
+                intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)
+            Intent.ACTION_SEND ->
+                if (intent.type == "text/plain") intent.getCharSequenceExtra(Intent.EXTRA_TEXT) else null
+            else -> null
+        } ?: return null
+        // A number is short; a whole pasted page isn't kept or passed on.
+        return text.toString().take(4000)
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -88,15 +128,21 @@ class MainActivity : FlutterFragmentActivity() {
                         result.success(pendingDial)
                         pendingDial = null
                     }
+                    "consumeDialText" -> {
+                        result.success(pendingDialText)
+                        pendingDialText = null
+                    }
                     "placeCall" -> {
                         placeCall(
                             call.argument<String>("number") ?: "",
                             call.argument<String>("account"),
                             rtt = call.argument<Boolean>("rtt") ?: false,
                             video = call.argument<Boolean>("video") ?: false,
+                            hideCallerId = call.argument<Boolean>("hideCallerId") ?: false,
                         )
                         result.success(null)
                     }
+                    "simCountry" -> result.success(simCountry())
                     "callFeatures" -> result.success(callFeatures())
                     "openCallAccessibilitySettings" -> result.success(openCallAccessibilitySettings())
                     "requestCamera" -> requestCamera(result)
@@ -118,11 +164,47 @@ class MainActivity : FlutterFragmentActivity() {
                             contactKeys = call.argument<List<String>>("contactKeys") ?: emptyList(),
                             voicemailKeys = call.argument<List<String>>("voicemailKeys") ?: emptyList(),
                             ringtones = call.argument<Map<String, String>>("ringtones") ?: emptyMap(),
+                            privateKeys = call.argument<List<String>>("privateKeys") ?: emptyList(),
                         )
                         result.success(null)
                     }
+                    "takePrivateCalls" -> result.success(PrivateCallLog.pending(this))
+                    "ackPrivateCalls" -> {
+                        PrivateCallLog.acknowledge(this, call.argument<List<String>>("keys") ?: emptyList())
+                        result.success(null)
+                    }
+                    "scheduleCallBack" -> {
+                        CallBackAlarms.schedule(
+                            this,
+                            call.argument<String>("id") ?: "",
+                            call.argument<String>("number") ?: "",
+                            (call.argument<Number>("at") ?: 0).toLong(),
+                        )
+                        result.success(null)
+                    }
+                    "exactAlarmState" -> result.success(
+                        mapOf(
+                            "exact" to CallBackAlarms.canBeExact(this),
+                            "asked" to CallBackAlarms.askedForExact(this),
+                        )
+                    )
+                    "markExactAlarmsAsked" -> {
+                        CallBackAlarms.markAskedForExact(this)
+                        result.success(null)
+                    }
+                    "openExactAlarmSettings" -> result.success(CallBackAlarms.openExactSettings(this))
+                    "cancelCallBack" -> {
+                        CallBackAlarms.cancel(this, call.argument<String>("id") ?: "")
+                        result.success(null)
+                    }
+                    "consumeCallBackLater" -> {
+                        result.success(pendingCallBackLater)
+                        pendingCallBackLater = null
+                    }
                     "clearScreeningContacts" -> {
                         ScreeningStore(this).clearContacts()
+                        PrivateCallLog.clear(this)
+                        CallBackAlarms.cancelAll(this)
                         result.success(null)
                     }
                     "insertCalls" -> result.success(
@@ -306,10 +388,17 @@ class MainActivity : FlutterFragmentActivity() {
     }
 
     private fun placeCall(
-        number: String, accountId: String? = null, rtt: Boolean = false, video: Boolean = false
+        number: String,
+        accountId: String? = null,
+        rtt: Boolean = false,
+        video: Boolean = false,
+        hideCallerId: Boolean = false,
     ) {
         if (number.isBlank()) return
-        val uri = Uri.fromParts("tel", number, null)
+        val account = accountFor(accountId)
+        // The code depends on the SIM the call goes out on (dual SIM).
+        val dialled = if (hideCallerId) CallerId.hide(number, simCountry(account)) else number
+        val uri = Uri.fromParts("tel", dialled, null)
         if (has(Manifest.permission.CALL_PHONE)) {
             val extras = Bundle()
             // P12: start with real-time text, or as a carrier video call.
@@ -322,7 +411,7 @@ class MainActivity : FlutterFragmentActivity() {
                 )
             }
             // The contact's SIM (P6), when this phone still has it.
-            accountFor(accountId)?.let {
+            account?.let {
                 extras.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, it)
             }
             getSystemService(TelecomManager::class.java).placeCall(uri, extras)
@@ -330,6 +419,23 @@ class MainActivity : FlutterFragmentActivity() {
             // Without the permission, hand the number to the system dialer.
             startActivity(Intent(Intent.ACTION_DIAL, uri))
         }
+    }
+
+    /**
+     * The SIM's country ("il"), else the network's, else null. [account]
+     * picks one SIM on a dual-SIM phone; null is the default one.
+     */
+    private fun simCountry(account: PhoneAccountHandle? = null): String? {
+        val base = getSystemService(TelephonyManager::class.java) ?: return null
+        val tm = account?.let {
+            try {
+                base.createForPhoneAccountHandle(it)
+            } catch (_: Exception) {
+                null
+            }
+        } ?: base
+        return tm.simCountryIso?.takeIf { it.isNotBlank() }
+            ?: tm.networkCountryIso?.takeIf { it.isNotBlank() }
     }
 
     private fun callVoicemail() {
@@ -547,5 +653,6 @@ class MainActivity : FlutterFragmentActivity() {
         private const val REQUEST_PERMISSIONS = 3102
         private const val REQUEST_RINGTONE = 3103
         const val ACTION_SHOW_RECENTS = "dev.sagron.zerotrustphone.SHOW_RECENTS"
+        const val ACTION_CALL_BACK_LATER = "dev.sagron.zerotrustphone.CALL_BACK_LATER"
     }
 }

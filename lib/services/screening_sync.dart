@@ -12,6 +12,7 @@ class ScreeningRules {
     required this.contactKeys,
     required this.voicemailKeys,
     required this.ringtones,
+    this.privateKeys = const <String>[],
   });
 
   factory ScreeningRules.build({
@@ -26,6 +27,7 @@ class ScreeningRules {
     final Set<String> contactKeys = <String>{};
     final Set<String> voicemailKeys = <String>{};
     final Map<String, String> ringtones = <String, String>{};
+    final Set<String> privateKeys = <String>{};
     for (final PhoneContact c in contacts) {
       final ContactCallSettings? s = byContact[c.id];
       for (final String p in c.phones) {
@@ -34,6 +36,7 @@ class ScreeningRules {
         contactKeys.add(key);
         // A contact blocked in ZT Contacts goes to voicemail too.
         if (s?.toVoicemail == true || c.isBlocked) voicemailKeys.add(key);
+        if (s?.privateLog == true) privateKeys.add(key);
         final String? tone = s?.ringtone;
         if (tone != null && tone.isNotEmpty) ringtones[key] = tone;
       }
@@ -45,6 +48,7 @@ class ScreeningRules {
       contactKeys: contactKeys.toList()..sort(),
       voicemailKeys: voicemailKeys.toList()..sort(),
       ringtones: ringtones,
+      privateKeys: privateKeys.toList()..sort(),
     );
   }
 
@@ -55,6 +59,9 @@ class ScreeningRules {
   final List<String> voicemailKeys;
   final Map<String, String> ringtones;
 
+  /// P23: lookup keys whose calls leave Android's shared call log.
+  final List<String> privateKeys;
+
   /// Same rules as [other], so there's nothing to send again.
   bool same(ScreeningRules? other) =>
       other != null &&
@@ -63,7 +70,8 @@ class ScreeningRules {
       other.prefixes.join('|') == prefixes.join('|') &&
       other.contactKeys.join('|') == contactKeys.join('|') &&
       other.voicemailKeys.join('|') == voicemailKeys.join('|') &&
-      other.ringtones.toString() == ringtones.toString();
+      other.ringtones.toString() == ringtones.toString() &&
+      other.privateKeys.join('|') == privateKeys.join('|');
 }
 
 /// How on-device screening treats a call, mirrored from

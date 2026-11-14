@@ -1476,6 +1476,528 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Real-time text and video go over your carrier\'s network, straight to the other person. ZT Phone never sends them to its servers or keeps them after the call.'**
   String get callAccessibilityPrivacy;
+
+  /// No description provided for @pasteNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a number'**
+  String get pasteNumber;
+
+  /// No description provided for @noNumberInText.
+  ///
+  /// In en, this message translates to:
+  /// **'No phone number found in the copied text'**
+  String get noNumberInText;
+
+  /// No description provided for @whichNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Which number?'**
+  String get whichNumber;
+
+  /// No description provided for @dialWithPauses.
+  ///
+  /// In en, this message translates to:
+  /// **'Dial with pauses'**
+  String get dialWithPauses;
+
+  /// No description provided for @dialWithPausesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait, then send a code or menu choice'**
+  String get dialWithPausesShort;
+
+  /// No description provided for @dialWithPausesExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'For phone menus, conference codes and voicemail PINs: call, wait, then send the digits for you. Save it and it\'s one tap next time.'**
+  String get dialWithPausesExplain;
+
+  /// No description provided for @dialShortcutDefaultLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Call with code'**
+  String get dialShortcutDefaultLabel;
+
+  /// No description provided for @dialShortcutName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get dialShortcutName;
+
+  /// No description provided for @dialShortcutNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Voicemail PIN, Work conference…'**
+  String get dialShortcutNameHint;
+
+  /// No description provided for @numberToCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Number to call'**
+  String get numberToCall;
+
+  /// No description provided for @addPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait 3 seconds'**
+  String get addPause;
+
+  /// No description provided for @addWaitForTap.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait for my tap'**
+  String get addWaitForTap;
+
+  /// No description provided for @addTones.
+  ///
+  /// In en, this message translates to:
+  /// **'Send digits'**
+  String get addTones;
+
+  /// No description provided for @dialsAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Dials'**
+  String get dialsAs;
+
+  /// No description provided for @callNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Call now'**
+  String get callNow;
+
+  /// No description provided for @pauseSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait about {seconds} seconds'**
+  String pauseSeconds(int seconds);
+
+  /// No description provided for @shorterPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Shorter'**
+  String get shorterPause;
+
+  /// No description provided for @longerPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Longer'**
+  String get longerPause;
+
+  /// No description provided for @waitForTapStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait until I tap Send on the call screen'**
+  String get waitForTapStep;
+
+  /// No description provided for @tonesToSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Digits to send'**
+  String get tonesToSend;
+
+  /// No description provided for @removeStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove step'**
+  String get removeStep;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @hideMyNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide my number on this call'**
+  String get hideMyNumber;
+
+  /// No description provided for @showMyNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Show my number on this call'**
+  String get showMyNumber;
+
+  /// No description provided for @numberHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'My number hidden'**
+  String get numberHidden;
+
+  /// No description provided for @keyStarHold.
+  ///
+  /// In en, this message translates to:
+  /// **'Star, hold for a pause'**
+  String get keyStarHold;
+
+  /// No description provided for @keyHashHold.
+  ///
+  /// In en, this message translates to:
+  /// **'Hash, hold for wait'**
+  String get keyHashHold;
+
+  /// No description provided for @callWithNumberHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Call with my number hidden'**
+  String get callWithNumberHidden;
+
+  /// No description provided for @callWithNumberHiddenBody.
+  ///
+  /// In en, this message translates to:
+  /// **'They see \"Private number\", if your carrier allows it. Emergency numbers always see your number.'**
+  String get callWithNumberHiddenBody;
+
+  /// No description provided for @hideMyNumberForContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide my number'**
+  String get hideMyNumberForContact;
+
+  /// No description provided for @hideMyNumberForContactBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every call to this contact shows \"Private number\", if your carrier allows it. Emergency numbers always see your number.'**
+  String get hideMyNumberForContactBody;
+
+  /// No description provided for @timeTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'{time} tomorrow'**
+  String timeTomorrow(String time);
+
+  /// No description provided for @timeYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'{time} yesterday'**
+  String timeYesterday(String time);
+
+  /// No description provided for @timeRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{from}–{to}'**
+  String timeRange(String from, String to);
+
+  /// No description provided for @countryTimeThere.
+  ///
+  /// In en, this message translates to:
+  /// **'{country} · {time} there now'**
+  String countryTimeThere(String country, String time);
+
+  /// No description provided for @sendTonesQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Send {tones} now?'**
+  String sendTonesQuestion(String tones);
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// No description provided for @privateCallLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Private call log'**
+  String get privateCallLog;
+
+  /// No description provided for @privateCallLogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Calls with this contact are kept only in your encrypted vault, not in Android\'s shared call history that other apps can read. Your carrier still keeps its own record.'**
+  String get privateCallLogBody;
+
+  /// No description provided for @movedToVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Moved {count} past calls into the vault'**
+  String movedToVault(int count);
+
+  /// No description provided for @callStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Call stats'**
+  String get callStats;
+
+  /// No description provided for @statsWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'7 days'**
+  String get statsWeek;
+
+  /// No description provided for @statsMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'30 days'**
+  String get statsMonth;
+
+  /// No description provided for @statsYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get statsYear;
+
+  /// No description provided for @statsCalls.
+  ///
+  /// In en, this message translates to:
+  /// **'Calls'**
+  String get statsCalls;
+
+  /// No description provided for @statsInOut.
+  ///
+  /// In en, this message translates to:
+  /// **'{incoming} in · {outgoing} out'**
+  String statsInOut(int incoming, int outgoing);
+
+  /// No description provided for @statsTalkTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk time'**
+  String get statsTalkTime;
+
+  /// No description provided for @statsAverageCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Average call'**
+  String get statsAverageCall;
+
+  /// No description provided for @statsLastWeeks.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 8 weeks'**
+  String get statsLastWeeks;
+
+  /// No description provided for @statsMostTalked.
+  ///
+  /// In en, this message translates to:
+  /// **'Who you talk to most'**
+  String get statsMostTalked;
+
+  /// No description provided for @statsPersonLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{calls} calls · {talk}'**
+  String statsPersonLine(int calls, String talk);
+
+  /// No description provided for @statsWeekBar.
+  ///
+  /// In en, this message translates to:
+  /// **'Week of {start}: {calls} calls, {talk}'**
+  String statsWeekBar(String start, int calls, String talk);
+
+  /// No description provided for @statsPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Worked out on this phone from your call history. Nothing is sent anywhere.'**
+  String get statsPrivacy;
+
+  /// No description provided for @talkMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String talkMinutes(int minutes);
+
+  /// No description provided for @talkHoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h {minutes} min'**
+  String talkHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @remindMeToCallBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me to call {name} back'**
+  String remindMeToCallBack(String name);
+
+  /// No description provided for @remindMeToCallBackShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me to call back'**
+  String get remindMeToCallBackShort;
+
+  /// No description provided for @remindMeToCallBackBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A reminder here, and a task in ZT Tasks'**
+  String get remindMeToCallBackBody;
+
+  /// No description provided for @callBackLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Call back later'**
+  String get callBackLater;
+
+  /// No description provided for @in15Minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'In 15 minutes'**
+  String get in15Minutes;
+
+  /// No description provided for @in1Hour.
+  ///
+  /// In en, this message translates to:
+  /// **'In 1 hour'**
+  String get in1Hour;
+
+  /// No description provided for @in3Hours.
+  ///
+  /// In en, this message translates to:
+  /// **'In 3 hours'**
+  String get in3Hours;
+
+  /// No description provided for @tonight.
+  ///
+  /// In en, this message translates to:
+  /// **'Tonight'**
+  String get tonight;
+
+  /// No description provided for @tomorrowMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow morning'**
+  String get tomorrowMorning;
+
+  /// No description provided for @pickATime.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a date and time'**
+  String get pickATime;
+
+  /// No description provided for @callBackExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'ZT Phone reminds you at that time and adds a task to ZT Tasks. Both are done once you call back.'**
+  String get callBackExplain;
+
+  /// No description provided for @callBackSetWithTask.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ll remind you at {time}. Added to ZT Tasks.'**
+  String callBackSetWithTask(String time);
+
+  /// No description provided for @callBackSetNoTask.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ll remind you at {time}. ZT Tasks couldn\'t be reached, so no task was added.'**
+  String callBackSetNoTask(String time);
+
+  /// No description provided for @callBackTaskTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Call {name} back'**
+  String callBackTaskTitle(String name);
+
+  /// No description provided for @callBackName.
+  ///
+  /// In en, this message translates to:
+  /// **'Call back {name}'**
+  String callBackName(String name);
+
+  /// No description provided for @callBackDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due since {time}'**
+  String callBackDue(String time);
+
+  /// No description provided for @cancelReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel reminder'**
+  String get cancelReminder;
+
+  /// No description provided for @nativeCallBackReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Call back %s'**
+  String get nativeCallBackReminder;
+
+  /// No description provided for @nativeCallBackChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Call back reminders'**
+  String get nativeCallBackChannel;
+
+  /// No description provided for @nativeRemindMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me'**
+  String get nativeRemindMe;
+
+  /// No description provided for @numberHiddenNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Your number is hidden on this call if your carrier allows it. Emergency numbers always see it.'**
+  String get numberHiddenNotice;
+
+  /// No description provided for @privateLogLimitsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Before you turn it on'**
+  String get privateLogLimitsTitle;
+
+  /// No description provided for @privateLogLimitsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'ZT Phone moves these calls into your vault, but Android doesn\'t let any Phone app keep a call out of its shared history entirely:'**
+  String get privateLogLimitsIntro;
+
+  /// No description provided for @privateLogLimitSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Each call shows in Android\'s shared history for a few seconds after it ends, until ZT Phone moves it.'**
+  String get privateLogLimitSeconds;
+
+  /// No description provided for @privateLogLimitDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'If ZT Phone isn\'t your default Phone app, calls stay there until you next open ZT Phone.'**
+  String get privateLogLimitDefault;
+
+  /// No description provided for @privateLogLimitCarrier.
+  ///
+  /// In en, this message translates to:
+  /// **'Your carrier\'s records and bill still list every call.'**
+  String get privateLogLimitCarrier;
+
+  /// No description provided for @turnOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on'**
+  String get turnOn;
+
+  /// No description provided for @notNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get notNow;
+
+  /// No description provided for @exactRemindersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind you on the minute?'**
+  String get exactRemindersTitle;
+
+  /// No description provided for @exactRemindersBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Android lets ZT Phone ring a reminder at the exact minute only if you allow \"Alarms & reminders\" for it. Without that, reminders still come, but can be a few minutes late.'**
+  String get exactRemindersBody;
+
+  /// No description provided for @callBackMayBeLate.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders can be a few minutes late'**
+  String get callBackMayBeLate;
+
+  /// No description provided for @callBackMayBeLateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to allow \"Alarms & reminders\" for exact times'**
+  String get callBackMayBeLateBody;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {
