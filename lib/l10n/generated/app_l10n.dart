@@ -1648,7 +1648,7 @@ abstract class AppL10n {
   /// No description provided for @callWithNumberHiddenBody.
   ///
   /// In en, this message translates to:
-  /// **'They see \"Private number\", if your carrier allows it'**
+  /// **'They see \"Private number\", if your carrier allows it. Emergency numbers always see your number.'**
   String get callWithNumberHiddenBody;
 
   /// No description provided for @hideMyNumberForContact.
@@ -1660,7 +1660,7 @@ abstract class AppL10n {
   /// No description provided for @hideMyNumberForContactBody.
   ///
   /// In en, this message translates to:
-  /// **'Every call to this contact shows \"Private number\", if your carrier allows it'**
+  /// **'Every call to this contact shows \"Private number\", if your carrier allows it. Emergency numbers always see your number.'**
   String get hideMyNumberForContactBody;
 
   /// No description provided for @timeTomorrow.
@@ -1708,7 +1708,7 @@ abstract class AppL10n {
   /// No description provided for @privateCallLogBody.
   ///
   /// In en, this message translates to:
-  /// **'Calls with this contact are kept only in your encrypted vault, not in Android\'s shared call history that other apps can read'**
+  /// **'Calls with this contact are kept only in your encrypted vault, not in Android\'s shared call history that other apps can read. Your carrier still keeps its own record.'**
   String get privateCallLogBody;
 
   /// No description provided for @movedToVault.
@@ -1926,6 +1926,48 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Remind me'**
   String get nativeRemindMe;
+
+  /// No description provided for @numberHiddenNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Your number is hidden on this call if your carrier allows it. Emergency numbers always see it.'**
+  String get numberHiddenNotice;
+
+  /// No description provided for @privateLogLimitsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Before you turn it on'**
+  String get privateLogLimitsTitle;
+
+  /// No description provided for @privateLogLimitsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'ZT Phone moves these calls into your vault, but Android doesn\'t let any Phone app keep a call out of its shared history entirely:'**
+  String get privateLogLimitsIntro;
+
+  /// No description provided for @privateLogLimitSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Each call shows in Android\'s shared history for a few seconds after it ends, until ZT Phone moves it.'**
+  String get privateLogLimitSeconds;
+
+  /// No description provided for @privateLogLimitDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'If ZT Phone isn\'t your default Phone app, calls stay there until you next open ZT Phone.'**
+  String get privateLogLimitDefault;
+
+  /// No description provided for @privateLogLimitCarrier.
+  ///
+  /// In en, this message translates to:
+  /// **'Your carrier\'s records and bill still list every call.'**
+  String get privateLogLimitCarrier;
+
+  /// No description provided for @turnOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on'**
+  String get turnOn;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {
