@@ -1,0 +1,29 @@
+Zero-Trust Phone replaces your phone app. It shows names from your encrypted Zero-Trust Contacts, silences spam and unknown callers on the phone itself, and keeps your call history private.
+
+WHAT IT DOES
+• Dialpad, recents, favourites and speed dial (long-press 2 to 9).
+• Caller names from Zero-Trust Contacts, without giving other apps your address book.
+• Spam and unknown-caller protection that runs on the phone, with no lookup service.
+• Per-contact ringtones and "always send to voicemail".
+• Decline with a text message, with your own quick replies.
+• Missed-call notification with Call back, Message and Add to contacts.
+• Recents with search, filters and a details page per person, plus call stats.
+• Private call log: chosen contacts never stay in Android's shared call log.
+• Encrypted call-history backup, so your history moves to a new phone.
+• Paste any text and the dialer finds the number; dial with pauses for phone menus.
+• Country and local time hint for international numbers, hide caller ID per call.
+• Call back reminders that become a Zero-Trust Tasks task.
+• Voicemail, Bluetooth car kits, Android Auto, RTT and carrier video calls.
+
+WHY ZERO-TRUST
+• End-to-end encrypted: everything is encrypted on your phone before it syncs. We can't read it, and neither can anyone who breaks into the server.
+• One private account for every Zero-Trust app, unlocked with your fingerprint or face.
+• Works offline and syncs across your devices when you're back online.
+• No ads, no trackers, no analytics, no data sold. Ever.
+• Open source (AGPL-3.0), so anyone can check what the app does.
+• English and Hebrew, with full right-to-left support.
+
+Part of the Zero-Trust suite: Notes, Tasks, Calendar, Contacts, Phone, Fitness, Meds, Time and Browser. One account opens them all.
+
+Privacy policy: https://zerotrust.bz/privacy/
+Support: support@zerotrust.bz
