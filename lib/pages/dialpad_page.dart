@@ -244,7 +244,18 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
             isSelected: _hideCallerId,
             icon: const Icon(Icons.visibility_off_outlined),
             selectedIcon: const Icon(Icons.visibility_off),
-            onPressed: () => setState(() => _hideCallerId = !_hideCallerId),
+            onPressed: () {
+              setState(() => _hideCallerId = !_hideCallerId);
+              // What hiding can't do, said each time it's switched on.
+              final ScaffoldMessengerState messenger = ScaffoldMessenger.of(
+                context,
+              )..hideCurrentSnackBar();
+              if (_hideCallerId) {
+                messenger.showSnackBar(
+                  SnackBar(content: Text(context.l10n.numberHiddenNotice)),
+                );
+              }
+            },
           ),
         ],
       ),

@@ -401,9 +401,9 @@
   "keyStarHold": "Star, hold for a pause",
   "keyHashHold": "Hash, hold for wait",
   "callWithNumberHidden": "Call with my number hidden",
-  "callWithNumberHiddenBody": "They see \"Private number\", if your carrier allows it",
+  "callWithNumberHiddenBody": "They see \"Private number\", if your carrier allows it. Emergency numbers always see your number.",
   "hideMyNumberForContact": "Hide my number",
-  "hideMyNumberForContactBody": "Every call to this contact shows \"Private number\", if your carrier allows it",
+  "hideMyNumberForContactBody": "Every call to this contact shows \"Private number\", if your carrier allows it. Emergency numbers always see your number.",
   "timeTomorrow": "{time} tomorrow",
   "@timeTomorrow": {
     "placeholders": {
@@ -452,7 +452,7 @@
   },
   "skip": "Skip",
   "privateCallLog": "Private call log",
-  "privateCallLogBody": "Calls with this contact are kept only in your encrypted vault, not in Android's shared call history that other apps can read",
+  "privateCallLogBody": "Calls with this contact are kept only in your encrypted vault, not in Android's shared call history that other apps can read. Your carrier still keeps its own record.",
   "movedToVault": "Moved {count} past calls into the vault",
   "@movedToVault": {
     "placeholders": {
@@ -588,6 +588,13 @@
   "nativeCallBackReminder": "Call back %s",
   "nativeCallBackChannel": "Call back reminders",
   "nativeRemindMe": "Remind me",
+  "numberHiddenNotice": "Your number is hidden on this call if your carrier allows it. Emergency numbers always see it.",
+  "privateLogLimitsTitle": "Before you turn it on",
+  "privateLogLimitsIntro": "ZT Phone moves these calls into your vault, but Android doesn't let any Phone app keep a call out of its shared history entirely:",
+  "privateLogLimitSeconds": "Each call shows in Android's shared history for a few seconds after it ends, until ZT Phone moves it.",
+  "privateLogLimitDefault": "If ZT Phone isn't your default Phone app, calls stay there until you next open ZT Phone.",
+  "privateLogLimitCarrier": "Your carrier's records and bill still list every call.",
+  "turnOn": "Turn on",
   "notNow": "Not now",
   "exactRemindersTitle": "Remind you on the minute?",
   "exactRemindersBody": "Android lets ZT Phone ring a reminder at the exact minute only if you allow \"Alarms & reminders\" for it. Without that, reminders still come, but can be a few minutes late.",

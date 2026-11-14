@@ -890,14 +890,14 @@ class AppL10nHe extends AppL10n {
 
   @override
   String get callWithNumberHiddenBody =>
-      'יופיע אצלם \"מספר חסוי\", אם הספק שלך מאפשר';
+      'יופיע אצלם \"מספר חסוי\", אם הספק שלך מאפשר. מספרי חירום תמיד רואים את המספר שלך.';
 
   @override
   String get hideMyNumberForContact => 'הסתרת המספר שלי';
 
   @override
   String get hideMyNumberForContactBody =>
-      'כל שיחה לאיש הקשר הזה תופיע כ\"מספר חסוי\", אם הספק שלך מאפשר';
+      'כל שיחה לאיש הקשר הזה תופיע כ\"מספר חסוי\", אם הספק שלך מאפשר. מספרי חירום תמיד רואים את המספר שלך.';
 
   @override
   String timeTomorrow(String time) {
@@ -932,7 +932,7 @@ class AppL10nHe extends AppL10n {
 
   @override
   String get privateCallLogBody =>
-      'שיחות עם איש הקשר הזה נשמרות רק בכספת המוצפנת שלך, ולא בהיסטוריית השיחות המשותפת של Android שאפליקציות אחרות יכולות לקרוא';
+      'שיחות עם איש הקשר הזה נשמרות רק בכספת המוצפנת שלך, ולא בהיסטוריית השיחות המשותפת של Android שאפליקציות אחרות יכולות לקרוא. הספק שלך עדיין שומר רישום משלו.';
 
   @override
   String movedToVault(int count) {
@@ -1067,6 +1067,32 @@ class AppL10nHe extends AppL10n {
 
   @override
   String get nativeRemindMe => 'תזכורת';
+
+  @override
+  String get numberHiddenNotice =>
+      'המספר שלך מוסתר בשיחה הזו אם הספק שלך מאפשר. מספרי חירום תמיד רואים אותו.';
+
+  @override
+  String get privateLogLimitsTitle => 'לפני שמפעילים';
+
+  @override
+  String get privateLogLimitsIntro =>
+      'ZT Phone מעביר את השיחות האלה לכספת שלך, אבל Android לא מאפשר לאף אפליקציית טלפון למנוע לגמרי את רישום השיחה בהיסטוריה המשותפת:';
+
+  @override
+  String get privateLogLimitSeconds =>
+      'כל שיחה מופיעה בהיסטוריה המשותפת של Android לכמה שניות אחרי שהיא מסתיימת, עד ש-ZT Phone מעביר אותה.';
+
+  @override
+  String get privateLogLimitDefault =>
+      'אם ZT Phone אינו אפליקציית הטלפון שמוגדרת כברירת מחדל, השיחות נשארות שם עד הפעם הבאה שפותחים את ZT Phone.';
+
+  @override
+  String get privateLogLimitCarrier =>
+      'הרישומים והחשבון של הספק שלך עדיין מציגים כל שיחה.';
+
+  @override
+  String get turnOn => 'הפעלה';
 
   @override
   String get notNow => 'לא עכשיו';

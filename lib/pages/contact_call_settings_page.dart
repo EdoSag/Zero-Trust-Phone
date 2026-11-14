@@ -80,6 +80,8 @@ class ContactCallSettingsPage extends ConsumerWidget {
             subtitle: Text(context.l10n.privateCallLogBody),
             value: settings.privateLog,
             onChanged: (bool on) async {
+              // Turning it on: what Android and the carrier still see.
+              if (on && await _confirmPrivateLog(context) != true) return;
               await data.saveContactSettings(settings.copyWith(privateLog: on));
               if (!on) return;
               final int moved = await ref
@@ -142,4 +144,49 @@ class ContactCallSettingsPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// The limits of the private call log (P23), before it's switched on.
+Future<bool?> _confirmPrivateLog(BuildContext context) {
+  final AppL10n l = context.l10n;
+  Widget point(String text) => Padding(
+    padding: const EdgeInsetsDirectional.only(top: 8),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        const Text('•  '),
+        Expanded(child: Text(text)),
+      ],
+    ),
+  );
+  return showDialog<bool>(
+    context: context,
+    builder: (BuildContext dialog) => AlertDialog(
+      icon: const Icon(Icons.lock_outline),
+      title: Text(l.privateLogLimitsTitle),
+      content: SingleChildScrollView(
+        child: Column(
+          key: const ValueKey<String>('private-log-limits'),
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(l.privateLogLimitsIntro),
+            point(l.privateLogLimitSeconds),
+            point(l.privateLogLimitDefault),
+            point(l.privateLogLimitCarrier),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(dialog).pop(false),
+          child: Text(l.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(dialog).pop(true),
+          child: Text(l.turnOn),
+        ),
+      ],
+    ),
+  );
 }

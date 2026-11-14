@@ -98,4 +98,33 @@ void main() {
     expect(hint(tester), endsWith(' · My number hidden'));
     expect(find.byTooltip('Show my number on this call'), findsOneWidget);
   });
+
+  testWidgets('switching hide on says what it can\'t do, at the bottom', (
+    WidgetTester tester,
+  ) async {
+    await pump(tester, number: '0541234567');
+    await tester.tap(find.byTooltip('Hide my number on this call'));
+    await tester.pumpAndSettle();
+    final Finder notice = find.textContaining(
+      'Emergency numbers always see it',
+    );
+    expect(notice, findsOneWidget);
+    expect(find.textContaining('if your carrier allows it'), findsOneWidget);
+    // A snackbar below the keypad, not on top of the number.
+    expect(
+      tester.getRect(notice).top,
+      greaterThan(tester.getRect(find.byType(TextField)).bottom),
+    );
+    // Switching it off again clears the notice.
+    await tester.tap(find.byTooltip('Show my number on this call'));
+    await tester.pumpAndSettle();
+    expect(notice, findsNothing);
+  });
+
+  testWidgets('the notice is in Hebrew too', (WidgetTester tester) async {
+    await pump(tester, locale: ZtLanguages.hebrew, number: '0541234567');
+    await tester.tap(find.byTooltip('הסתרת המספר שלי בשיחה הזו'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('מספרי חירום תמיד רואים אותו'), findsOneWidget);
+  });
 }

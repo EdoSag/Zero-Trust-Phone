@@ -890,14 +890,14 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get callWithNumberHiddenBody =>
-      'They see \"Private number\", if your carrier allows it';
+      'They see \"Private number\", if your carrier allows it. Emergency numbers always see your number.';
 
   @override
   String get hideMyNumberForContact => 'Hide my number';
 
   @override
   String get hideMyNumberForContactBody =>
-      'Every call to this contact shows \"Private number\", if your carrier allows it';
+      'Every call to this contact shows \"Private number\", if your carrier allows it. Emergency numbers always see your number.';
 
   @override
   String timeTomorrow(String time) {
@@ -932,7 +932,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get privateCallLogBody =>
-      'Calls with this contact are kept only in your encrypted vault, not in Android\'s shared call history that other apps can read';
+      'Calls with this contact are kept only in your encrypted vault, not in Android\'s shared call history that other apps can read. Your carrier still keeps its own record.';
 
   @override
   String movedToVault(int count) {
@@ -1068,6 +1068,32 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get nativeRemindMe => 'Remind me';
+
+  @override
+  String get numberHiddenNotice =>
+      'Your number is hidden on this call if your carrier allows it. Emergency numbers always see it.';
+
+  @override
+  String get privateLogLimitsTitle => 'Before you turn it on';
+
+  @override
+  String get privateLogLimitsIntro =>
+      'ZT Phone moves these calls into your vault, but Android doesn\'t let any Phone app keep a call out of its shared history entirely:';
+
+  @override
+  String get privateLogLimitSeconds =>
+      'Each call shows in Android\'s shared history for a few seconds after it ends, until ZT Phone moves it.';
+
+  @override
+  String get privateLogLimitDefault =>
+      'If ZT Phone isn\'t your default Phone app, calls stay there until you next open ZT Phone.';
+
+  @override
+  String get privateLogLimitCarrier =>
+      'Your carrier\'s records and bill still list every call.';
+
+  @override
+  String get turnOn => 'Turn on';
 
   @override
   String get notNow => 'Not now';
