@@ -1068,4 +1068,21 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get nativeRemindMe => 'Remind me';
+
+  @override
+  String get notNow => 'Not now';
+
+  @override
+  String get exactRemindersTitle => 'Remind you on the minute?';
+
+  @override
+  String get exactRemindersBody =>
+      'Android lets ZT Phone ring a reminder at the exact minute only if you allow \"Alarms & reminders\" for it. Without that, reminders still come, but can be a few minutes late.';
+
+  @override
+  String get callBackMayBeLate => 'Reminders can be a few minutes late';
+
+  @override
+  String get callBackMayBeLateBody =>
+      'Tap to allow \"Alarms & reminders\" for exact times';
 }

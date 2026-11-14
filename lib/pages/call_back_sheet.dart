@@ -6,6 +6,7 @@ import 'package:zerotrust_phone/data/phone_items.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
 import 'package:zerotrust_phone/pages/call_actions.dart';
 import 'package:zerotrust_phone/services/call_backs.dart';
+import 'package:zerotrust_phone/telecom/telecom.dart';
 
 /// "Remind me to call back" (P25): in 15 minutes, an hour, 3 hours,
 /// tonight, tomorrow morning, or a time I pick.
@@ -19,6 +20,9 @@ Future<void> showCallBackSheet(
   final PhoneContact? who =
       contact ?? ref.read(contactDirectoryProvider).lookup(number);
   final DateTime from = now ?? DateTime.now();
+  final Telecom telecom = ref.read(telecomProvider);
+  final ExactAlarmState? alarm = await telecom.exactAlarmState();
+  if (!context.mounted) return;
   final DateTime? at = await showModalBottomSheet<DateTime>(
     context: context,
     showDragHandle: true,
@@ -42,6 +46,16 @@ Future<void> showCallBackSheet(
                 style: Theme.of(sheet).textTheme.titleMedium,
               ),
             ),
+            // Said every time until it's allowed, so a late reminder is
+            // never a surprise.
+            if (alarm != null && !alarm.exact)
+              ListTile(
+                key: const ValueKey<String>('call-back-inexact'),
+                leading: const Icon(Icons.schedule_outlined),
+                title: Text(l.callBackMayBeLate),
+                subtitle: Text(l.callBackMayBeLateBody),
+                onTap: telecom.openExactAlarmSettings,
+              ),
             for (final CallBackWhen w in CallBackWhen.values)
               ListTile(
                 leading: const Icon(Icons.alarm),
@@ -99,6 +113,35 @@ Future<void> showCallBackSheet(
   final bool inTasks = await ref
       .read(callBacksServiceProvider)
       .add(number: number, at: at, contact: who);
+  // The first reminder without "Alarms & reminders": ask, once. Allowing
+  // it later also makes this one exact (Android tells ZT Phone). Read
+  // again: the note in the sheet may have opened Settings meanwhile.
+  final ExactAlarmState? latest = alarm == null || alarm.exact
+      ? alarm
+      : await telecom.exactAlarmState();
+  if (latest != null && !latest.exact && !latest.asked && context.mounted) {
+    await telecom.markExactAlarmsAsked();
+    if (!context.mounted) return;
+    final bool? allow = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialog) => AlertDialog(
+        icon: const Icon(Icons.alarm),
+        title: Text(l.exactRemindersTitle),
+        content: Text(l.exactRemindersBody),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialog).pop(false),
+            child: Text(l.notNow),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialog).pop(true),
+            child: Text(l.allow),
+          ),
+        ],
+      ),
+    );
+    if (allow == true) await telecom.openExactAlarmSettings();
+  }
   messenger
     ..hideCurrentSnackBar()
     ..showSnackBar(

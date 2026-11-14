@@ -1067,4 +1067,21 @@ class AppL10nHe extends AppL10n {
 
   @override
   String get nativeRemindMe => 'תזכורת';
+
+  @override
+  String get notNow => 'לא עכשיו';
+
+  @override
+  String get exactRemindersTitle => 'להזכיר בדיוק בזמן?';
+
+  @override
+  String get exactRemindersBody =>
+      'Android מאפשר ל-ZT Phone להזכיר בדיוק בדקה שבחרת רק אם מאשרים לו \"שעונים מעוררים ותזכורות\". בלי זה התזכורות עדיין מגיעות, אבל יכולות לאחר בכמה דקות.';
+
+  @override
+  String get callBackMayBeLate => 'תזכורות יכולות לאחר בכמה דקות';
+
+  @override
+  String get callBackMayBeLateBody =>
+      'יש להקיש כדי לאשר \"שעונים מעוררים ותזכורות\" לזמנים מדויקים';
 }

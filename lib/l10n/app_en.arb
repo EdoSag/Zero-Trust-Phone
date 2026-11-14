@@ -587,5 +587,10 @@
   "cancelReminder": "Cancel reminder",
   "nativeCallBackReminder": "Call back %s",
   "nativeCallBackChannel": "Call back reminders",
-  "nativeRemindMe": "Remind me"
+  "nativeRemindMe": "Remind me",
+  "notNow": "Not now",
+  "exactRemindersTitle": "Remind you on the minute?",
+  "exactRemindersBody": "Android lets ZT Phone ring a reminder at the exact minute only if you allow \"Alarms & reminders\" for it. Without that, reminders still come, but can be a few minutes late.",
+  "callBackMayBeLate": "Reminders can be a few minutes late",
+  "callBackMayBeLateBody": "Tap to allow \"Alarms & reminders\" for exact times"
 }
