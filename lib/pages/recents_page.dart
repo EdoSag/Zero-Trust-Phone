@@ -6,7 +6,6 @@ import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/pages/call_actions.dart';
 import 'package:zerotrust_phone/pages/call_back_sheet.dart';
 import 'package:zerotrust_phone/pages/call_details_page.dart';
-import 'package:zerotrust_phone/pages/call_stats_page.dart';
 import 'package:zerotrust_phone/services/private_calls.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/util/phone_numbers.dart';
@@ -124,14 +123,6 @@ class _RecentsPageState extends ConsumerState<RecentsPage> {
                 onSelected: (_) => setState(() => _filter = f),
               ),
             ),
-          // P28.
-          ActionChip(
-            avatar: const Icon(Icons.insights_outlined, size: 18),
-            label: Text(context.l10n.callStats),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const CallStatsPage()),
-            ),
-          ),
         ],
       ),
     );
