@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zerotrust_phone/pages/call_stats_page.dart';
 import 'package:zerotrust_phone/pages/contacts_page.dart';
 import 'package:zerotrust_phone/pages/dialpad_page.dart';
 import 'package:zerotrust_phone/pages/favorites_page.dart';
@@ -87,6 +88,15 @@ class _HomePageState extends ConsumerState<HomePage> {
           ],
         ),
         actions: <Widget>[
+          // P28: the stats sit beside the call history they describe.
+          if (tab == HomeTab.recents)
+            IconButton(
+              tooltip: context.l10n.callStats,
+              icon: const Icon(Icons.insights_outlined),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const CallStatsPage()),
+              ),
+            ),
           IconButton(
             tooltip: context.l10n.settings,
             icon: const Icon(Icons.settings_outlined),
