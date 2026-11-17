@@ -111,6 +111,9 @@ class MainActivity : FlutterFragmentActivity() {
         if (dialText(intent) != null) return ""
         if (intent.action != Intent.ACTION_DIAL && intent.action != Intent.ACTION_VIEW) return null
         val data = intent.data ?: return ""
+        // Web links (the password-reset email, see EmailLinks) aren't numbers
+        // to dial; app_links passes them to the Dart side.
+        if (data.scheme == "https" || data.scheme == "http") return null
         return if (data.scheme == "tel") Uri.decode(data.schemeSpecificPart) else ""
     }
 
