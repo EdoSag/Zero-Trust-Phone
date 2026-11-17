@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +9,7 @@ import 'package:zerotrust_phone/app/native_strings.dart';
 import 'package:zerotrust_phone/app/phone_config.dart';
 import 'package:zerotrust_phone/call/in_call_app.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
+import 'app/email_links.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +18,7 @@ Future<void> main() async {
     url: dotenv.env['SUPABASE_URL']!,
     publishableKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
+  unawaited(EmailLinks.listen());
   // English or Hebrew, as picked in Settings, from the first frame.
   await ZtLanguageController.preload();
   runApp(
