@@ -1,5 +1,9 @@
 package dev.sagron.zerotrustphone
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.telecom.Call
 import android.telecom.CallAudioState
 import android.telecom.InCallService
@@ -9,15 +13,39 @@ import android.telecom.InCallService
  * exists. Hands calls to [CallManager] and opens the in-call screen.
  */
 class ZtInCallService : InCallService() {
+    /**
+     * Brings the call screen back when the phone is unlocked during a call,
+     * or its screen comes on while a call rings, so the user never has to
+     * look for the notification or reopen the app.
+     */
+    private val screenEvents = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (CallScreenRules.reopenOn(intent.action, CallManager.hasCalls, CallManager.ringing() != null)) {
+                CallActivity.start(this@ZtInCallService)
+            }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         CallManager.service = this
         CallNotifications.createChannels(this)
         // Warm the in-call screen's Flutter engine so it opens quickly.
         CallEngine.ensure(applicationContext)
+        registerReceiver(
+            screenEvents,
+            IntentFilter().apply {
+                addAction(Intent.ACTION_USER_PRESENT)
+                addAction(Intent.ACTION_SCREEN_ON)
+            },
+        )
     }
 
     override fun onDestroy() {
+        try {
+            unregisterReceiver(screenEvents)
+        } catch (_: IllegalArgumentException) {
+        }
         CallNotifications.cancel(this)
         if (CallManager.service === this) CallManager.service = null
         super.onDestroy()
@@ -28,18 +56,13 @@ class ZtInCallService : InCallService() {
         CallManager.add(call)
         if (call.stateCompat() == Call.STATE_RINGING) {
             call.details.handle?.schemeSpecificPart?.let { CallRinger.start(this, it) }
-            // The full-screen notification opens the call screen when the
-            // phone is locked or idle, and shows a heads-up card otherwise.
+            // The pinned call card (full screen when locked) ...
             CallNotifications.update(this)
-            // Without the notification (permission off) or its full-screen
-            // part, and whenever the phone is locked, open the call screen
-            // ourselves: Android lets a bound InCallService start it.
-            if (!CallNotifications.alertsReady(this) || CallNotifications.deviceIdle(this)) {
-                CallActivity.start(this)
-            }
-        } else {
-            CallActivity.start(this)
         }
+        // ... and the call screen itself, every time: locked, idle or while
+        // the phone is in use. A heads-up card alone is easy to miss or
+        // swipe away. Android lets a bound InCallService start it.
+        CallActivity.start(this)
     }
 
     override fun onCallRemoved(call: Call) {

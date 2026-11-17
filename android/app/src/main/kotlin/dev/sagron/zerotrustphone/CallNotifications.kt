@@ -106,6 +106,12 @@ object CallNotifications {
                 )
         } else {
             val connectedAt = call.details.connectTimeMillis
+            val caller = Person.Builder().setName(title).setImportant(true).build()
+            // A call-style card stays pinned at the top of the shade and
+            // gives the status bar its "return to call" chip. Android only
+            // takes the call style with a full-screen intent; it fires once,
+            // when the card first appears (an outgoing call, whose screen is
+            // already open), never on the updates that follow.
             builder.setSmallIcon(android.R.drawable.sym_action_call)
                 .setContentText(
                     when (call.stateCompat()) {
@@ -114,7 +120,13 @@ object CallNotifications {
                         else -> NativeStrings.get(context, "calling", R.string.calling)
                     }
                 )
-                .addAction(0, NativeStrings.get(context, "nativeHangUp", R.string.hang_up), CallActionReceiver.intent(context, CallActionReceiver.HANG_UP))
+                .setFullScreenIntent(open, false)
+                .setStyle(
+                    NotificationCompat.CallStyle.forOngoingCall(
+                        caller,
+                        CallActionReceiver.intent(context, CallActionReceiver.HANG_UP),
+                    )
+                )
             if (connectedAt > 0) builder.setWhen(connectedAt).setUsesChronometer(true)
         }
         context.getSystemService(NotificationManager::class.java).notify(ID, builder.build())

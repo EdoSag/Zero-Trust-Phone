@@ -1110,4 +1110,7 @@ class AppL10nHe extends AppL10n {
   @override
   String get callBackMayBeLateBody =>
       'יש להקיש כדי לאשר \"שעונים מעוררים ותזכורות\" לזמנים מדויקים';
+
+  @override
+  String get returnToCall => 'חזרה לשיחה';
 }

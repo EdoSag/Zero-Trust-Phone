@@ -110,6 +110,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       ),
       body: Column(
         children: <Widget>[
+          const ReturnToCallBar(),
           const DefaultDialerBanner(),
           Expanded(child: body),
         ],
@@ -199,6 +200,67 @@ class DefaultDialerBanner extends ConsumerWidget {
           child: Text(context.l10n.setAsDefault),
         ),
       ],
+    );
+  }
+}
+
+/// A green bar on top while a call is in progress: tapping it brings the
+/// call screen back, so it is never lost behind the dialer.
+class ReturnToCallBar extends ConsumerStatefulWidget {
+  const ReturnToCallBar({super.key});
+
+  @override
+  ConsumerState<ReturnToCallBar> createState() => _ReturnToCallBarState();
+}
+
+class _ReturnToCallBarState extends ConsumerState<ReturnToCallBar> {
+  late final Telecom _telecom = ref.read(telecomProvider);
+
+  @override
+  void initState() {
+    super.initState();
+    if (_telecom.isSupported) _telecom.refreshCall();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _telecom.callInProgress,
+      builder: (BuildContext context, bool inCall, _) {
+        if (!inCall) return const SizedBox.shrink();
+        const Color green = Color(0xFF1E8E3E);
+        return Material(
+          color: green,
+          child: InkWell(
+            onTap: _telecom.openCallScreen,
+            child: SafeArea(
+              top: false,
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                child: Row(
+                  children: <Widget>[
+                    const Icon(Icons.phone_in_talk, color: Colors.white),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        context.l10n.returnToCall,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleSmall?.copyWith(color: Colors.white),
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right, color: Colors.white),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
