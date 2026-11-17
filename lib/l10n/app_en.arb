@@ -599,5 +599,9 @@
   "exactRemindersTitle": "Remind you on the minute?",
   "exactRemindersBody": "Android lets ZT Phone ring a reminder at the exact minute only if you allow \"Alarms & reminders\" for it. Without that, reminders still come, but can be a few minutes late.",
   "callBackMayBeLate": "Reminders can be a few minutes late",
-  "callBackMayBeLateBody": "Tap to allow \"Alarms & reminders\" for exact times"
+  "callBackMayBeLateBody": "Tap to allow \"Alarms & reminders\" for exact times",
+  "returnToCall": "Return to call",
+  "@returnToCall": {
+    "description": "Bar on top of the dialer while a call is in progress; tapping it opens the call screen."
+  }
 }

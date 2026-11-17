@@ -1111,4 +1111,7 @@ class AppL10nEn extends AppL10n {
   @override
   String get callBackMayBeLateBody =>
       'Tap to allow \"Alarms & reminders\" for exact times';
+
+  @override
+  String get returnToCall => 'Return to call';
 }
