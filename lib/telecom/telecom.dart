@@ -119,6 +119,10 @@ class Telecom {
   /// Ticks when "Remind me" on a missed call is tapped while the app is open.
   final ValueNotifier<int> callBackRequests = ValueNotifier<int>(0);
 
+  /// Whether a call is in progress, for the "Return to call" bar. Android
+  /// pushes changes while the app is in front; [refreshCall] asks directly.
+  final ValueNotifier<bool> callInProgress = ValueNotifier<bool>(false);
+
   bool get isSupported => defaultTargetPlatform == TargetPlatform.android;
 
   void listenForDials() {
@@ -126,6 +130,9 @@ class Telecom {
       if (call.method == 'dialPending') dialRequests.value++;
       if (call.method == 'recentsPending') recentsRequests.value++;
       if (call.method == 'callBackPending') callBackRequests.value++;
+      if (call.method == 'callsChanged') {
+        callInProgress.value = call.arguments == true;
+      }
     });
   }
 
@@ -148,6 +155,20 @@ class Telecom {
 
   /// A number the app was opened with (DIAL or tel: link), "" for an empty
   /// dialpad, null when it was opened normally.
+  /// Asks Android whether a call is in progress, and updates [callInProgress].
+  Future<bool> refreshCall() async {
+    final bool has = await _call<bool>('hasCall') ?? false;
+    callInProgress.value = has;
+    return has;
+  }
+
+  /// Brings the in-call screen to the front. False when no call is left.
+  Future<bool> openCallScreen() async {
+    final bool open = await _call<bool>('openCallScreen') ?? false;
+    if (!open) callInProgress.value = false;
+    return open;
+  }
+
   Future<String?> consumeDial() => _call<String>('consumeDial');
 
   /// Text the app was opened with from another app's text menu or share

@@ -34,6 +34,9 @@ class PhoneSettingsPage extends ConsumerWidget {
       showSyncStatus: false,
       onSignedOut: () =>
           Navigator.of(context).popUntil((Route<dynamic> r) => r.isFirst),
+      privacyPolicyUrl: Uri.parse('https://zerotrust.bz/privacy/'),
+      termsUrl: Uri.parse('https://zerotrust.bz/terms/'),
+      supportUrl: Uri.parse('https://zerotrust.bz/support/'),
       onOpenUrl: (Uri url) =>
           launchUrl(url, mode: LaunchMode.externalApplication),
       appSection: <Widget>[

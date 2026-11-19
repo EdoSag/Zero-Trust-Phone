@@ -7,6 +7,7 @@ import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
 import 'package:zerotrust_phone/pages/call_stats_page.dart';
+import 'package:zerotrust_phone/pages/home_page.dart';
 import 'package:zerotrust_phone/pages/recents_page.dart';
 import 'package:zerotrust_phone/services/call_backs.dart';
 import 'package:zerotrust_phone/services/private_calls.dart';
@@ -314,9 +315,11 @@ void main() {
       );
       // The chips, then the reminder.
       expect(
-        tester.getRect(find.text('Call stats')).bottom,
+        tester.getRect(find.byType(ChoiceChip).first).bottom,
         lessThanOrEqualTo(tester.getRect(reminder).top),
       );
+      // The chip row holds filters only; the stats are in the top bar.
+      expect(find.text('Call stats'), findsNothing);
       final Finder lock = find.byIcon(Icons.lock_outline);
       expect(lock, findsOneWidget);
       // On Dana's row, not Avi's.
@@ -325,6 +328,37 @@ void main() {
       expect(lockRect.top, greaterThan(danaRect.top));
       expect(lockRect.top - danaRect.bottom, lessThan(30));
       expect(find.byTooltip('Cancel reminder'), findsOneWidget);
+    });
+
+    testWidgets('Home: the stats button sits in the top bar beside '
+        'Settings, on Recents only, and opens the stats', (
+      WidgetTester tester,
+    ) async {
+      await pump(tester, const HomePage(), shared: log);
+      final Finder stats = find.byTooltip('Call stats');
+      final Finder settings = find.byTooltip('Settings');
+      expect(stats, findsOneWidget);
+      final Rect statsRect = tester.getRect(stats);
+      final Rect settingsRect = tester.getRect(settings);
+      // Same row as the gear, right before it, above the filter chips.
+      expect(statsRect.center.dy, moreOrLessEquals(settingsRect.center.dy));
+      expect(statsRect.right, lessThanOrEqualTo(settingsRect.left));
+      expect(settingsRect.left - statsRect.right, lessThan(16));
+      expect(
+        statsRect.bottom,
+        lessThanOrEqualTo(tester.getRect(find.byType(ChoiceChip).first).top),
+      );
+
+      await tester.tap(find.text('Contacts'));
+      await tester.pumpAndSettle();
+      expect(stats, findsNothing);
+      expect(settings, findsOneWidget);
+
+      await tester.tap(find.text('Recents'));
+      await tester.pumpAndSettle();
+      await tester.tap(stats);
+      await tester.pumpAndSettle();
+      expect(find.text('Who you talk to most'), findsOneWidget);
     });
 
     testWidgets('Stats: totals, then weekly bars, then people; taller bar '

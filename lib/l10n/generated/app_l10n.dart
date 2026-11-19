@@ -1998,6 +1998,12 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Tap to allow \"Alarms & reminders\" for exact times'**
   String get callBackMayBeLateBody;
+
+  /// Bar on top of the dialer while a call is in progress; tapping it opens the call screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Return to call'**
+  String get returnToCall;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

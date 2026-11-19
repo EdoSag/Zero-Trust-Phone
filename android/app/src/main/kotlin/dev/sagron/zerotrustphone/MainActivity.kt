@@ -55,6 +55,29 @@ class MainActivity : FlutterFragmentActivity() {
         pendingCallBackLater = callBackLater(intent)
     }
 
+    /** Tells the dialer whether a call is in progress ("Return to call"). */
+    private var lastHasCall: Boolean? = null
+    private val callListener = CallManager.Listener { state ->
+        val has = (state["calls"] as? List<*>)?.isNotEmpty() == true
+        if (has != lastHasCall) {
+            lastHasCall = has
+            channel?.invokeMethod("callsChanged", has)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        CallManager.addListener(callListener)
+        // Opening ZT Phone while a call rings goes straight to its screen.
+        if (CallManager.ringing() != null) CallActivity.start(this)
+    }
+
+    override fun onPause() {
+        CallManager.removeListener(callListener)
+        lastHasCall = null
+        super.onPause()
+    }
+
     private fun callBackLater(intent: Intent?): String? =
         if (intent?.action == ACTION_CALL_BACK_LATER) {
             intent.getStringExtra(MissedCallReceiver.EXTRA_NUMBER)?.takeIf { it.isNotBlank() }
@@ -88,6 +111,9 @@ class MainActivity : FlutterFragmentActivity() {
         if (dialText(intent) != null) return ""
         if (intent.action != Intent.ACTION_DIAL && intent.action != Intent.ACTION_VIEW) return null
         val data = intent.data ?: return ""
+        // Web links (the password-reset email, see EmailLinks) aren't numbers
+        // to dial; app_links passes them to the Dart side.
+        if (data.scheme == "https" || data.scheme == "http") return null
         return if (data.scheme == "tel") Uri.decode(data.schemeSpecificPart) else ""
     }
 
@@ -116,6 +142,11 @@ class MainActivity : FlutterFragmentActivity() {
                     "callAlertsReady" -> {
                         CallNotifications.createChannels(this)
                         result.success(CallNotifications.alertsReady(this))
+                    }
+                    "hasCall" -> result.success(CallManager.hasCalls)
+                    "openCallScreen" -> {
+                        if (CallManager.hasCalls) CallActivity.start(this)
+                        result.success(CallManager.hasCalls)
                     }
                     "fixCallAlerts" -> {
                         fixCallAlerts()
