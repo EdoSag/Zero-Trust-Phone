@@ -16,7 +16,7 @@ import java.security.MessageDigest
 object MeetingGuard {
     private const val PREFS = "zt_meeting_guard"
     private const val RULES = "rules"
-    private const val LAST = "last_declined"
+    private const val RECENT = "recent_callers"
 
     /** A second call from the same number within this time rings anyway. */
     private const val REPEAT_MS = 15 * 60 * 1000L
@@ -76,15 +76,13 @@ object MeetingGuard {
         if (key.isEmpty()) return Outcome.RING
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val hashed = hash(key)
-        if (r.optBoolean("repeat", true)) {
-            val last = prefs.getString(LAST, null)?.split('|')
-            if (last != null && last.size == 2 && last[0] == hashed &&
-                now - (last[1].toLongOrNull() ?: 0L) < REPEAT_MS
-            ) {
-                return Outcome.RING
-            }
+        // One time per caller, so A, B, then A again still counts as a repeat.
+        val recent = recentCallers(prefs.getString(RECENT, null), now)
+        if (r.optBoolean("repeat", true) && isRepeat(recent, hashed, now)) {
+            return Outcome.RING
         }
-        prefs.edit().putString(LAST, "$hashed|$now").apply()
+        recent.put(hashed, now)
+        prefs.edit().putString(RECENT, recent.toString()).apply()
         return if (mode == "decline") {
             val message = r.optString("message", "")
             if (message.isNotBlank()) call.reject(true, message) else call.reject(false, null)
@@ -97,6 +95,24 @@ object MeetingGuard {
             Outcome.SILENCED
         }
     }
+
+    /** The callers held back in the last [REPEAT_MS], older ones dropped. */
+    fun recentCallers(raw: String?, now: Long): JSONObject {
+        val all = try {
+            if (raw == null) JSONObject() else JSONObject(raw)
+        } catch (_: Exception) {
+            JSONObject()
+        }
+        val kept = JSONObject()
+        for (k in all.keys()) {
+            val at = all.optLong(k)
+            if (now - at < REPEAT_MS) kept.put(k, at)
+        }
+        return kept
+    }
+
+    fun isRepeat(recent: JSONObject, hashed: String, now: Long): Boolean =
+        recent.has(hashed) && now - recent.optLong(hashed) < REPEAT_MS
 
     /** Only to tell repeat callers apart; the number itself isn't kept. */
     private fun hash(key: String): String =
