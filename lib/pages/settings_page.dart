@@ -9,7 +9,9 @@ import 'package:zerotrust_phone/pages/blocked_numbers_page.dart';
 import 'package:zerotrust_phone/pages/call_accessibility_page.dart';
 import 'package:zerotrust_phone/pages/call_protection_page.dart';
 import 'package:zerotrust_phone/pages/history_backup_page.dart';
+import 'package:zerotrust_phone/pages/keypad_settings_page.dart';
 import 'package:zerotrust_phone/pages/quick_replies_page.dart';
+import 'package:zerotrust_phone/pages/sim_picker.dart';
 import 'package:zerotrust_phone/pages/speed_dial_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
@@ -97,6 +99,18 @@ class PhoneSettingsPage extends ConsumerWidget {
           title: Text(context.l10n.speedDial),
           subtitle: Text(context.l10n.speedDialBody),
           onTap: () => push(const SpeedDialPage()),
+        ),
+        ListTile(
+          leading: const Icon(Icons.dialpad),
+          title: Text(context.l10n.keypadAndHandling),
+          subtitle: Text(context.l10n.keypadAndHandlingBody),
+          onTap: () => push(const KeypadSettingsPage()),
+        ),
+        ListTile(
+          leading: const Icon(Icons.sim_card_outlined),
+          title: Text(context.l10n.simPerNumber),
+          subtitle: Text(context.l10n.simPerNumberShort),
+          onTap: () => push(const SimChoicesPage()),
         ),
         ListTile(
           leading: const Icon(Icons.rtt),
