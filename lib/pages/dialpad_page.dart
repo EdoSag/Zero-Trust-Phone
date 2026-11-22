@@ -395,6 +395,7 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
                   label: context.l10n.callHoldForSim,
                   button: true,
                   excludeSemantics: true,
+                  onTap: () => _call(_number.text),
                   onLongPress: () => _call(_number.text, pickSim: true),
                   child: GestureDetector(
                     key: const ValueKey<String>('dial-call'),
