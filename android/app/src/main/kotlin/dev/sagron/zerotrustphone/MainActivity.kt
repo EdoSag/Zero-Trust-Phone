@@ -311,6 +311,8 @@ class MainActivity : FlutterFragmentActivity() {
                             ringtones = call.argument<Map<String, String>>("ringtones") ?: emptyMap(),
                             privateKeys = call.argument<List<String>>("privateKeys") ?: emptyList(),
                         )
+                        // W11: a contact made private leaves the widget now.
+                        RecentCallsWidget.refresh(this)
                         result.success(null)
                     }
                     "takePrivateCalls" -> result.success(PrivateCallLog.pending(this))

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zero_trust_core/zero_trust_core.dart';
@@ -125,9 +126,9 @@ void main() {
           ],
           home: Consumer(
             builder: (BuildContext context, WidgetRef ref, Widget? _) {
-              // Data and the SIM memory are read as the dialpad opens.
+              // Data is read as the dialpad opens; the SIM memory is not
+              // watched, so the picker must wait for it on its own.
               ref.watch(phoneDataProvider);
-              ref.watch(simChoicesProvider);
               return home ?? DialpadPage(initialNumber: number);
             },
           ),
@@ -243,6 +244,34 @@ void main() {
   });
 
   group('P18 SIM picker', () {
+    testWidgets('TalkBack can both call and pick a SIM on the call button', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle semantics = tester.ensureSemantics();
+      final FakeTelecom t = await pump(
+        tester,
+        telecom: FakeTelecom(sims: <PhoneAccount>[twoSims.first]),
+      );
+      final SemanticsNode node = tester.getSemantics(
+        find.byKey(const ValueKey<String>('dial-call')),
+      );
+      expect(
+        node,
+        matchesSemantics(
+          label: 'Call (hold to pick the SIM)',
+          isButton: true,
+          hasTapAction: true,
+          hasLongPressAction: true,
+        ),
+      );
+      tester.semantics.tap(
+        find.semantics.byLabel('Call (hold to pick the SIM)'),
+      );
+      await tester.pumpAndSettle();
+      expect(t.placed, <(String, String?)>[('0541234567', null)]);
+      semantics.dispose();
+    });
+
     testWidgets('one SIM: calls at once, no question', (
       WidgetTester tester,
     ) async {

@@ -23,6 +23,11 @@ object CallRinger {
         expected = PhoneNumbers.lookupKey(number)
     }
 
+    /** The call was silenced (P26 meeting rule): its ringtone doesn't play. */
+    fun skip() {
+        expected = null
+    }
+
     fun start(context: Context, number: String) {
         val key = PhoneNumbers.lookupKey(number)
         if (key.isEmpty() || key != expected) return
