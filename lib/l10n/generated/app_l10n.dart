@@ -2412,6 +2412,156 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Card text'**
   String get myCardText;
+
+  /// Settings section for the recent calls widget (W11)
+  ///
+  /// In en, this message translates to:
+  /// **'Home screen widget'**
+  String get homeScreenWidget;
+
+  /// No description provided for @widgetDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Show details on the home screen'**
+  String get widgetDetails;
+
+  /// No description provided for @widgetDetailsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Off: the Recent calls widget shows a lock and the number of new missed calls. On: it lists your latest calls, and the names of your ZT Contacts are stored unencrypted on this phone for the home screen. Private contacts never show'**
+  String get widgetDetailsBody;
+
+  /// No description provided for @widgetRecents.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent calls'**
+  String get widgetRecents;
+
+  /// No description provided for @widgetMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed calls'**
+  String get widgetMissed;
+
+  /// No description provided for @widgetSwitchView.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch between recent and missed calls'**
+  String get widgetSwitchView;
+
+  /// No description provided for @widgetDialpad.
+  ///
+  /// In en, this message translates to:
+  /// **'Dialpad'**
+  String get widgetDialpad;
+
+  /// No description provided for @widgetNoCalls.
+  ///
+  /// In en, this message translates to:
+  /// **'No calls yet'**
+  String get widgetNoCalls;
+
+  /// No description provided for @widgetNoMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'No missed calls'**
+  String get widgetNoMissed;
+
+  /// No description provided for @widgetOpenToAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Open ZT Phone to allow the call log'**
+  String get widgetOpenToAllow;
+
+  /// No description provided for @widgetRecentsHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on \"Show details on the home screen\" in ZT Phone settings to see your calls here'**
+  String get widgetRecentsHidden;
+
+  /// No description provided for @widgetYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get widgetYesterday;
+
+  /// No description provided for @spamHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Numbers reported as spam'**
+  String get spamHeader;
+
+  /// No description provided for @spamOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off (don\'t download the list)'**
+  String get spamOff;
+
+  /// No description provided for @spamWarn.
+  ///
+  /// In en, this message translates to:
+  /// **'Ring, with a warning on the call screen'**
+  String get spamWarn;
+
+  /// No description provided for @spamSilence.
+  ///
+  /// In en, this message translates to:
+  /// **'Silence (they still show in Recents)'**
+  String get spamSilence;
+
+  /// No description provided for @spamVoicemail.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to voicemail'**
+  String get spamVoicemail;
+
+  /// No description provided for @spamExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'Once a week ZT Phone downloads a list of numbers many people reported as spam, from ZT Phone\'s own releases on GitHub, and uses it only if its signature checks out. Numbers are looked up on this phone: nothing about you or your calls is sent. Your contacts are never affected. Sources: complaints to the US Do Not Call registry (FTC) and numbers reported to ZT Phone.'**
+  String get spamExplain;
+
+  /// No description provided for @spamListInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'List from {date}, {count} numbers'**
+  String spamListInfo(String date, int count);
+
+  /// No description provided for @spamListNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No list downloaded yet'**
+  String get spamListNone;
+
+  /// No description provided for @spamCheckNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for a newer list'**
+  String get spamCheckNow;
+
+  /// No description provided for @spamUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'The spam list is updated'**
+  String get spamUpdated;
+
+  /// No description provided for @spamUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'The spam list is up to date'**
+  String get spamUpToDate;
+
+  /// No description provided for @spamCheckFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t get the spam list. Check the connection and try again'**
+  String get spamCheckFailed;
+
+  /// On the call screen (P24)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Reported as spam} other{Reported as spam {count} times}}'**
+  String reportedSpam(int count);
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

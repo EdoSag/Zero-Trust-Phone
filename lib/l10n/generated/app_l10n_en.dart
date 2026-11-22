@@ -1348,4 +1348,93 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get myCardText => 'Card text';
+
+  @override
+  String get homeScreenWidget => 'Home screen widget';
+
+  @override
+  String get widgetDetails => 'Show details on the home screen';
+
+  @override
+  String get widgetDetailsBody =>
+      'Off: the Recent calls widget shows a lock and the number of new missed calls. On: it lists your latest calls, and the names of your ZT Contacts are stored unencrypted on this phone for the home screen. Private contacts never show';
+
+  @override
+  String get widgetRecents => 'Recent calls';
+
+  @override
+  String get widgetMissed => 'Missed calls';
+
+  @override
+  String get widgetSwitchView => 'Switch between recent and missed calls';
+
+  @override
+  String get widgetDialpad => 'Dialpad';
+
+  @override
+  String get widgetNoCalls => 'No calls yet';
+
+  @override
+  String get widgetNoMissed => 'No missed calls';
+
+  @override
+  String get widgetOpenToAllow => 'Open ZT Phone to allow the call log';
+
+  @override
+  String get widgetRecentsHidden =>
+      'Turn on \"Show details on the home screen\" in ZT Phone settings to see your calls here';
+
+  @override
+  String get widgetYesterday => 'Yesterday';
+
+  @override
+  String get spamHeader => 'Numbers reported as spam';
+
+  @override
+  String get spamOff => 'Off (don\'t download the list)';
+
+  @override
+  String get spamWarn => 'Ring, with a warning on the call screen';
+
+  @override
+  String get spamSilence => 'Silence (they still show in Recents)';
+
+  @override
+  String get spamVoicemail => 'Send to voicemail';
+
+  @override
+  String get spamExplain =>
+      'Once a week ZT Phone downloads a list of numbers many people reported as spam, from ZT Phone\'s own releases on GitHub, and uses it only if its signature checks out. Numbers are looked up on this phone: nothing about you or your calls is sent. Your contacts are never affected. Sources: complaints to the US Do Not Call registry (FTC) and numbers reported to ZT Phone.';
+
+  @override
+  String spamListInfo(String date, int count) {
+    return 'List from $date, $count numbers';
+  }
+
+  @override
+  String get spamListNone => 'No list downloaded yet';
+
+  @override
+  String get spamCheckNow => 'Check for a newer list';
+
+  @override
+  String get spamUpdated => 'The spam list is updated';
+
+  @override
+  String get spamUpToDate => 'The spam list is up to date';
+
+  @override
+  String get spamCheckFailed =>
+      'Couldn\'t get the spam list. Check the connection and try again';
+
+  @override
+  String reportedSpam(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Reported as spam $count times',
+      one: 'Reported as spam',
+    );
+    return '$_temp0';
+  }
 }

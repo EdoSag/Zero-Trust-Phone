@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Missed calls in the recent calls widget, readable light and dark. -->
+    <color name="widget_missed">#D93025</color>
+</resources>

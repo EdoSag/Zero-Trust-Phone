@@ -67,4 +67,6 @@ flutter {
 
 dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
+    // Scrolling list in the recent calls widget (W11).
+    implementation("androidx.core:core-remoteviews:1.1.0")
 }

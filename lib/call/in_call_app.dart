@@ -594,6 +594,27 @@ class _CallerHeader extends StatelessWidget {
           liveRegion: call.state != CallState.active,
           child: Text(status, style: text.titleMedium),
         ),
+        if (call.spamReports case final int reports) ...<Widget>[
+          const SizedBox(height: 8),
+          Row(
+            key: const ValueKey<String>('call-spam'),
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                Icons.report_outlined,
+                size: 18,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                l.reportedSpam(reports),
+                style: text.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.error,
+                ),
+              ),
+            ],
+          ),
+        ],
         if (call.meeting case final String meeting) ...<Widget>[
           const SizedBox(height: 8),
           Padding(

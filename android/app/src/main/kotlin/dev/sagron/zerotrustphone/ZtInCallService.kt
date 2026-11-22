@@ -90,6 +90,7 @@ class ZtInCallService : InCallService() {
         CallManager.remove(call)
         if (CallManager.ringing() == null) CallComfort.stopWatching(this)
         if (!CallManager.hasCalls) CallNotifications.cancel(this)
+        RecentCallsWidget.refreshSoon(this)
     }
 
     @Deprecated("Still delivered on every supported Android version")

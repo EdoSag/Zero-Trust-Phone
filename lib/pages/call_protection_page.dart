@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zerotrust_phone/services/spam_list.dart';
+import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
 
@@ -78,6 +80,8 @@ class CallProtectionPage extends ConsumerWidget {
                 ),
               ),
             ),
+          const Divider(),
+          const SpamListSection(),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(context.l10n.protectionExplain),
@@ -130,6 +134,126 @@ class CallProtectionPage extends ConsumerWidget {
     if (p.blockedPrefixes.contains(clean)) return;
     await data.saveProtection(
       p.copyWith(blockedPrefixes: <String>[...p.blockedPrefixes, clean]),
+    );
+  }
+}
+
+/// P24: what happens to calls from numbers on the signed spam list, which
+/// list is in use, and a manual check for a newer one.
+class SpamListSection extends ConsumerStatefulWidget {
+  const SpamListSection({super.key});
+
+  @override
+  ConsumerState<SpamListSection> createState() => _SpamListSectionState();
+}
+
+class _SpamListSectionState extends ConsumerState<SpamListSection> {
+  ({String? date, int count})? _info;
+  bool _checking = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInfo();
+  }
+
+  Future<void> _loadInfo() async {
+    final ({String? date, int count}) info = await ref
+        .read(telecomProvider)
+        .spamListInfo();
+    if (mounted) setState(() => _info = info);
+  }
+
+  Future<void> _check() async {
+    setState(() => _checking = true);
+    final SpamListCheck result = await ref
+        .read(spamListUpdaterProvider)
+        .checkIfDue(ref.read(spamModeProvider), force: true);
+    if (!mounted) return;
+    setState(() => _checking = false);
+    await _loadInfo();
+    if (!mounted) return;
+    final AppL10n l = context.l10n;
+    final String? message = switch (result) {
+      SpamListCheck.updated => l.spamUpdated,
+      SpamListCheck.upToDate || SpamListCheck.notDue => l.spamUpToDate,
+      SpamListCheck.failed => l.spamCheckFailed,
+      SpamListCheck.off => null,
+    };
+    if (message != null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
+  static String label(AppL10n l, SpamMode m) => switch (m) {
+    SpamMode.off => l.spamOff,
+    SpamMode.warn => l.spamWarn,
+    SpamMode.silence => l.spamSilence,
+    SpamMode.voicemail => l.spamVoicemail,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final AppL10n l = context.l10n;
+    final ThemeData theme = Theme.of(context);
+    final SpamMode mode = ref.watch(spamModeProvider);
+    final ({String? date, int count})? info = _info;
+    final String? date = info?.date;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+          child: Text(
+            l.spamHeader,
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: theme.colorScheme.primary,
+            ),
+          ),
+        ),
+        RadioGroup<SpamMode>(
+          groupValue: mode,
+          onChanged: (SpamMode? v) async {
+            if (v == null) return;
+            await ref.read(spamModeProvider.notifier).set(v);
+            // Turned on for the first time: get the list now.
+            if (v != SpamMode.off && (_info?.count ?? 0) == 0) await _check();
+          },
+          child: Column(
+            children: <Widget>[
+              for (final SpamMode m in SpamMode.values)
+                RadioListTile<SpamMode>(
+                  key: ValueKey<String>('spam-${m.name}'),
+                  value: m,
+                  title: Text(label(l, m)),
+                ),
+            ],
+          ),
+        ),
+        if (mode != SpamMode.off)
+          ListTile(
+            key: const ValueKey<String>('spam-check'),
+            leading: _checking
+                ? const SizedBox.square(
+                    dimension: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.refresh),
+            title: Text(l.spamCheckNow),
+            subtitle: Text(
+              date == null || info == null
+                  ? l.spamListNone
+                  : l.spamListInfo(date.replaceFirst('T', ' '), info.count),
+            ),
+            onTap: _checking ? null : _check,
+          ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+          child: Text(l.spamExplain, style: theme.textTheme.bodySmall),
+        ),
+      ],
     );
   }
 }

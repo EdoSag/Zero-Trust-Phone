@@ -30,6 +30,7 @@ class PhoneCall {
     this.notice,
     this.postDialWait,
     this.meeting,
+    this.spamReports,
   });
 
   factory PhoneCall.fromMap(Map<Object?, Object?> m) => PhoneCall(
@@ -67,6 +68,7 @@ class PhoneCall {
     notice: m['notice'] as String?,
     postDialWait: m['postDialWait'] as String?,
     meeting: m['meeting'] as String?,
+    spamReports: (m['spamReports'] as num?)?.toInt(),
   );
 
   static (int, int)? _size(Object? w, Object? h) {
@@ -128,6 +130,10 @@ class PhoneCall {
   /// P26: the next meeting with this person in ZT Calendar ("Tomorrow
   /// 10:00: Design review"), while ZT Phone is unlocked.
   final String? meeting;
+
+  /// P24: how many times this number was reported as spam, when it's on
+  /// the signed spam list and isn't a contact.
+  final int? spamReports;
 
   bool get isVideo => VideoState.isVideo(videoState);
   bool get sendingVideo =>

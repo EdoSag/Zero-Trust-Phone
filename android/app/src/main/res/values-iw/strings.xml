@@ -23,4 +23,18 @@
     <string name="call_back_reminder">לחזור אל %s</string>
     <string name="call_back_channel">תזכורות לחזור בשיחה</string>
     <string name="remind_me">תזכורת</string>
+    <!-- Recent calls widget (W11). -->
+    <string name="widget_recents">שיחות אחרונות</string>
+    <string name="widget_missed">שיחות שלא נענו</string>
+    <string name="widget_switch_view">מעבר בין שיחות אחרונות לשיחות שלא נענו</string>
+    <string name="widget_dialpad">לוח חיוג</string>
+    <string name="widget_no_calls">אין עדיין שיחות</string>
+    <string name="widget_no_missed">אין שיחות שלא נענו</string>
+    <string name="widget_open_to_allow">יש לפתוח את ZT Phone כדי לאשר גישה ליומן השיחות</string>
+    <string name="widget_recents_hidden">כדי לראות כאן את השיחות, יש להפעיל את \"הצגת פרטים במסך הבית\" בהגדרות של ZT Phone</string>
+    <string name="widget_recents_description">השיחות האחרונות שלך. הקשה על שיחה פותחת את לוח החיוג עם המספר.</string>
+    <string name="widget_yesterday">אתמול</string>
+    <string name="widget_sample_name">דנה לוי</string>
+    <string name="widget_sample_missed">+972 50 000 0000</string>
+    <string name="widget_locale">he</string>
 </resources>

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zero_trust_core/zero_trust_core.dart';
 import 'package:zerotrust_phone/app/history_retention.dart';
+import 'package:zerotrust_phone/app/recents_widget.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
 import 'package:zerotrust_phone/pages/blocked_numbers_page.dart';
@@ -150,6 +151,17 @@ class PhoneSettingsPage extends ConsumerWidget {
           leading: const Icon(Icons.do_not_disturb_on_outlined),
           title: Text(context.l10n.dndStarred),
           subtitle: Text(context.l10n.dndStarredBody),
+        ),
+        // W11: off by default, like every Zero-Trust widget.
+        SwitchListTile(
+          key: const ValueKey<String>('recents-widget-details'),
+          secondary: const Icon(Icons.widgets_outlined),
+          title: Text(context.l10n.widgetDetails),
+          subtitle: Text(context.l10n.widgetDetailsBody),
+          isThreeLine: true,
+          value: ref.watch(recentsWidgetDetailsProvider),
+          onChanged: (bool on) =>
+              ref.read(recentsWidgetDetailsProvider.notifier).set(on),
         ),
       ],
     );

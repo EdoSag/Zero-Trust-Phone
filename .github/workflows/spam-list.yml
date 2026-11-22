@@ -1,0 +1,76 @@
+# Builds the list of numbers reported as spam every week (P24), signs it,
+# and publishes it on the rolling "spam-list" release. ZT Phone downloads
+# it once a week and only uses it when the signature matches the public
+# key built into the app (lib/services/spam_list.dart), so the list stays
+# fresh without app updates and a changed file is never used. Numbers are
+# looked up on the phone; the app sends nothing about calls anywhere.
+#
+# Sources: US Do Not Call registry complaints (FTC, public domain) and
+# spam/reported.tsv in this repository (tool/build_spam_list.py).
+#
+# One-time setup (Settings > Secrets and variables > Actions > New secret):
+#   BLOCKLIST_SIGNING_KEY   the same Ed25519 private key (PEM) ZT Browser's
+#                           blocklist uses. Never commit it.
+name: Spam list
+
+on:
+  schedule:
+    # Tuesdays 04:23 UTC.
+    - cron: '23 4 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: spam-list
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build the list
+        run: |
+          python3 -I tool/build_spam_list.py "$RUNNER_TEMP/spam-list.txt" --reported spam/reported.tsv
+          gzip -9n -c "$RUNNER_TEMP/spam-list.txt" > spam-list.txt.gz
+          ls -l spam-list.txt.gz
+
+      - name: Sign it
+        env:
+          SIGNING_KEY: ${{ secrets.BLOCKLIST_SIGNING_KEY }}
+        run: |
+          if [ -z "$SIGNING_KEY" ]; then
+            echo "::error::Add the BLOCKLIST_SIGNING_KEY secret (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+          umask 077
+          printf '%s\n' "$SIGNING_KEY" > "$RUNNER_TEMP/key.pem"
+          openssl pkeyutl -sign -inkey "$RUNNER_TEMP/key.pem" -rawin -in spam-list.txt.gz \
+            | base64 -w0 > spam-list.txt.gz.sig
+          rm -f "$RUNNER_TEMP/key.pem"
+          # Check it against the key the app trusts before publishing.
+          PUB=$(sed -nE "/spamListPublicKey =/,/;/ s/.*'([A-Za-z0-9+\/=]{44})';.*/\1/p" lib/services/spam_list.dart | head -1)
+          [ -n "$PUB" ] || { echo "::error::Public key not found in the app"; exit 1; }
+          { printf '\x30\x2a\x30\x05\x06\x03\x2b\x65\x70\x03\x21\x00'; printf '%s' "$PUB" | base64 -d; } \
+            | openssl pkey -pubin -inform DER -out "$RUNNER_TEMP/pub.pem"
+          base64 -d spam-list.txt.gz.sig > "$RUNNER_TEMP/sig.bin"
+          openssl pkeyutl -verify -pubin -inkey "$RUNNER_TEMP/pub.pem" -rawin \
+            -in spam-list.txt.gz -sigfile "$RUNNER_TEMP/sig.bin"
+
+      - name: Publish on the "spam-list" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          DATE=$(sed -nE 's/^# list-date: (.*)$/\1/p' "$RUNNER_TEMP/spam-list.txt" | head -1)
+          COUNT=$(grep -c '^+' "$RUNNER_TEMP/spam-list.txt" || true)
+          NOTES="The list of numbers reported as spam that ZT Phone downloads each week ($COUNT numbers, from $DATE UTC). Made from complaints to the US National Do Not Call Registry published by the FTC (public domain) and spam/reported.tsv in this repository. Not an app release."
+          if ! gh release view spam-list >/dev/null 2>&1; then
+            gh release create spam-list --target "$GITHUB_SHA" --latest=false \
+              --title "Spam list (updated weekly)" --notes "$NOTES"
+          fi
+          gh release upload spam-list spam-list.txt.gz spam-list.txt.gz.sig --clobber
+          gh release edit spam-list --latest=false --notes "$NOTES"

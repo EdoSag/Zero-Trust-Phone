@@ -163,6 +163,12 @@ object CallManager {
         return nameFor(ctx, number)
     }
 
+    private fun spamReports(number: String): Int? {
+        val ctx = service ?: return null
+        if (number.isEmpty() || SpamList.mode(ctx) == "off" || nameFor(number) != null) return null
+        return SpamList.reports(ctx, number)
+    }
+
     fun nameFor(context: Context, number: String): String? {
         val key = PhoneNumbers.lookupKey(number)
         if (key.isNotEmpty()) vaultNames[key]?.let { return it }
@@ -221,6 +227,8 @@ object CallManager {
             "number" to number,
             "name" to (if (number.isNotEmpty()) nameFor(number) else null),
             "meeting" to meetingHints[PhoneNumbers.lookupKey(number)],
+            // P24: reports of this number on the spam list; never for a contact.
+            "spamReports" to spamReports(number),
             "state" to stateName(call.stateCompat()),
             "connectedAt" to details.connectTimeMillis.takeIf { it > 0 },
             "isConference" to details.hasProperty(Call.Details.PROPERTY_CONFERENCE),
