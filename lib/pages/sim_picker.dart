@@ -43,8 +43,20 @@ Future<SimPick> pickSimFor(
   }
   if (sims.length < 2) return const SimChosen(null);
   final String key = PhoneNumbers.lookupKey(number);
-  final List<SimChoice> remembered =
-      ref.read(simChoicesProvider).value ?? const <SimChoice>[];
+  // Awaited, and listened to while it loads (an unwatched provider is
+  // paused): on the first call after start the list is still loading.
+  final ProviderSubscription<Future<List<SimChoice>>> memory = ref.listenManual(
+    simChoicesProvider.future,
+    (_, _) {},
+  );
+  List<SimChoice> remembered;
+  try {
+    remembered = await memory.read().timeout(const Duration(seconds: 2));
+  } on Object {
+    remembered = const <SimChoice>[];
+  } finally {
+    memory.close();
+  }
   final SimChoice? saved = remembered
       .where((SimChoice c) => c.key == key)
       .firstOrNull;
