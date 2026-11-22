@@ -346,6 +346,40 @@ final ZtCollection<CallBack> callBackCollection = ZtCollection<CallBack>(
   idOf: (CallBack c) => c.id,
 );
 
+/// The SIM a number was last called with, when "Remember for this
+/// number" was ticked on the SIM picker (P18). Item id = the number's
+/// lookup key, so two spellings of one number share it.
+class SimChoice {
+  const SimChoice({
+    required this.key,
+    required this.number,
+    required this.accountId,
+    required this.accountLabel,
+  });
+
+  final String key;
+  final String number;
+  final String accountId;
+  final String accountLabel;
+}
+
+final ZtCollection<SimChoice> simChoiceCollection = ZtCollection<SimChoice>(
+  kind: 'sim_choice',
+  version: 1,
+  fromJson: (String id, Map<String, Object?> j, DateTime _) => SimChoice(
+    key: id,
+    number: j['number'] as String? ?? '',
+    accountId: j['accountId'] as String? ?? '',
+    accountLabel: j['accountLabel'] as String? ?? '',
+  ),
+  toJson: (SimChoice c) => <String, Object?>{
+    'number': c.number,
+    'accountId': c.accountId,
+    'accountLabel': c.accountLabel,
+  },
+  idOf: (SimChoice c) => c.key,
+);
+
 /// Phone's own store, open while unlocked.
 final phoneStoreProvider = FutureProvider<ZtLocalStore>(
   (ref) async => (await ref.watch(ztLocalStoreProvider.future)) as ZtLocalStore,
@@ -362,6 +396,7 @@ final speedDialsProvider = _watch(speedDialCollection);
 final dialShortcutsProvider = _watch(dialShortcutCollection);
 final privateCallsProvider = _watch(privateCallsCollection);
 final callBacksProvider = _watch(callBackCollection);
+final simChoicesProvider = _watch(simChoiceCollection);
 final _protectionList = _watch(protectionCollection);
 
 final callProtectionProvider = Provider<CallProtection>((ref) {
@@ -414,6 +449,10 @@ class PhoneData {
 
   Future<List<BackedUpCall>> privateCalls() async =>
       privateCallsCollection.list(await ref.read(phoneStoreProvider.future));
+
+  Future<void> saveSimChoice(SimChoice c) => _save(simChoiceCollection, c);
+
+  Future<void> deleteSimChoice(String key) => _delete(simChoiceCollection, key);
 
   Future<void> saveCallBack(CallBack c) => _save(callBackCollection, c);
 

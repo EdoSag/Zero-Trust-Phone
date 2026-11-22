@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zero_trust_core/zero_trust_core.dart';
 import 'package:zerotrust_phone/app/auth_providers.dart';
+import 'package:zerotrust_phone/app/call_comfort.dart';
 import 'package:zerotrust_phone/app/history_retention.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
@@ -128,7 +129,10 @@ class _AppGateState extends ConsumerState<AppGate> with WidgetsBindingObserver {
   }
 
   void _forgotPassword() => Navigator.of(context).push(
-    MaterialPageRoute<void>(builder: (_) => ZtForgotPasswordScreen(redirectTo: EmailLinks.passwordReset)),
+    MaterialPageRoute<void>(
+      builder: (_) =>
+          ZtForgotPasswordScreen(redirectTo: EmailLinks.passwordReset),
+    ),
   );
 
   @override
@@ -233,6 +237,8 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
       ref.invalidate(callAlertsReadyProvider);
     }
     await ref.read(historyRetentionProvider.notifier).apply();
+    // P29: hands flip to silence to the Android side as it loads.
+    await ref.read(callComfortProvider.notifier).loaded;
     await _backUp();
   }
 

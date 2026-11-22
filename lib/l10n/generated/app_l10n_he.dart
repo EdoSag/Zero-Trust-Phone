@@ -1113,4 +1113,98 @@ class AppL10nHe extends AppL10n {
 
   @override
   String get returnToCall => 'חזרה לשיחה';
+
+  @override
+  String get rememberSimForNumber => 'לזכור עבור המספר הזה';
+
+  @override
+  String get rememberSimForNumberBody => 'בפעם הבאה ייבחר ה-SIM הזה בלי לשאול';
+
+  @override
+  String get callHoldForSim => 'חיוג (לחיצה ארוכה לבחירת SIM)';
+
+  @override
+  String get simPerNumber => 'SIM לכל מספר';
+
+  @override
+  String get simPerNumberShort => 'מספרים שתמיד מחויגים מאותו SIM';
+
+  @override
+  String get simPerNumberBody =>
+      'בטלפון עם שני כרטיסי SIM, ZT Phone שואל באיזה מהם להשתמש, אלא אם נבחר באנדרואיד SIM ברירת מחדל לשיחות. אם מסמנים \"לזכור עבור המספר הזה\" בשאלה, המספר תמיד יחויג מאותו SIM. לחיצה ארוכה על כפתור החיוג מאפשרת לבחור מחדש. SIM שנקבע לאיש קשר תמיד גובר.';
+
+  @override
+  String get simPerNumberEmpty => 'אין עדיין מספרים';
+
+  @override
+  String get forget => 'לשכוח';
+
+  @override
+  String get keypadAndHandling => 'מקלדת ואחיזה';
+
+  @override
+  String get keypadAndHandlingBody =>
+      'מקשים גדולים, מצב יד אחת, צלילי מקשים, הפיכה להשתקה';
+
+  @override
+  String get largeKeys => 'מקשים גדולים';
+
+  @override
+  String get largeKeysBody => 'מקשים וספרות גדולים יותר במקלדת החיוג';
+
+  @override
+  String get oneHandedMode => 'מצב יד אחת';
+
+  @override
+  String get oneHandedModeBody =>
+      'מקלדת צרה יותר בצד אחד, בהישג האגודל. החץ שלידה מעביר אותה לצד השני.';
+
+  @override
+  String get handLeft => 'שמאל';
+
+  @override
+  String get handRight => 'ימין';
+
+  @override
+  String get keypadMoveLeft => 'העברת המקלדת שמאלה';
+
+  @override
+  String get keypadMoveRight => 'העברת המקלדת ימינה';
+
+  @override
+  String get keyTones => 'צלילי מקשים';
+
+  @override
+  String get keyTonesBody =>
+      'צליל קצר לכל מקש, בעוצמת צלילי המקלדת של הטלפון. שקט כשהטלפון במצב שקט.';
+
+  @override
+  String get keyVibration => 'רטט מקשים';
+
+  @override
+  String get vibrationLight => 'קל';
+
+  @override
+  String get vibrationStrong => 'חזק';
+
+  @override
+  String get handling => 'אחיזה';
+
+  @override
+  String get flipToSilence => 'הפיכה להשתקה';
+
+  @override
+  String get flipToSilenceBody =>
+      'הפיכת טלפון מצלצל עם המסך למטה משתיקה את השיחה. המתקשר ממשיך לשמוע צלצול, ועדיין אפשר לענות.';
+
+  @override
+  String get pocketGuard => 'הגנה מחיוג בכיס';
+
+  @override
+  String get pocketGuardBody =>
+      'לא לחייג כשמשהו מכסה את המסך, כמו כיס או תיק. דורש חיישן קרבה.';
+
+  @override
+  String get pocketGuardStopped =>
+      'השיחה לא חויגה: נראה שהמסך מכוסה. אם זו טעות, אפשר לכבות את ההגנה מחיוג בכיס בהגדרות.';
 }

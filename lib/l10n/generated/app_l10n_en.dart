@@ -1114,4 +1114,99 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get returnToCall => 'Return to call';
+
+  @override
+  String get rememberSimForNumber => 'Remember for this number';
+
+  @override
+  String get rememberSimForNumberBody =>
+      'Next time this SIM is used without asking';
+
+  @override
+  String get callHoldForSim => 'Call (hold to pick the SIM)';
+
+  @override
+  String get simPerNumber => 'SIM for each number';
+
+  @override
+  String get simPerNumberShort => 'Numbers that always use the same SIM';
+
+  @override
+  String get simPerNumberBody =>
+      'On a phone with two SIMs, ZT Phone asks which one to use unless Android has a default SIM for calls. Tick \"Remember for this number\" on that question and the number always uses the same SIM. Hold the call button to choose again. A SIM set for a contact always wins.';
+
+  @override
+  String get simPerNumberEmpty => 'No numbers yet';
+
+  @override
+  String get forget => 'Forget';
+
+  @override
+  String get keypadAndHandling => 'Keypad and handling';
+
+  @override
+  String get keypadAndHandlingBody =>
+      'Big keys, one-handed mode, key tones, flip to silence';
+
+  @override
+  String get largeKeys => 'Big keys';
+
+  @override
+  String get largeKeysBody => 'Larger keys and digits on the dialpad';
+
+  @override
+  String get oneHandedMode => 'One-handed mode';
+
+  @override
+  String get oneHandedModeBody =>
+      'A narrower keypad on one side, in reach of your thumb. The arrow beside it moves it across.';
+
+  @override
+  String get handLeft => 'Left';
+
+  @override
+  String get handRight => 'Right';
+
+  @override
+  String get keypadMoveLeft => 'Move keypad left';
+
+  @override
+  String get keypadMoveRight => 'Move keypad right';
+
+  @override
+  String get keyTones => 'Key tones';
+
+  @override
+  String get keyTonesBody =>
+      'A short tone for each key, at the phone\'s keypad volume. Silent when the phone is on silent.';
+
+  @override
+  String get keyVibration => 'Key vibration';
+
+  @override
+  String get vibrationLight => 'Light';
+
+  @override
+  String get vibrationStrong => 'Strong';
+
+  @override
+  String get handling => 'Handling';
+
+  @override
+  String get flipToSilence => 'Flip to silence';
+
+  @override
+  String get flipToSilenceBody =>
+      'Turn a ringing phone face down to silence the call. It keeps ringing for the caller, and you can still answer.';
+
+  @override
+  String get pocketGuard => 'Pocket-dial guard';
+
+  @override
+  String get pocketGuardBody =>
+      'Don\'t place a call while something covers the screen, like a pocket or a bag. Needs a proximity sensor.';
+
+  @override
+  String get pocketGuardStopped =>
+      'Call not placed: the screen seems covered. Turn off the pocket-dial guard in Settings if this is wrong.';
 }

@@ -56,6 +56,8 @@ class ZtInCallService : InCallService() {
         CallManager.add(call)
         if (call.stateCompat() == Call.STATE_RINGING) {
             call.details.handle?.schemeSpecificPart?.let { CallRinger.start(this, it) }
+            // P29: face down silences it, when switched on.
+            CallComfort.watchRinging(this)
             // The pinned call card (full screen when locked) ...
             CallNotifications.update(this)
         }
@@ -73,6 +75,7 @@ class ZtInCallService : InCallService() {
             PrivateCallLog.scrubSoon(this, number, call.details.creationTimeMillis)
         }
         CallManager.remove(call)
+        if (CallManager.ringing() == null) CallComfort.stopWatching(this)
         if (!CallManager.hasCalls) CallNotifications.cancel(this)
     }
 

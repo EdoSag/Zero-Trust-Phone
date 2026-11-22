@@ -295,6 +295,20 @@ class MainActivity : FlutterFragmentActivity() {
                         NativeStrings.set(this, call.arguments as? Map<String, String> ?: emptyMap())
                         result.success(null)
                     }
+                    "setCallComfort" -> {
+                        CallComfort.save(
+                            this,
+                            call.argument<Boolean>("flipToSilence") ?: false,
+                            call.argument<Boolean>("pocketGuard") ?: false,
+                        )
+                        result.success(null)
+                    }
+                    "playKeyTone" -> {
+                        CallComfort.playKeyTone(this, call.argument<String>("key") ?: "")
+                        result.success(null)
+                    }
+                    "screenCovered" -> CallComfort.screenCovered(this) { result.success(it) }
+                    "defaultPhoneAccount" -> result.success(defaultPhoneAccount())
                     "clearVaultNames" -> {
                         CallManager.clearVaultNames()
                         result.success(null)
@@ -535,6 +549,19 @@ class MainActivity : FlutterFragmentActivity() {
 
     private fun accountFor(id: String?): PhoneAccountHandle? =
         if (id.isNullOrEmpty()) null else callAccounts().firstOrNull { it.id == id }
+
+    /**
+     * P18: the SIM Android calls with without asking, or null when it asks
+     * each time (or there's only one).
+     */
+    private fun defaultPhoneAccount(): String? = try {
+        getSystemService(TelecomManager::class.java)
+            .getDefaultOutgoingPhoneAccount(PhoneAccount.SCHEME_TEL)
+            ?.takeIf { callAccounts().size > 1 }
+            ?.id
+    } catch (_: SecurityException) {
+        null
+    }
 
     /** The SIMs (and other calling accounts) this phone can call with. */
     private fun phoneAccounts(): List<Map<String, String>> {

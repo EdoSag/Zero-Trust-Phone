@@ -238,6 +238,13 @@ class Telecom {
         PhoneAccount(id: '${a['id']}', label: '${a['label']}'),
   ];
 
+  /// The SIM Android calls with by default ("Calls" in its SIM settings),
+  /// or null when it asks each time (P18).
+  Future<String?> defaultPhoneAccount() async {
+    final String? id = await _call<String>('defaultPhoneAccount');
+    return id == null || id.isEmpty ? null : id;
+  }
+
   /// What on-device call screening needs while the vault is locked (P1,
   /// P7). The Android side keeps only keyed hashes of the numbers.
   Future<void> setScreening({
@@ -381,6 +388,25 @@ class Telecom {
 
   /// Opens the system screen that turns call alerts back on.
   Future<void> fixCallAlerts() => _call<void>('fixCallAlerts');
+
+  /// P29: the switches the Android side needs while the app is closed.
+  Future<void> setCallComfort({
+    required bool flipToSilence,
+    required bool pocketGuard,
+  }) => _call<void>('setCallComfort', {
+    'flipToSilence': flipToSilence,
+    'pocketGuard': pocketGuard,
+  });
+
+  /// P17: the keypad tone for [key] (0-9, * or #), at the phone's keypad
+  /// tone volume. Silent when the phone is on silent or vibrate.
+  Future<void> playKeyTone(String key) =>
+      _call<void>('playKeyTone', {'key': key});
+
+  /// P29: whether something covers the screen right now (proximity
+  /// sensor), as in a pocket. False when the phone has no such sensor.
+  Future<bool> screenCovered() async =>
+      await _call<bool>('screenCovered') ?? false;
 }
 
 final telecomProvider = Provider<Telecom>((ref) => Telecom());

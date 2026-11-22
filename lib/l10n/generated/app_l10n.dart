@@ -2004,6 +2004,180 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Return to call'**
   String get returnToCall;
+
+  /// No description provided for @rememberSimForNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember for this number'**
+  String get rememberSimForNumber;
+
+  /// No description provided for @rememberSimForNumberBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Next time this SIM is used without asking'**
+  String get rememberSimForNumberBody;
+
+  /// No description provided for @callHoldForSim.
+  ///
+  /// In en, this message translates to:
+  /// **'Call (hold to pick the SIM)'**
+  String get callHoldForSim;
+
+  /// No description provided for @simPerNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'SIM for each number'**
+  String get simPerNumber;
+
+  /// No description provided for @simPerNumberShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Numbers that always use the same SIM'**
+  String get simPerNumberShort;
+
+  /// No description provided for @simPerNumberBody.
+  ///
+  /// In en, this message translates to:
+  /// **'On a phone with two SIMs, ZT Phone asks which one to use unless Android has a default SIM for calls. Tick \"Remember for this number\" on that question and the number always uses the same SIM. Hold the call button to choose again. A SIM set for a contact always wins.'**
+  String get simPerNumberBody;
+
+  /// No description provided for @simPerNumberEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No numbers yet'**
+  String get simPerNumberEmpty;
+
+  /// No description provided for @forget.
+  ///
+  /// In en, this message translates to:
+  /// **'Forget'**
+  String get forget;
+
+  /// No description provided for @keypadAndHandling.
+  ///
+  /// In en, this message translates to:
+  /// **'Keypad and handling'**
+  String get keypadAndHandling;
+
+  /// No description provided for @keypadAndHandlingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Big keys, one-handed mode, key tones, flip to silence'**
+  String get keypadAndHandlingBody;
+
+  /// No description provided for @largeKeys.
+  ///
+  /// In en, this message translates to:
+  /// **'Big keys'**
+  String get largeKeys;
+
+  /// No description provided for @largeKeysBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Larger keys and digits on the dialpad'**
+  String get largeKeysBody;
+
+  /// No description provided for @oneHandedMode.
+  ///
+  /// In en, this message translates to:
+  /// **'One-handed mode'**
+  String get oneHandedMode;
+
+  /// No description provided for @oneHandedModeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A narrower keypad on one side, in reach of your thumb. The arrow beside it moves it across.'**
+  String get oneHandedModeBody;
+
+  /// No description provided for @handLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Left'**
+  String get handLeft;
+
+  /// No description provided for @handRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Right'**
+  String get handRight;
+
+  /// No description provided for @keypadMoveLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Move keypad left'**
+  String get keypadMoveLeft;
+
+  /// No description provided for @keypadMoveRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Move keypad right'**
+  String get keypadMoveRight;
+
+  /// No description provided for @keyTones.
+  ///
+  /// In en, this message translates to:
+  /// **'Key tones'**
+  String get keyTones;
+
+  /// No description provided for @keyTonesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A short tone for each key, at the phone\'s keypad volume. Silent when the phone is on silent.'**
+  String get keyTonesBody;
+
+  /// No description provided for @keyVibration.
+  ///
+  /// In en, this message translates to:
+  /// **'Key vibration'**
+  String get keyVibration;
+
+  /// No description provided for @vibrationLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get vibrationLight;
+
+  /// No description provided for @vibrationStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get vibrationStrong;
+
+  /// No description provided for @handling.
+  ///
+  /// In en, this message translates to:
+  /// **'Handling'**
+  String get handling;
+
+  /// No description provided for @flipToSilence.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip to silence'**
+  String get flipToSilence;
+
+  /// No description provided for @flipToSilenceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn a ringing phone face down to silence the call. It keeps ringing for the caller, and you can still answer.'**
+  String get flipToSilenceBody;
+
+  /// No description provided for @pocketGuard.
+  ///
+  /// In en, this message translates to:
+  /// **'Pocket-dial guard'**
+  String get pocketGuard;
+
+  /// No description provided for @pocketGuardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t place a call while something covers the screen, like a pocket or a bag. Needs a proximity sensor.'**
+  String get pocketGuardBody;
+
+  /// No description provided for @pocketGuardStopped.
+  ///
+  /// In en, this message translates to:
+  /// **'Call not placed: the screen seems covered. Turn off the pocket-dial guard in Settings if this is wrong.'**
+  String get pocketGuardStopped;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {
