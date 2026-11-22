@@ -428,8 +428,6 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
     );
     if (rules.same(_sentRules)) return;
     _sentRules = rules;
-    // Private contacts may have changed: the widget's names follow.
-    _syncWidget();
     _telecom
         .setScreening(
           unknownMode: rules.unknownMode,
@@ -440,6 +438,9 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
           ringtones: rules.ringtones,
           privateKeys: rules.privateKeys,
         )
+        // Private contacts may have changed: the widget follows, once the
+        // native side has the new rules (its call list filters by them).
+        .then((_) => _syncWidget(), onError: (Object _) => _syncWidget())
         .ignore();
   }
 
