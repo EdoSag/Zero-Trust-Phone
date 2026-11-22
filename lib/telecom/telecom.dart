@@ -389,6 +389,27 @@ class Telecom {
   /// Opens the system screen that turns call alerts back on.
   Future<void> fixCallAlerts() => _call<void>('fixCallAlerts');
 
+  /// P26: when I'm in a meeting ([busy], start and end times, kept sealed
+  /// on the phone), what to do then ([mode] ring / silence / decline with
+  /// [message]), and, in memory only, a line about the next meeting per
+  /// number ([hints], by lookup key) for the call screen.
+  Future<void> setMeetings({
+    required String mode,
+    required String message,
+    required bool letRepeatCallersRing,
+    required List<(DateTime, DateTime)> busy,
+    required Map<String, String> hints,
+  }) => _call<void>('setMeetings', {
+    'mode': mode,
+    'message': message,
+    'letRepeatCallersRing': letRepeatCallersRing,
+    'busy': <List<int>>[
+      for (final (DateTime s, DateTime e) in busy)
+        <int>[s.millisecondsSinceEpoch, e.millisecondsSinceEpoch],
+    ],
+    'hints': hints,
+  });
+
   /// P29: the switches the Android side needs while the app is closed.
   Future<void> setCallComfort({
     required bool flipToSilence,

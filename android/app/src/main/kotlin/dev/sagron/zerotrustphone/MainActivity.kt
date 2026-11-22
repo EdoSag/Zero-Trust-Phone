@@ -309,6 +309,22 @@ class MainActivity : FlutterFragmentActivity() {
                     }
                     "screenCovered" -> CallComfort.screenCovered(this) { result.success(it) }
                     "defaultPhoneAccount" -> result.success(defaultPhoneAccount())
+                    "setMeetings" -> {
+                        @Suppress("UNCHECKED_CAST")
+                        val busy = (call.argument<List<Any?>>("busy") ?: emptyList()).mapNotNull { pair ->
+                            (pair as? List<Any?>)?.mapNotNull { (it as? Number)?.toLong() }?.takeIf { it.size == 2 }
+                        }
+                        MeetingGuard.save(
+                            this,
+                            call.argument<String>("mode") ?: "ring",
+                            call.argument<String>("message") ?: "",
+                            call.argument<Boolean>("letRepeatCallersRing") ?: true,
+                            busy,
+                        )
+                        @Suppress("UNCHECKED_CAST")
+                        CallManager.setMeetingHints(call.argument<Map<String, String>>("hints") ?: emptyMap())
+                        result.success(null)
+                    }
                     "clearVaultNames" -> {
                         CallManager.clearVaultNames()
                         result.success(null)

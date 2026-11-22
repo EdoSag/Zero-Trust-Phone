@@ -1209,4 +1209,143 @@ class AppL10nEn extends AppL10n {
   @override
   String get pocketGuardStopped =>
       'Call not placed: the screen seems covered. Turn off the pocket-dial guard in Settings if this is wrong.';
+
+  @override
+  String get inMeetingDefaultMessage =>
+      'I\'m in a meeting. I\'ll call you back soon.';
+
+  @override
+  String get meetingUntitled => 'Meeting';
+
+  @override
+  String meetingNow(String title) {
+    return 'Now: $title';
+  }
+
+  @override
+  String meetingToday(String time) {
+    return 'Today $time';
+  }
+
+  @override
+  String meetingTomorrow(String time) {
+    return 'Tomorrow $time';
+  }
+
+  @override
+  String meetingAt(String when, String title) {
+    return '$when: $title';
+  }
+
+  @override
+  String get callTools => 'More';
+
+  @override
+  String get callNote => 'Write a note';
+
+  @override
+  String get callNoteBody => 'Saved in ZT Notes';
+
+  @override
+  String callNoteTitle(String name) {
+    return 'Call with $name';
+  }
+
+  @override
+  String get callNoteHint => 'What to remember from this call';
+
+  @override
+  String get callNoteWhere =>
+      'Kept encrypted on this phone, and moved into ZT Notes the next time you open ZT Phone.';
+
+  @override
+  String get callNoteSaved =>
+      'Note saved. It moves to ZT Notes when you next open ZT Phone.';
+
+  @override
+  String get textMyCard => 'Text my card';
+
+  @override
+  String get textMyCardBody =>
+      'Opens your SMS app with your name and number, ready to send';
+
+  @override
+  String get myCardNotSet => 'Set your card in ZT Phone Settings first';
+
+  @override
+  String get openCalendar => 'Open ZT Calendar';
+
+  @override
+  String get openCalendarBody =>
+      'Check your shared calendars. The call keeps going.';
+
+  @override
+  String get calendarMissing => 'ZT Calendar isn\'t installed';
+
+  @override
+  String get calendarAndCalls => 'Calendar and calls';
+
+  @override
+  String get calendarAndCallsShort =>
+      'Meetings on calls, and calls during meetings';
+
+  @override
+  String get calendarAndCallsBody =>
+      'ZT Phone reads your ZT Calendar in the same account, on this phone only, to know when you meet people and when you\'re busy.';
+
+  @override
+  String get showMeetings => 'Show meetings with a contact';
+
+  @override
+  String get showMeetingsBody =>
+      '\"Tomorrow 10:00: Design review\" on their calls and their contact sheet';
+
+  @override
+  String get callsDuringMeetings => 'Calls during a meeting';
+
+  @override
+  String get inMeetingRing => 'Ring as usual';
+
+  @override
+  String get inMeetingSilence => 'Ring silently';
+
+  @override
+  String get inMeetingSilenceBody => 'The call shows, without sound';
+
+  @override
+  String get inMeetingDecline => 'Decline with a text';
+
+  @override
+  String get inMeetingDeclineBody =>
+      'The caller gets your message; the call shows in Recents';
+
+  @override
+  String get inMeetingMessage => 'Message';
+
+  @override
+  String get letRepeatCallersRing => 'Let repeat callers ring';
+
+  @override
+  String get letRepeatCallersRingBody =>
+      'A second call from the same number within 15 minutes rings as usual, in case it\'s urgent';
+
+  @override
+  String get calendarAndCallsLimits =>
+      'Counts timed events in your own ZT Calendar for the next 7 days; all-day events don\'t count. The times are refreshed each time ZT Phone opens, and only start and end times are kept on the phone for this.';
+
+  @override
+  String get myCard => 'My card';
+
+  @override
+  String get myCardShort => 'What \"Text my card\" sends during a call';
+
+  @override
+  String get myCardBody =>
+      'During a call, \"Text my card\" opens your SMS app with this text to the other person, ready to send. It\'s kept encrypted on this phone so it works while ZT Phone is locked.';
+
+  @override
+  String get myCardPick => 'Choose from ZT Contacts';
+
+  @override
+  String get myCardText => 'Card text';
 }

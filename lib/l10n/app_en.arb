@@ -632,5 +632,87 @@
   "flipToSilenceBody": "Turn a ringing phone face down to silence the call. It keeps ringing for the caller, and you can still answer.",
   "pocketGuard": "Pocket-dial guard",
   "pocketGuardBody": "Don't place a call while something covers the screen, like a pocket or a bag. Needs a proximity sensor.",
-  "pocketGuardStopped": "Call not placed: the screen seems covered. Turn off the pocket-dial guard in Settings if this is wrong."
+  "pocketGuardStopped": "Call not placed: the screen seems covered. Turn off the pocket-dial guard in Settings if this is wrong.",
+  "inMeetingDefaultMessage": "I'm in a meeting. I'll call you back soon.",
+  "meetingUntitled": "Meeting",
+  "meetingNow": "Now: {title}",
+  "@meetingNow": {
+    "description": "The person is in a meeting with me right now (from ZT Calendar).",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "meetingToday": "Today {time}",
+  "@meetingToday": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "meetingTomorrow": "Tomorrow {time}",
+  "@meetingTomorrow": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "meetingAt": "{when}: {title}",
+  "@meetingAt": {
+    "description": "The next meeting with this contact: when, then its title.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "callTools": "More",
+  "@callTools": {
+    "description": "In-call button that opens note, my card and calendar tools."
+  },
+  "callNote": "Write a note",
+  "callNoteBody": "Saved in ZT Notes",
+  "callNoteTitle": "Call with {name}",
+  "@callNoteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "callNoteHint": "What to remember from this call",
+  "callNoteWhere": "Kept encrypted on this phone, and moved into ZT Notes the next time you open ZT Phone.",
+  "callNoteSaved": "Note saved. It moves to ZT Notes when you next open ZT Phone.",
+  "textMyCard": "Text my card",
+  "textMyCardBody": "Opens your SMS app with your name and number, ready to send",
+  "myCardNotSet": "Set your card in ZT Phone Settings first",
+  "openCalendar": "Open ZT Calendar",
+  "openCalendarBody": "Check your shared calendars. The call keeps going.",
+  "calendarMissing": "ZT Calendar isn't installed",
+  "calendarAndCalls": "Calendar and calls",
+  "calendarAndCallsShort": "Meetings on calls, and calls during meetings",
+  "calendarAndCallsBody": "ZT Phone reads your ZT Calendar in the same account, on this phone only, to know when you meet people and when you're busy.",
+  "showMeetings": "Show meetings with a contact",
+  "showMeetingsBody": "\"Tomorrow 10:00: Design review\" on their calls and their contact sheet",
+  "callsDuringMeetings": "Calls during a meeting",
+  "inMeetingRing": "Ring as usual",
+  "inMeetingSilence": "Ring silently",
+  "inMeetingSilenceBody": "The call shows, without sound",
+  "inMeetingDecline": "Decline with a text",
+  "inMeetingDeclineBody": "The caller gets your message; the call shows in Recents",
+  "inMeetingMessage": "Message",
+  "letRepeatCallersRing": "Let repeat callers ring",
+  "letRepeatCallersRingBody": "A second call from the same number within 15 minutes rings as usual, in case it's urgent",
+  "calendarAndCallsLimits": "Counts timed events in your own ZT Calendar for the next 7 days; all-day events don't count. The times are refreshed each time ZT Phone opens, and only start and end times are kept on the phone for this.",
+  "myCard": "My card",
+  "myCardShort": "What \"Text my card\" sends during a call",
+  "myCardBody": "During a call, \"Text my card\" opens your SMS app with this text to the other person, ready to send. It's kept encrypted on this phone so it works while ZT Phone is locked.",
+  "myCardPick": "Choose from ZT Contacts",
+  "myCardText": "Card text"
 }
