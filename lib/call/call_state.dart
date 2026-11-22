@@ -29,6 +29,7 @@ class PhoneCall {
     this.cameraAllowed = false,
     this.notice,
     this.postDialWait,
+    this.meeting,
   });
 
   factory PhoneCall.fromMap(Map<Object?, Object?> m) => PhoneCall(
@@ -65,6 +66,7 @@ class PhoneCall {
     cameraAllowed: m['cameraAllowed'] == true,
     notice: m['notice'] as String?,
     postDialWait: m['postDialWait'] as String?,
+    meeting: m['meeting'] as String?,
   );
 
   static (int, int)? _size(Object? w, Object? h) {
@@ -122,6 +124,10 @@ class PhoneCall {
 
   /// P15: the call reached a "wait for my tap" (`;`); these tones are next.
   final String? postDialWait;
+
+  /// P26: the next meeting with this person in ZT Calendar ("Tomorrow
+  /// 10:00: Design review"), while ZT Phone is unlocked.
+  final String? meeting;
 
   bool get isVideo => VideoState.isVideo(videoState);
   bool get sendingVideo =>

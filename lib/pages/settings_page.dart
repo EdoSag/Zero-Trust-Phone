@@ -10,6 +10,8 @@ import 'package:zerotrust_phone/pages/call_accessibility_page.dart';
 import 'package:zerotrust_phone/pages/call_protection_page.dart';
 import 'package:zerotrust_phone/pages/history_backup_page.dart';
 import 'package:zerotrust_phone/pages/keypad_settings_page.dart';
+import 'package:zerotrust_phone/pages/meetings_page.dart';
+import 'package:zerotrust_phone/pages/my_card_page.dart';
 import 'package:zerotrust_phone/pages/quick_replies_page.dart';
 import 'package:zerotrust_phone/pages/sim_picker.dart';
 import 'package:zerotrust_phone/pages/speed_dial_page.dart';
@@ -111,6 +113,18 @@ class PhoneSettingsPage extends ConsumerWidget {
           title: Text(context.l10n.simPerNumber),
           subtitle: Text(context.l10n.simPerNumberShort),
           onTap: () => push(const SimChoicesPage()),
+        ),
+        ListTile(
+          leading: const Icon(Icons.event_outlined),
+          title: Text(context.l10n.calendarAndCalls),
+          subtitle: Text(context.l10n.calendarAndCallsShort),
+          onTap: () => push(const MeetingsPage()),
+        ),
+        ListTile(
+          leading: const Icon(Icons.contact_page_outlined),
+          title: Text(context.l10n.myCard),
+          subtitle: Text(context.l10n.myCardShort),
+          onTap: () => push(const MyCardPage()),
         ),
         ListTile(
           leading: const Icon(Icons.rtt),

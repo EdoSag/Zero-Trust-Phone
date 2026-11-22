@@ -2178,6 +2178,240 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Call not placed: the screen seems covered. Turn off the pocket-dial guard in Settings if this is wrong.'**
   String get pocketGuardStopped;
+
+  /// No description provided for @inMeetingDefaultMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m in a meeting. I\'ll call you back soon.'**
+  String get inMeetingDefaultMessage;
+
+  /// No description provided for @meetingUntitled.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting'**
+  String get meetingUntitled;
+
+  /// The person is in a meeting with me right now (from ZT Calendar).
+  ///
+  /// In en, this message translates to:
+  /// **'Now: {title}'**
+  String meetingNow(String title);
+
+  /// No description provided for @meetingToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today {time}'**
+  String meetingToday(String time);
+
+  /// No description provided for @meetingTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow {time}'**
+  String meetingTomorrow(String time);
+
+  /// The next meeting with this contact: when, then its title.
+  ///
+  /// In en, this message translates to:
+  /// **'{when}: {title}'**
+  String meetingAt(String when, String title);
+
+  /// In-call button that opens note, my card and calendar tools.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get callTools;
+
+  /// No description provided for @callNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a note'**
+  String get callNote;
+
+  /// No description provided for @callNoteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved in ZT Notes'**
+  String get callNoteBody;
+
+  /// No description provided for @callNoteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Call with {name}'**
+  String callNoteTitle(String name);
+
+  /// No description provided for @callNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What to remember from this call'**
+  String get callNoteHint;
+
+  /// No description provided for @callNoteWhere.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept encrypted on this phone, and moved into ZT Notes the next time you open ZT Phone.'**
+  String get callNoteWhere;
+
+  /// No description provided for @callNoteSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Note saved. It moves to ZT Notes when you next open ZT Phone.'**
+  String get callNoteSaved;
+
+  /// No description provided for @textMyCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Text my card'**
+  String get textMyCard;
+
+  /// No description provided for @textMyCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens your SMS app with your name and number, ready to send'**
+  String get textMyCardBody;
+
+  /// No description provided for @myCardNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your card in ZT Phone Settings first'**
+  String get myCardNotSet;
+
+  /// No description provided for @openCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Open ZT Calendar'**
+  String get openCalendar;
+
+  /// No description provided for @openCalendarBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your shared calendars. The call keeps going.'**
+  String get openCalendarBody;
+
+  /// No description provided for @calendarMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'ZT Calendar isn\'t installed'**
+  String get calendarMissing;
+
+  /// No description provided for @calendarAndCalls.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar and calls'**
+  String get calendarAndCalls;
+
+  /// No description provided for @calendarAndCallsShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Meetings on calls, and calls during meetings'**
+  String get calendarAndCallsShort;
+
+  /// No description provided for @calendarAndCallsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'ZT Phone reads your ZT Calendar in the same account, on this phone only, to know when you meet people and when you\'re busy.'**
+  String get calendarAndCallsBody;
+
+  /// No description provided for @showMeetings.
+  ///
+  /// In en, this message translates to:
+  /// **'Show meetings with a contact'**
+  String get showMeetings;
+
+  /// No description provided for @showMeetingsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'\"Tomorrow 10:00: Design review\" on their calls and their contact sheet'**
+  String get showMeetingsBody;
+
+  /// No description provided for @callsDuringMeetings.
+  ///
+  /// In en, this message translates to:
+  /// **'Calls during a meeting'**
+  String get callsDuringMeetings;
+
+  /// No description provided for @inMeetingRing.
+  ///
+  /// In en, this message translates to:
+  /// **'Ring as usual'**
+  String get inMeetingRing;
+
+  /// No description provided for @inMeetingSilence.
+  ///
+  /// In en, this message translates to:
+  /// **'Ring silently'**
+  String get inMeetingSilence;
+
+  /// No description provided for @inMeetingSilenceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The call shows, without sound'**
+  String get inMeetingSilenceBody;
+
+  /// No description provided for @inMeetingDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline with a text'**
+  String get inMeetingDecline;
+
+  /// No description provided for @inMeetingDeclineBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The caller gets your message; the call shows in Recents'**
+  String get inMeetingDeclineBody;
+
+  /// No description provided for @inMeetingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get inMeetingMessage;
+
+  /// No description provided for @letRepeatCallersRing.
+  ///
+  /// In en, this message translates to:
+  /// **'Let repeat callers ring'**
+  String get letRepeatCallersRing;
+
+  /// No description provided for @letRepeatCallersRingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A second call from the same number within 15 minutes rings as usual, in case it\'s urgent'**
+  String get letRepeatCallersRingBody;
+
+  /// No description provided for @calendarAndCallsLimits.
+  ///
+  /// In en, this message translates to:
+  /// **'Counts timed events in your own ZT Calendar for the next 7 days; all-day events don\'t count. The times are refreshed each time ZT Phone opens, and only start and end times are kept on the phone for this.'**
+  String get calendarAndCallsLimits;
+
+  /// No description provided for @myCard.
+  ///
+  /// In en, this message translates to:
+  /// **'My card'**
+  String get myCard;
+
+  /// No description provided for @myCardShort.
+  ///
+  /// In en, this message translates to:
+  /// **'What \"Text my card\" sends during a call'**
+  String get myCardShort;
+
+  /// No description provided for @myCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'During a call, \"Text my card\" opens your SMS app with this text to the other person, ready to send. It\'s kept encrypted on this phone so it works while ZT Phone is locked.'**
+  String get myCardBody;
+
+  /// No description provided for @myCardPick.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from ZT Contacts'**
+  String get myCardPick;
+
+  /// No description provided for @myCardText.
+  ///
+  /// In en, this message translates to:
+  /// **'Card text'**
+  String get myCardText;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

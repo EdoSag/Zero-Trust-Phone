@@ -1207,4 +1207,141 @@ class AppL10nHe extends AppL10n {
   @override
   String get pocketGuardStopped =>
       'השיחה לא חויגה: נראה שהמסך מכוסה. אם זו טעות, אפשר לכבות את ההגנה מחיוג בכיס בהגדרות.';
+
+  @override
+  String get inMeetingDefaultMessage => 'אני בפגישה, אחזור אליך בקרוב.';
+
+  @override
+  String get meetingUntitled => 'פגישה';
+
+  @override
+  String meetingNow(String title) {
+    return 'עכשיו: $title';
+  }
+
+  @override
+  String meetingToday(String time) {
+    return 'היום $time';
+  }
+
+  @override
+  String meetingTomorrow(String time) {
+    return 'מחר $time';
+  }
+
+  @override
+  String meetingAt(String when, String title) {
+    return '$when: $title';
+  }
+
+  @override
+  String get callTools => 'עוד';
+
+  @override
+  String get callNote => 'כתיבת פתק';
+
+  @override
+  String get callNoteBody => 'נשמר ב-ZT Notes';
+
+  @override
+  String callNoteTitle(String name) {
+    return 'שיחה עם $name';
+  }
+
+  @override
+  String get callNoteHint => 'מה לזכור מהשיחה';
+
+  @override
+  String get callNoteWhere =>
+      'נשמר מוצפן בטלפון, ועובר ל-ZT Notes בפעם הבאה שפותחים את ZT Phone.';
+
+  @override
+  String get callNoteSaved =>
+      'הפתק נשמר. הוא יעבור ל-ZT Notes כשתפתחו את ZT Phone.';
+
+  @override
+  String get textMyCard => 'שליחת הכרטיס שלי בהודעה';
+
+  @override
+  String get textMyCardBody =>
+      'פותח את אפליקציית ההודעות עם השם והמספר שלך, מוכן לשליחה';
+
+  @override
+  String get myCardNotSet =>
+      'קודם צריך להגדיר את הכרטיס שלך בהגדרות של ZT Phone';
+
+  @override
+  String get openCalendar => 'פתיחת ZT Calendar';
+
+  @override
+  String get openCalendarBody => 'לבדוק את היומנים המשותפים. השיחה ממשיכה.';
+
+  @override
+  String get calendarMissing => 'ZT Calendar לא מותקן';
+
+  @override
+  String get calendarAndCalls => 'יומן ושיחות';
+
+  @override
+  String get calendarAndCallsShort => 'פגישות בשיחות, ושיחות בזמן פגישות';
+
+  @override
+  String get calendarAndCallsBody =>
+      'ZT Phone קורא את ZT Calendar באותו חשבון, בטלפון הזה בלבד, כדי לדעת מתי יש לך פגישות ועם מי.';
+
+  @override
+  String get showMeetings => 'הצגת פגישות עם איש קשר';
+
+  @override
+  String get showMeetingsBody =>
+      '\"מחר 10:00: סקירת עיצוב\" בשיחות שלהם ובכרטיס איש הקשר';
+
+  @override
+  String get callsDuringMeetings => 'שיחות בזמן פגישה';
+
+  @override
+  String get inMeetingRing => 'צלצול רגיל';
+
+  @override
+  String get inMeetingSilence => 'צלצול שקט';
+
+  @override
+  String get inMeetingSilenceBody => 'השיחה מוצגת, בלי צליל';
+
+  @override
+  String get inMeetingDecline => 'דחייה עם הודעה';
+
+  @override
+  String get inMeetingDeclineBody =>
+      'המתקשר מקבל את ההודעה שלך; השיחה מופיעה באחרונות';
+
+  @override
+  String get inMeetingMessage => 'הודעה';
+
+  @override
+  String get letRepeatCallersRing => 'לתת למתקשרים חוזרים לצלצל';
+
+  @override
+  String get letRepeatCallersRingBody =>
+      'שיחה שנייה מאותו מספר תוך 15 דקות תצלצל כרגיל, למקרה שזה דחוף';
+
+  @override
+  String get calendarAndCallsLimits =>
+      'נספרים אירועים עם שעה ב-ZT Calendar שלך ל-7 הימים הקרובים; אירועים של יום שלם לא נספרים. הזמנים מתעדכנים בכל פתיחה של ZT Phone, ונשמרים בטלפון רק זמני התחלה וסיום.';
+
+  @override
+  String get myCard => 'הכרטיס שלי';
+
+  @override
+  String get myCardShort => 'מה נשלח ב\"שליחת הכרטיס שלי\" בזמן שיחה';
+
+  @override
+  String get myCardBody =>
+      'בזמן שיחה, \"שליחת הכרטיס שלי\" פותח את אפליקציית ההודעות עם הטקסט הזה לצד השני, מוכן לשליחה. הוא נשמר מוצפן בטלפון כדי לעבוד גם כש-ZT Phone נעול.';
+
+  @override
+  String get myCardPick => 'בחירה מ-ZT Contacts';
+
+  @override
+  String get myCardText => 'טקסט הכרטיס';
 }

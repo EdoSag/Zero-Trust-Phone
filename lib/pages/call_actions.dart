@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zerotrust_phone/app/call_comfort.dart';
 import 'package:zerotrust_phone/app/rtt_preference.dart';
+import 'package:zerotrust_phone/calendar/meeting_guard.dart';
+import 'package:zerotrust_phone/calendar/phone_calendar.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
@@ -112,6 +114,8 @@ Future<void> showNumberSheet(
                 ? Text(contact.company)
                 : null,
           ),
+          // P26: the next meeting with them in ZT Calendar.
+          if (contact != null) MeetingLine(contact: contact),
           const Divider(),
           for (final String n in numbers)
             ListTile(
@@ -289,6 +293,35 @@ Future<void> confirmBlock(
   if (context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(context.l10n.numberBlocked(ltr(number)))),
+    );
+  }
+}
+
+/// "Tomorrow 10:00: Design review": the next meeting with [contact] in ZT
+/// Calendar (P26), or nothing.
+class MeetingLine extends ConsumerWidget {
+  const MeetingLine({super.key, required this.contact});
+  final PhoneContact contact;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (!ref.watch(meetingGuardProvider).showMeetings) {
+      return const SizedBox.shrink();
+    }
+    final List<PhoneEvent> events =
+        ref.watch(phoneEventsProvider).value ?? const <PhoneEvent>[];
+    final DateTime now = DateTime.now();
+    final Meeting? m = Meetings.nextWith(events, contact, now);
+    if (m == null) return const SizedBox.shrink();
+    final AppL10n l = context.l10n;
+    return ListTile(
+      key: const ValueKey<String>('meeting-line'),
+      dense: true,
+      leading: Icon(
+        Icons.event_outlined,
+        color: Theme.of(context).colorScheme.primary,
+      ),
+      title: Text(meetingLine(m, now, l, l.localeName)),
     );
   }
 }

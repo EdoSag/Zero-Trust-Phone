@@ -51,6 +51,10 @@ object CallManager {
     /** Names known only while the vault is unlocked; never written to disk. */
     private val vaultNames = mutableMapOf<String, String>()
 
+    /** P26: "Meeting tomorrow 10:00: ..." per number, from the unlocked
+     * calendar; in memory only, like [vaultNames]. */
+    private val meetingHints = mutableMapOf<String, String>()
+
     private val callback = object : Call.Callback() {
         override fun onStateChanged(call: Call, state: Int) {
             if (ringing() == null) CallRinger.stop()
@@ -140,8 +144,15 @@ object CallManager {
         notifyChanged()
     }
 
+    fun setMeetingHints(hints: Map<String, String>) {
+        meetingHints.clear()
+        meetingHints.putAll(hints)
+        notifyChanged()
+    }
+
     fun clearVaultNames() {
         vaultNames.clear()
+        meetingHints.clear()
         // The call screen and notification drop names only the vault knew.
         notifyChanged()
     }
@@ -209,6 +220,7 @@ object CallManager {
             "id" to id,
             "number" to number,
             "name" to (if (number.isNotEmpty()) nameFor(number) else null),
+            "meeting" to meetingHints[PhoneNumbers.lookupKey(number)],
             "state" to stateName(call.stateCompat()),
             "connectedAt" to details.connectTimeMillis.takeIf { it > 0 },
             "isConference" to details.hasProperty(Call.Details.PROPERTY_CONFERENCE),

@@ -90,6 +90,10 @@ object CallEngine {
                 "mute" -> CallManager.setMuted(call.argument<Boolean>("on") ?: false)
                 "route" -> CallManager.setRoute(call.argument<Int>("route") ?: 0)
                 "selectAccount" -> CallManager.selectAccount(id, call.argument<Int>("index") ?: 0)
+                "openApp" -> {
+                    result.success(openApp(call.argument<String>("package") ?: ""))
+                    return@setMethodCallHandler
+                }
                 "close" -> activity?.finishAndRemoveTask()
                 "addCall" -> activity?.addCall()
                 else -> {
@@ -99,5 +103,31 @@ object CallEngine {
             }
             result.success(null)
         }
+    }
+
+    /**
+     * P27: opens another ZT app (ZT Calendar) from the call screen, asking
+     * to unlock the phone first when it's locked. False when it's not
+     * installed.
+     */
+    private fun openApp(packageName: String): Boolean {
+        val screen = activity ?: return false
+        if (!packageName.startsWith("dev.sagron.")) return false
+        val launch = screen.packageManager.getLaunchIntentForPackage(packageName) ?: return false
+        launch.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+        val keyguard = screen.getSystemService(android.app.KeyguardManager::class.java)
+        if (keyguard?.isKeyguardLocked == true) {
+            keyguard.requestDismissKeyguard(
+                screen,
+                object : android.app.KeyguardManager.KeyguardDismissCallback() {
+                    override fun onDismissSucceeded() {
+                        screen.startActivity(launch)
+                    }
+                },
+            )
+        } else {
+            screen.startActivity(launch)
+        }
+        return true
     }
 }

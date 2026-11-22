@@ -18,6 +18,10 @@ import 'package:zerotrust_phone/pages/home_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
 import 'email_links.dart';
+import 'package:intl/intl.dart';
+import 'package:zerotrust_phone/calendar/meeting_guard.dart';
+import 'package:zerotrust_phone/calendar/phone_calendar.dart';
+import 'package:zerotrust_phone/services/notes_bridge.dart';
 
 /// Routes between the shared account screens and the dialer.
 ///
@@ -114,6 +118,10 @@ class _AppGateState extends ConsumerState<AppGate> with WidgetsBindingObserver {
     await ref.read(contactsKeyProvider.notifier).deriveFrom(result.dek);
     // And the Tasks key, to add call back tasks (P25).
     await ref.read(tasksKeyProvider.notifier).deriveFrom(result.dek);
+    // Calendar to know meetings (P26), read only; Notes to save notes
+    // written during calls (P27).
+    await ref.read(calendarKeyProvider.notifier).deriveFrom(result.dek);
+    await ref.read(notesKeyProvider.notifier).deriveFrom(result.dek);
     if (!mounted) return;
     if (result.newRecoveryKey != null) {
       setState(() {
@@ -263,6 +271,8 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
           .refresh(mergeCalls(shared, private));
       // ZT Tasks writes made offline go out now.
       await ref.read(tasksBridgeProvider).flush();
+      // P27: notes written on the call screen move into ZT Notes.
+      await _moveCallNotes();
     } on Object {
       // Locked meanwhile, or offline: the next open tries again.
     }
@@ -284,6 +294,9 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
       ref.invalidate(callLogProvider);
       ref.invalidate(defaultDialerProvider);
       ref.invalidate(callAlertsReadyProvider);
+      // "Today" and "now" move on; busy times reach a week ahead.
+      _sentMeetings = null;
+      _syncMeetings();
       _backUp();
     }
   }
@@ -302,6 +315,57 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
     Navigator.of(context).popUntil((Route<dynamic> r) => r.isFirst);
     ref.read(homeTabProvider.notifier).show(HomeTab.recents);
     await showCallBackSheet(context, ref, number: number);
+  }
+
+  Future<void> _moveCallNotes() async {
+    final NotesBridge notes = ref.read(notesBridgeProvider);
+    final AppL10n l = appL10nFor(ref.read(ztLanguageProvider));
+    final String locale = l.localeName;
+    await ref.read(pendingCallNotesProvider).moveInto((PendingCallNote n) {
+      final String who = n.name.isNotEmpty ? n.name : n.number;
+      final String when = DateFormat.yMMMd(locale).add_Hm().format(n.at);
+      return notes.add(
+        title: l.callNoteTitle(who),
+        body: '${n.text}\n\n$when · ${n.number}',
+      );
+    });
+    await notes.flush();
+  }
+
+  MeetingRules? _sentMeetings;
+
+  /// P26: busy times, the in-a-meeting rule and the call screen's meeting
+  /// lines, to the Android side.
+  void _syncMeetings() {
+    final List<PhoneEvent>? events = ref.read(phoneEventsProvider).value;
+    final List<PhoneContact>? contacts = ref.read(phoneContactsProvider).value;
+    if (events == null || contacts == null) return;
+    final AppL10n l = appL10nFor(ref.read(ztLanguageProvider));
+    final MeetingRules rules;
+    try {
+      rules = MeetingRules.build(
+        events: events,
+        contacts: contacts,
+        guard: ref.read(meetingGuardProvider),
+        l10n: l,
+        locale: l.localeName,
+        now: DateTime.now(),
+      );
+    } on Object {
+      // Date names not loaded yet: the next change or resume sends them.
+      return;
+    }
+    if (rules.same(_sentMeetings)) return;
+    _sentMeetings = rules;
+    _telecom
+        .setMeetings(
+          mode: rules.mode.name,
+          message: rules.message,
+          letRepeatCallersRing: rules.letRepeatCallersRing,
+          busy: rules.busy,
+          hints: rules.hints,
+        )
+        .ignore();
   }
 
   void _syncScreening() {
@@ -340,6 +404,9 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
     ref.listen(phoneContactsProvider, (_, _) => _syncScreening());
     ref.listen(contactSettingsProvider, (_, _) => _syncScreening());
     ref.listen(callProtectionProvider, (_, _) => _syncScreening());
+    ref.listen(phoneEventsProvider, (_, _) => _syncMeetings());
+    ref.listen(phoneContactsProvider, (_, _) => _syncMeetings());
+    ref.listen(meetingGuardProvider, (_, _) => _syncMeetings());
     // Phone's own synced store: settings, speed dial, call-history backup.
     ref.watch(ztSyncControllerProvider);
     return const HomePage();

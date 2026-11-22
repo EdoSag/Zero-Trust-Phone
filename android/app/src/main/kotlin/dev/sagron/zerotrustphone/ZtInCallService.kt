@@ -53,6 +53,14 @@ class ZtInCallService : InCallService() {
 
     override fun onCallAdded(call: Call) {
         super.onCallAdded(call)
+        // P26: in a meeting, decline with a text (no screen at all) or
+        // ring silently, as chosen in Settings.
+        if (call.stateCompat() == Call.STATE_RINGING &&
+            MeetingGuard.handle(this, call) == MeetingGuard.Outcome.DECLINED
+        ) {
+            CallManager.add(call)
+            return
+        }
         CallManager.add(call)
         if (call.stateCompat() == Call.STATE_RINGING) {
             call.details.handle?.schemeSpecificPart?.let { CallRinger.start(this, it) }
