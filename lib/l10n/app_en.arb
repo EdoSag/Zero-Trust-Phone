@@ -714,5 +714,51 @@
   "myCardShort": "What \"Text my card\" sends during a call",
   "myCardBody": "During a call, \"Text my card\" opens your SMS app with this text to the other person, ready to send. It's kept encrypted on this phone so it works while ZT Phone is locked.",
   "myCardPick": "Choose from ZT Contacts",
-  "myCardText": "Card text"
+  "myCardText": "Card text",
+  "homeScreenWidget": "Home screen widget",
+  "@homeScreenWidget": {
+    "description": "Settings section for the recent calls widget (W11)"
+  },
+  "widgetDetails": "Show details on the home screen",
+  "widgetDetailsBody": "Off: the Recent calls widget shows a lock and the number of new missed calls. On: it lists your latest calls, and the names of your ZT Contacts are stored unencrypted on this phone for the home screen. Private contacts never show",
+  "widgetRecents": "Recent calls",
+  "widgetMissed": "Missed calls",
+  "widgetSwitchView": "Switch between recent and missed calls",
+  "widgetDialpad": "Dialpad",
+  "widgetNoCalls": "No calls yet",
+  "widgetNoMissed": "No missed calls",
+  "widgetOpenToAllow": "Open ZT Phone to allow the call log",
+  "widgetRecentsHidden": "Turn on \"Show details on the home screen\" in ZT Phone settings to see your calls here",
+  "widgetYesterday": "Yesterday",
+  "spamHeader": "Numbers reported as spam",
+  "spamOff": "Off (don't download the list)",
+  "spamWarn": "Ring, with a warning on the call screen",
+  "spamSilence": "Silence (they still show in Recents)",
+  "spamVoicemail": "Send to voicemail",
+  "spamExplain": "Once a week ZT Phone downloads a list of numbers many people reported as spam, from ZT Phone's own releases on GitHub, and uses it only if its signature checks out. Numbers are looked up on this phone: nothing about you or your calls is sent. Your contacts are never affected. Sources: complaints to the US Do Not Call registry (FTC) and numbers reported to ZT Phone.",
+  "spamListInfo": "List from {date}, {count} numbers",
+  "@spamListInfo": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spamListNone": "No list downloaded yet",
+  "spamCheckNow": "Check for a newer list",
+  "spamUpdated": "The spam list is updated",
+  "spamUpToDate": "The spam list is up to date",
+  "spamCheckFailed": "Couldn't get the spam list. Check the connection and try again",
+  "reportedSpam": "{count, plural, =1{Reported as spam} other{Reported as spam {count} times}}",
+  "@reportedSpam": {
+    "description": "On the call screen (P24)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

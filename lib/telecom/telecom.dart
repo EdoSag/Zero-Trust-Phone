@@ -411,6 +411,39 @@ class Telecom {
   });
 
   /// P29: the switches the Android side needs while the app is closed.
+  /// W11: the Recent calls widget's "Show details on the home screen" and,
+  /// while it's on, the contact names it may show (lookup key -> name).
+  Future<void> setRecentsWidget({
+    required bool details,
+    Map<String, String> names = const <String, String>{},
+  }) => _call<void>('setRecentsWidget', {
+    'details': details,
+    'names': details ? names : const <String, String>{},
+  });
+
+  /// P24: hands a verified spam list to the screening service. False when
+  /// Android couldn't save it.
+  Future<bool> installSpamList(String text) async =>
+      await _call<bool>('installSpamList', {'text': text}) ?? false;
+
+  /// P24: the list in use: its date and how many numbers it has.
+  Future<({String? date, int count})> spamListInfo() async {
+    final Map<Object?, Object?>? m = await _call<Map<Object?, Object?>>(
+      'spamListInfo',
+    );
+    return (
+      date: m?['date'] as String?,
+      count: (m?['count'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  /// P24: "off", "warn", "silence" or "voicemail".
+  Future<void> setSpamMode(String mode) =>
+      _call<void>('setSpamMode', {'mode': mode});
+
+  /// Redraws the Recent calls widget (after the app opens).
+  Future<void> refreshRecentsWidget() => _call<void>('refreshRecentsWidget');
+
   Future<void> setCallComfort({
     required bool flipToSilence,
     required bool pocketGuard,

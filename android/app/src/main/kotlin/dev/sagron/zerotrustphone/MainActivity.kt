@@ -271,6 +271,36 @@ class MainActivity : FlutterFragmentActivity() {
                     )
                     "markMissedSeen" -> {
                         markMissedSeen()
+                        RecentCallsWidget.refresh(this)
+                        result.success(null)
+                    }
+                    "setRecentsWidget" -> {
+                        RecentCallsWidget.setDetails(
+                            this,
+                            call.argument<Boolean>("details") ?: false,
+                            call.argument<Map<String, String>>("names") ?: emptyMap(),
+                        )
+                        result.success(null)
+                    }
+                    "installSpamList" -> {
+                        val text = call.argument<String>("text") ?: ""
+                        Thread {
+                            val ok = try { SpamList.install(this, text) } catch (_: Exception) { false }
+                            runOnUiThread { result.success(ok) }
+                        }.start()
+                    }
+                    "setSpamMode" -> {
+                        SpamList.setMode(this, call.argument<String>("mode") ?: "warn")
+                        result.success(null)
+                    }
+                    "spamListInfo" -> {
+                        Thread {
+                            val info = try { SpamList.info(this) } catch (_: Exception) { emptyMap() }
+                            runOnUiThread { result.success(info) }
+                        }.start()
+                    }
+                    "refreshRecentsWidget" -> {
+                        RecentCallsWidget.refresh(this)
                         result.success(null)
                     }
                     "canBlock" -> result.success(
@@ -293,6 +323,7 @@ class MainActivity : FlutterFragmentActivity() {
                     "setNativeStrings" -> {
                         @Suppress("UNCHECKED_CAST")
                         NativeStrings.set(this, call.arguments as? Map<String, String> ?: emptyMap())
+                        RecentCallsWidget.refresh(this)
                         result.success(null)
                     }
                     "setCallComfort" -> {

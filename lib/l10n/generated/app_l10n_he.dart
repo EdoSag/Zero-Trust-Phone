@@ -1344,4 +1344,94 @@ class AppL10nHe extends AppL10n {
 
   @override
   String get myCardText => 'טקסט הכרטיס';
+
+  @override
+  String get homeScreenWidget => 'ווידג\'ט למסך הבית';
+
+  @override
+  String get widgetDetails => 'הצגת פרטים במסך הבית';
+
+  @override
+  String get widgetDetailsBody =>
+      'כבוי: הווידג\'ט של השיחות האחרונות מציג מנעול ואת מספר השיחות החדשות שלא נענו. מופעל: הווידג\'ט מציג את השיחות האחרונות, ושמות אנשי הקשר שלך מ-ZT Contacts נשמרים בטלפון הזה ללא הצפנה, בשביל מסך הבית. אנשי קשר פרטיים אף פעם לא מוצגים';
+
+  @override
+  String get widgetRecents => 'שיחות אחרונות';
+
+  @override
+  String get widgetMissed => 'שיחות שלא נענו';
+
+  @override
+  String get widgetSwitchView => 'מעבר בין שיחות אחרונות לשיחות שלא נענו';
+
+  @override
+  String get widgetDialpad => 'לוח חיוג';
+
+  @override
+  String get widgetNoCalls => 'אין עדיין שיחות';
+
+  @override
+  String get widgetNoMissed => 'אין שיחות שלא נענו';
+
+  @override
+  String get widgetOpenToAllow =>
+      'יש לפתוח את ZT Phone כדי לאשר גישה ליומן השיחות';
+
+  @override
+  String get widgetRecentsHidden =>
+      'כדי לראות כאן את השיחות, יש להפעיל את \"הצגת פרטים במסך הבית\" בהגדרות של ZT Phone';
+
+  @override
+  String get widgetYesterday => 'אתמול';
+
+  @override
+  String get spamHeader => 'מספרים שדווחו כספאם';
+
+  @override
+  String get spamOff => 'כבוי (בלי להוריד את הרשימה)';
+
+  @override
+  String get spamWarn => 'צלצול, עם אזהרה במסך השיחה';
+
+  @override
+  String get spamSilence => 'השתקה (עדיין מופיעים בשיחות האחרונות)';
+
+  @override
+  String get spamVoicemail => 'העברה לתא הקולי';
+
+  @override
+  String get spamExplain =>
+      'פעם בשבוע ZT Phone מורידה רשימה של מספרים שאנשים רבים דיווחו עליהם כספאם, מהגרסאות של ZT Phone עצמה ב-GitHub, ומשתמשת בה רק אם החתימה שלה תקינה. הבדיקה של המספרים נעשית בטלפון הזה: שום דבר עליך או על השיחות שלך לא נשלח. אנשי הקשר שלך אף פעם לא מושפעים. מקורות: תלונות למאגר Do Not Call האמריקאי (FTC) ומספרים שדווחו ל-ZT Phone.';
+
+  @override
+  String spamListInfo(String date, int count) {
+    return 'רשימה מ-$date, $count מספרים';
+  }
+
+  @override
+  String get spamListNone => 'עדיין לא הורדה רשימה';
+
+  @override
+  String get spamCheckNow => 'בדיקה אם יש רשימה חדשה יותר';
+
+  @override
+  String get spamUpdated => 'רשימת הספאם עודכנה';
+
+  @override
+  String get spamUpToDate => 'רשימת הספאם מעודכנת';
+
+  @override
+  String get spamCheckFailed =>
+      'לא הצלחנו להוריד את רשימת הספאם. כדאי לבדוק את החיבור ולנסות שוב';
+
+  @override
+  String reportedSpam(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'דווח כספאם $count פעמים',
+      one: 'דווח כספאם',
+    );
+    return '$_temp0';
+  }
 }

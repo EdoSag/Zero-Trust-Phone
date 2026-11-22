@@ -4,6 +4,7 @@ import 'package:zero_trust_core/zero_trust_core.dart';
 import 'package:zerotrust_phone/app/auth_providers.dart';
 import 'package:zerotrust_phone/app/call_comfort.dart';
 import 'package:zerotrust_phone/app/history_retention.dart';
+import 'package:zerotrust_phone/app/recents_widget.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
@@ -13,6 +14,7 @@ import 'package:zerotrust_phone/services/history_backup.dart';
 import 'package:zerotrust_phone/services/tasks_bridge.dart';
 import 'package:zerotrust_phone/services/private_calls.dart';
 import 'package:zerotrust_phone/services/screening_sync.dart';
+import 'package:zerotrust_phone/services/spam_list.dart';
 import 'package:zerotrust_phone/pages/dialpad_page.dart';
 import 'package:zerotrust_phone/pages/home_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
@@ -247,6 +249,16 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
     await ref.read(historyRetentionProvider.notifier).apply();
     // P29: hands flip to silence to the Android side as it loads.
     await ref.read(callComfortProvider.notifier).loaded;
+    // W11: the widget's switch, and its names while that's on.
+    await ref.read(recentsWidgetDetailsProvider.notifier).loaded;
+    _syncWidget();
+    // P24: the spam rule to the Android side, and a newer list once a week.
+    final SpamMode spam = await ref
+        .read(spamModeProvider.notifier)
+        .loaded
+        .then((_) => ref.read(spamModeProvider));
+    await _telecom.setSpamMode(spam.name);
+    _checkSpamList();
     await _backUp();
   }
 
@@ -297,6 +309,9 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
       // "Today" and "now" move on; busy times reach a week ahead.
       _sentMeetings = null;
       _syncMeetings();
+      // W11: calls made or missed meanwhile, and "Yesterday" moving on.
+      _telecom.refreshRecentsWidget().ignore();
+      _checkSpamList();
       _backUp();
     }
   }
@@ -368,6 +383,36 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
         .ignore();
   }
 
+  void _checkSpamList() {
+    ref
+        .read(spamListUpdaterProvider)
+        .checkIfDue(ref.read(spamModeProvider))
+        .ignore();
+  }
+
+  String? _sentWidget;
+
+  /// W11: the Recent calls widget's switch and, while it's on, the names
+  /// it shows. Waits for the screening rules, so a private contact's name
+  /// never reaches the widget.
+  void _syncWidget() {
+    final bool on = ref.read(recentsWidgetDetailsProvider);
+    Map<String, String> names = const <String, String>{};
+    if (on) {
+      final ScreeningRules? rules = _sentRules;
+      if (rules == null) return;
+      names = widgetNames(
+        ref.read(contactDirectoryProvider).namesByKey,
+        rules.privateKeys,
+      );
+    }
+    final String sent =
+        '$on|${(<String>[for (final MapEntry<String, String> e in names.entries) '${e.key}=${e.value}']..sort()).join('\n')}';
+    if (sent == _sentWidget) return;
+    _sentWidget = sent;
+    _telecom.setRecentsWidget(details: on, names: names).ignore();
+  }
+
   void _syncScreening() {
     final List<PhoneContact>? contacts = ref.read(phoneContactsProvider).value;
     final List<ContactCallSettings>? settings = ref
@@ -383,6 +428,8 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
     );
     if (rules.same(_sentRules)) return;
     _sentRules = rules;
+    // Private contacts may have changed: the widget's names follow.
+    _syncWidget();
     _telecom
         .setScreening(
           unknownMode: rules.unknownMode,
@@ -400,7 +447,9 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
   Widget build(BuildContext context) {
     ref.listen(contactDirectoryProvider, (_, ContactDirectory next) {
       _telecom.setVaultNames(next.namesByKey).ignore();
+      _syncWidget();
     });
+    ref.listen(recentsWidgetDetailsProvider, (_, _) => _syncWidget());
     ref.listen(phoneContactsProvider, (_, _) => _syncScreening());
     ref.listen(contactSettingsProvider, (_, _) => _syncScreening());
     ref.listen(callProtectionProvider, (_, _) => _syncScreening());

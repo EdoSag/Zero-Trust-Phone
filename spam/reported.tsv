@@ -1,0 +1,4 @@
+# Numbers reported to ZT Phone as spam, checked by hand, any country.
+# One per line: the number in +E.164 form (country code, no spaces), a tab,
+# and a short note. Added to every weekly list (tool/build_spam_list.py).
+# Report a number: https://github.com/EdoSag/Zero-Trust-Phone/issues

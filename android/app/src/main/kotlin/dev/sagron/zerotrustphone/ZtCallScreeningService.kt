@@ -7,10 +7,11 @@ import android.telecom.CallScreeningService
 import android.telecom.TelecomManager
 
 /**
- * Screens incoming calls on the phone, with no server and no list of
- * spam numbers: hidden numbers, blocked prefixes, unknown callers, and
- * contacts set to go straight to voicemail. Runs while the vault is
- * locked, from [ScreeningStore].
+ * Screens incoming calls on the phone, with no server: hidden numbers,
+ * blocked prefixes, unknown callers, contacts set to go straight to
+ * voicemail, and numbers on the signed spam list (P24, [SpamList]), which
+ * is looked up on the phone. Runs while the vault is locked, from
+ * [ScreeningStore].
  */
 class ZtCallScreeningService : CallScreeningService() {
     override fun onScreenCall(details: Call.Details) {
@@ -28,6 +29,8 @@ class ZtCallScreeningService : CallScreeningService() {
             number = number,
             hidden = hidden,
             knownToPhone = number.isNotBlank() && SystemContacts.lookupName(this, number) != null,
+            spamMode = SpamList.mode(this),
+            reportedSpam = !hidden && SpamList.reports(this, number) != null,
         )
         when (decision) {
             Decision.ALLOW -> {
@@ -70,6 +73,8 @@ class ZtCallScreeningService : CallScreeningService() {
             number: String,
             hidden: Boolean,
             knownToPhone: Boolean,
+            spamMode: String = "off",
+            reportedSpam: Boolean = false,
         ): Decision {
             if (hidden) return if (store.blockHidden) Decision.BLOCK else unknown(store)
             if (store.blockedPrefixes.any { PhoneNumbersPrefix.matches(number, it) }) return Decision.BLOCK
@@ -77,7 +82,15 @@ class ZtCallScreeningService : CallScreeningService() {
             if (isContact) {
                 return if (store.sendsToVoicemail(number)) Decision.VOICEMAIL else Decision.ALLOW
             }
-            return unknown(store)
+            // P24: a reported number gets the stricter of the spam rule and
+            // the unknown-callers rule. "warn" only labels the call.
+            val spam = if (!reportedSpam) Decision.ALLOW else when (spamMode) {
+                "silence" -> Decision.SILENCE
+                "voicemail" -> Decision.VOICEMAIL
+                else -> Decision.ALLOW
+            }
+            val rule = unknown(store)
+            return if (spam.ordinal > rule.ordinal) spam else rule
         }
 
         private fun unknown(store: ScreeningStore): Decision = when (store.unknownMode) {
