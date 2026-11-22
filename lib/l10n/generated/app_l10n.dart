@@ -2562,6 +2562,294 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'{count, plural, =1{Reported as spam} other{Reported as spam {count} times}}'**
   String reportedSpam(int count);
+
+  /// No description provided for @recordingsAndVoicemail.
+  ///
+  /// In en, this message translates to:
+  /// **'Recordings and voicemail'**
+  String get recordingsAndVoicemail;
+
+  /// No description provided for @recordingsAndVoicemailShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded calls, visual voicemail and transcripts made on this phone'**
+  String get recordingsAndVoicemailShort;
+
+  /// No description provided for @recordingSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording and transcripts'**
+  String get recordingSettings;
+
+  /// No description provided for @recordedCalls.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded calls'**
+  String get recordedCalls;
+
+  /// No description provided for @noRecordings.
+  ///
+  /// In en, this message translates to:
+  /// **'No recorded calls'**
+  String get noRecordings;
+
+  /// No description provided for @noRecordingsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on Record calls in settings, then tap More > Record call during a call.'**
+  String get noRecordingsBody;
+
+  /// No description provided for @noVisualVoicemail.
+  ///
+  /// In en, this message translates to:
+  /// **'No visual voicemail on this phone'**
+  String get noVisualVoicemail;
+
+  /// No description provided for @noVisualVoicemailBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages show here only when your carrier offers visual voicemail and it\'s set up on this phone. Otherwise call your voicemail from the dialpad (hold 1).'**
+  String get noVisualVoicemailBody;
+
+  /// No description provided for @play.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get play;
+
+  /// No description provided for @stop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get stop;
+
+  /// No description provided for @copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copy;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get retry;
+
+  /// No description provided for @transcribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcribe'**
+  String get transcribe;
+
+  /// No description provided for @inNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'In ZT Notes'**
+  String get inNotes;
+
+  /// No description provided for @saveToNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to ZT Notes'**
+  String get saveToNotes;
+
+  /// No description provided for @savedToNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to ZT Notes'**
+  String get savedToNotes;
+
+  /// No description provided for @notesSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save to ZT Notes. Try again when you\'re online'**
+  String get notesSaveFailed;
+
+  /// No description provided for @deleteRecordingQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this recording?'**
+  String get deleteRecordingQuestion;
+
+  /// No description provided for @transcriptNeedsModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Download a speech model first'**
+  String get transcriptNeedsModel;
+
+  /// No description provided for @transcriptNeedsModelBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcripts are made on this phone with a speech model (the same ones ZT Keyboard uses). Download one once; nothing is sent anywhere.'**
+  String get transcriptNeedsModelBody;
+
+  /// No description provided for @transcriptNoAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'There\'s no sound to transcribe'**
+  String get transcriptNoAudio;
+
+  /// No description provided for @transcriptFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The transcript didn\'t work. Try again, or try another model'**
+  String get transcriptFailed;
+
+  /// No description provided for @transcriptEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'(No words were heard)'**
+  String get transcriptEmpty;
+
+  /// No description provided for @transcriptMadeOnPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcribed on this phone by ZT Phone'**
+  String get transcriptMadeOnPhone;
+
+  /// No description provided for @voicemailFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Voicemail from {who}'**
+  String voicemailFrom(String who);
+
+  /// No description provided for @minutesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min'**
+  String minutesShort(int count);
+
+  /// No description provided for @recordCalls.
+  ///
+  /// In en, this message translates to:
+  /// **'Record calls'**
+  String get recordCalls;
+
+  /// No description provided for @recordCallsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Adds Record call to the call screen. Recordings stay on this phone, encrypted. Android decides what an app can hear during a call: on many phones, Pixel and GrapheneOS included, it\'s only silence. ZT Phone then stops and tells you.'**
+  String get recordCallsBody;
+
+  /// No description provided for @recordCallsWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording laws differ by place. In some, everyone on the call must agree to be recorded, so tell the other person before you record. ZT Phone records only when you tap Record call, keeps the recording encrypted on this phone, and never uploads it.'**
+  String get recordCallsWarning;
+
+  /// No description provided for @microphoneNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording needs the microphone. Allow it in Android settings'**
+  String get microphoneNeeded;
+
+  /// No description provided for @saveTranscripts.
+  ///
+  /// In en, this message translates to:
+  /// **'Save transcripts to ZT Notes'**
+  String get saveTranscripts;
+
+  /// No description provided for @saveTranscriptsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'New recordings are transcribed on this phone and saved as notes, encrypted, the next time ZT Phone is unlocked. Needs a speech model.'**
+  String get saveTranscriptsBody;
+
+  /// No description provided for @transcriptLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Language of transcripts'**
+  String get transcriptLanguage;
+
+  /// No description provided for @languageAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Detect it'**
+  String get languageAuto;
+
+  /// No description provided for @speechModels.
+  ///
+  /// In en, this message translates to:
+  /// **'Speech models'**
+  String get speechModels;
+
+  /// No description provided for @transcriptsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcripts don\'t work on this phone'**
+  String get transcriptsUnavailable;
+
+  /// No description provided for @modelOnPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'On this phone'**
+  String get modelOnPhone;
+
+  /// No description provided for @modelNoSpace.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough space for this model'**
+  String get modelNoSpace;
+
+  /// No description provided for @modelNoConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t reach the model list. Check the connection'**
+  String get modelNoConnection;
+
+  /// No description provided for @modelFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The download didn\'t work. Try again'**
+  String get modelFailed;
+
+  /// No description provided for @transcriptsExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'Speech models come from ZT Keyboard\'s releases on GitHub and are checked before use. Recordings and voicemail are transcribed on this phone; nothing is sent anywhere. Larger models are more accurate and slower; a long call can take a few minutes.'**
+  String get transcriptsExplain;
+
+  /// No description provided for @recordCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Record call'**
+  String get recordCall;
+
+  /// No description provided for @recordCallBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept encrypted on this phone. If Android gives only silence, it stops and tells you'**
+  String get recordCallBody;
+
+  /// No description provided for @stopRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop recording'**
+  String get stopRecording;
+
+  /// No description provided for @recordingKept.
+  ///
+  /// In en, this message translates to:
+  /// **'The recording is in Settings > Recordings and voicemail'**
+  String get recordingKept;
+
+  /// No description provided for @recordingFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording {time}'**
+  String recordingFor(String time);
+
+  /// No description provided for @recordingSilent.
+  ///
+  /// In en, this message translates to:
+  /// **'Android gave ZT Phone only silence for this call, so nothing was recorded'**
+  String get recordingSilent;
+
+  /// No description provided for @recordingFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording couldn\'t start. Check that ZT Phone may use the microphone'**
+  String get recordingFailed;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

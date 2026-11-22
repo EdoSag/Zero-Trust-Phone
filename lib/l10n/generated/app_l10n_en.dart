@@ -1437,4 +1437,170 @@ class AppL10nEn extends AppL10n {
     );
     return '$_temp0';
   }
+
+  @override
+  String get recordingsAndVoicemail => 'Recordings and voicemail';
+
+  @override
+  String get recordingsAndVoicemailShort =>
+      'Recorded calls, visual voicemail and transcripts made on this phone';
+
+  @override
+  String get recordingSettings => 'Recording and transcripts';
+
+  @override
+  String get recordedCalls => 'Recorded calls';
+
+  @override
+  String get noRecordings => 'No recorded calls';
+
+  @override
+  String get noRecordingsBody =>
+      'Turn on Record calls in settings, then tap More > Record call during a call.';
+
+  @override
+  String get noVisualVoicemail => 'No visual voicemail on this phone';
+
+  @override
+  String get noVisualVoicemailBody =>
+      'Messages show here only when your carrier offers visual voicemail and it\'s set up on this phone. Otherwise call your voicemail from the dialpad (hold 1).';
+
+  @override
+  String get play => 'Play';
+
+  @override
+  String get stop => 'Stop';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String get retry => 'Try again';
+
+  @override
+  String get transcribe => 'Transcribe';
+
+  @override
+  String get inNotes => 'In ZT Notes';
+
+  @override
+  String get saveToNotes => 'Save to ZT Notes';
+
+  @override
+  String get savedToNotes => 'Saved to ZT Notes';
+
+  @override
+  String get notesSaveFailed =>
+      'Couldn\'t save to ZT Notes. Try again when you\'re online';
+
+  @override
+  String get deleteRecordingQuestion => 'Delete this recording?';
+
+  @override
+  String get transcriptNeedsModel => 'Download a speech model first';
+
+  @override
+  String get transcriptNeedsModelBody =>
+      'Transcripts are made on this phone with a speech model (the same ones ZT Keyboard uses). Download one once; nothing is sent anywhere.';
+
+  @override
+  String get transcriptNoAudio => 'There\'s no sound to transcribe';
+
+  @override
+  String get transcriptFailed =>
+      'The transcript didn\'t work. Try again, or try another model';
+
+  @override
+  String get transcriptEmpty => '(No words were heard)';
+
+  @override
+  String get transcriptMadeOnPhone => 'Transcribed on this phone by ZT Phone';
+
+  @override
+  String voicemailFrom(String who) {
+    return 'Voicemail from $who';
+  }
+
+  @override
+  String minutesShort(int count) {
+    return '$count min';
+  }
+
+  @override
+  String get recordCalls => 'Record calls';
+
+  @override
+  String get recordCallsBody =>
+      'Adds Record call to the call screen. Recordings stay on this phone, encrypted. Android decides what an app can hear during a call: on many phones, Pixel and GrapheneOS included, it\'s only silence. ZT Phone then stops and tells you.';
+
+  @override
+  String get recordCallsWarning =>
+      'Recording laws differ by place. In some, everyone on the call must agree to be recorded, so tell the other person before you record. ZT Phone records only when you tap Record call, keeps the recording encrypted on this phone, and never uploads it.';
+
+  @override
+  String get microphoneNeeded =>
+      'Recording needs the microphone. Allow it in Android settings';
+
+  @override
+  String get saveTranscripts => 'Save transcripts to ZT Notes';
+
+  @override
+  String get saveTranscriptsBody =>
+      'New recordings are transcribed on this phone and saved as notes, encrypted, the next time ZT Phone is unlocked. Needs a speech model.';
+
+  @override
+  String get transcriptLanguage => 'Language of transcripts';
+
+  @override
+  String get languageAuto => 'Detect it';
+
+  @override
+  String get speechModels => 'Speech models';
+
+  @override
+  String get transcriptsUnavailable => 'Transcripts don\'t work on this phone';
+
+  @override
+  String get modelOnPhone => 'On this phone';
+
+  @override
+  String get modelNoSpace => 'Not enough space for this model';
+
+  @override
+  String get modelNoConnection =>
+      'Couldn\'t reach the model list. Check the connection';
+
+  @override
+  String get modelFailed => 'The download didn\'t work. Try again';
+
+  @override
+  String get transcriptsExplain =>
+      'Speech models come from ZT Keyboard\'s releases on GitHub and are checked before use. Recordings and voicemail are transcribed on this phone; nothing is sent anywhere. Larger models are more accurate and slower; a long call can take a few minutes.';
+
+  @override
+  String get recordCall => 'Record call';
+
+  @override
+  String get recordCallBody =>
+      'Kept encrypted on this phone. If Android gives only silence, it stops and tells you';
+
+  @override
+  String get stopRecording => 'Stop recording';
+
+  @override
+  String get recordingKept =>
+      'The recording is in Settings > Recordings and voicemail';
+
+  @override
+  String recordingFor(String time) {
+    return 'Recording $time';
+  }
+
+  @override
+  String get recordingSilent =>
+      'Android gave ZT Phone only silence for this call, so nothing was recorded';
+
+  @override
+  String get recordingFailed =>
+      'Recording couldn\'t start. Check that ZT Phone may use the microphone';
 }

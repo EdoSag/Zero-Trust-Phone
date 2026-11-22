@@ -99,6 +99,11 @@ object CallManager {
 
     fun remove(call: Call) {
         call.unregisterCallback(callback)
+        // P19: a recording ends with its call.
+        if (recordingCall === call) {
+            CallRecorder.stop()
+            recordingCall = null
+        }
         if (ringing() == null || ringing() === call) CallRinger.stop()
         VideoSessions.remove(call)
         calls.remove(call)?.let { RttSessions.clear(it) }
@@ -162,6 +167,29 @@ object CallManager {
         val ctx = service ?: return vaultNames[PhoneNumbers.lookupKey(number)]
         return nameFor(ctx, number)
     }
+
+    /**
+     * P19: starts or stops recording [id]. False when it can't start: no
+     * microphone permission, or Android didn't give any audio source.
+     */
+    fun setRecording(id: String?, on: Boolean): Boolean {
+        if (!on) {
+            CallRecorder.stop()
+            return true
+        }
+        val call = byId(id) ?: return false
+        val ctx = service ?: return false
+        val number = PhoneNumbers.plain(call.details.handle?.schemeSpecificPart ?: "")
+        val started = CallRecorder.start(ctx, number, nameFor(number)) {
+            // Android gave nothing but silence: the file is already gone.
+            if (calls.containsKey(call)) notice(call, "recordingSilent")
+        }
+        if (started) recordingCall = call else notice(call, "recordingFailed")
+        notifyChanged()
+        return started
+    }
+
+    private var recordingCall: Call? = null
 
     private fun spamReports(number: String): Int? {
         val ctx = service ?: return null
@@ -229,6 +257,8 @@ object CallManager {
             "meeting" to meetingHints[PhoneNumbers.lookupKey(number)],
             // P24: reports of this number on the spam list; never for a contact.
             "spamReports" to spamReports(number),
+            // P19: when this call's recording started, while it records.
+            "recordingSince" to (if (recordingCall == call && CallRecorder.isRecording) CallRecorder.startedAt else null),
             "state" to stateName(call.stateCompat()),
             "connectedAt" to details.connectTimeMillis.takeIf { it > 0 },
             "isConference" to details.hasProperty(Call.Details.PROPERTY_CONFERENCE),

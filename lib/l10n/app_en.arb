@@ -760,5 +760,74 @@
         "type": "int"
       }
     }
-  }
+  },
+  "recordingsAndVoicemail": "Recordings and voicemail",
+  "recordingsAndVoicemailShort": "Recorded calls, visual voicemail and transcripts made on this phone",
+  "recordingSettings": "Recording and transcripts",
+  "recordedCalls": "Recorded calls",
+  "noRecordings": "No recorded calls",
+  "noRecordingsBody": "Turn on Record calls in settings, then tap More > Record call during a call.",
+  "noVisualVoicemail": "No visual voicemail on this phone",
+  "noVisualVoicemailBody": "Messages show here only when your carrier offers visual voicemail and it's set up on this phone. Otherwise call your voicemail from the dialpad (hold 1).",
+  "play": "Play",
+  "stop": "Stop",
+  "copy": "Copy",
+  "retry": "Try again",
+  "transcribe": "Transcribe",
+  "inNotes": "In ZT Notes",
+  "saveToNotes": "Save to ZT Notes",
+  "savedToNotes": "Saved to ZT Notes",
+  "notesSaveFailed": "Couldn't save to ZT Notes. Try again when you're online",
+  "deleteRecordingQuestion": "Delete this recording?",
+  "transcriptNeedsModel": "Download a speech model first",
+  "transcriptNeedsModelBody": "Transcripts are made on this phone with a speech model (the same ones ZT Keyboard uses). Download one once; nothing is sent anywhere.",
+  "transcriptNoAudio": "There's no sound to transcribe",
+  "transcriptFailed": "The transcript didn't work. Try again, or try another model",
+  "transcriptEmpty": "(No words were heard)",
+  "transcriptMadeOnPhone": "Transcribed on this phone by ZT Phone",
+  "voicemailFrom": "Voicemail from {who}",
+  "@voicemailFrom": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "minutesShort": "{count} min",
+  "@minutesShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recordCalls": "Record calls",
+  "recordCallsBody": "Adds Record call to the call screen. Recordings stay on this phone, encrypted. Android decides what an app can hear during a call: on many phones, Pixel and GrapheneOS included, it's only silence. ZT Phone then stops and tells you.",
+  "recordCallsWarning": "Recording laws differ by place. In some, everyone on the call must agree to be recorded, so tell the other person before you record. ZT Phone records only when you tap Record call, keeps the recording encrypted on this phone, and never uploads it.",
+  "microphoneNeeded": "Recording needs the microphone. Allow it in Android settings",
+  "saveTranscripts": "Save transcripts to ZT Notes",
+  "saveTranscriptsBody": "New recordings are transcribed on this phone and saved as notes, encrypted, the next time ZT Phone is unlocked. Needs a speech model.",
+  "transcriptLanguage": "Language of transcripts",
+  "languageAuto": "Detect it",
+  "speechModels": "Speech models",
+  "transcriptsUnavailable": "Transcripts don't work on this phone",
+  "modelOnPhone": "On this phone",
+  "modelNoSpace": "Not enough space for this model",
+  "modelNoConnection": "Couldn't reach the model list. Check the connection",
+  "modelFailed": "The download didn't work. Try again",
+  "transcriptsExplain": "Speech models come from ZT Keyboard's releases on GitHub and are checked before use. Recordings and voicemail are transcribed on this phone; nothing is sent anywhere. Larger models are more accurate and slower; a long call can take a few minutes.",
+  "recordCall": "Record call",
+  "recordCallBody": "Kept encrypted on this phone. If Android gives only silence, it stops and tells you",
+  "stopRecording": "Stop recording",
+  "recordingKept": "The recording is in Settings > Recordings and voicemail",
+  "recordingFor": "Recording {time}",
+  "@recordingFor": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "recordingSilent": "Android gave ZT Phone only silence for this call, so nothing was recorded",
+  "recordingFailed": "Recording couldn't start. Check that ZT Phone may use the microphone"
 }

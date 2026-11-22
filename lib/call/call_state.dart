@@ -31,6 +31,7 @@ class PhoneCall {
     this.postDialWait,
     this.meeting,
     this.spamReports,
+    this.recordingSince,
   });
 
   factory PhoneCall.fromMap(Map<Object?, Object?> m) => PhoneCall(
@@ -69,6 +70,11 @@ class PhoneCall {
     postDialWait: m['postDialWait'] as String?,
     meeting: m['meeting'] as String?,
     spamReports: (m['spamReports'] as num?)?.toInt(),
+    recordingSince: (m['recordingSince'] as num?) == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(
+            (m['recordingSince'] as num).toInt(),
+          ),
   );
 
   static (int, int)? _size(Object? w, Object? h) {
@@ -134,6 +140,9 @@ class PhoneCall {
   /// P24: how many times this number was reported as spam, when it's on
   /// the signed spam list and isn't a contact.
   final int? spamReports;
+
+  /// P19: when this call's recording started, while it records.
+  final DateTime? recordingSince;
 
   bool get isVideo => VideoState.isVideo(videoState);
   bool get sendingVideo =>

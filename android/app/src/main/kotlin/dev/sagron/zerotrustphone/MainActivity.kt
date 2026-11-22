@@ -42,6 +42,33 @@ class MainActivity : FlutterFragmentActivity() {
     private var pendingCallBackLater: String? = null
     private var pendingRingtone: MethodChannel.Result? = null
     private var pendingCamera: MethodChannel.Result? = null
+    private var pendingMicrophone: MethodChannel.Result? = null
+    @Volatile private var downloadCancelled = false
+
+    /** Runs [work] off the main thread and answers with its result (null if it threw). */
+    private fun background(result: MethodChannel.Result, work: () -> Any?) {
+        Thread {
+            val value = try { work() } catch (_: Exception) { null }
+            runOnUiThread { result.success(value) }
+        }.start()
+    }
+
+    /**
+     * P20, P21: a transcript on the phone. Answers {"text": ...} or
+     * {"error": "noModel" | "noAudio" | "failed"}.
+     */
+    private fun transcribe(result: MethodChannel.Result, language: String, audio: () -> FloatArray?) {
+        background(result) {
+            val model = SpeechModels.forLanguage(this, language)
+                ?: return@background mapOf("error" to "noModel")
+            val samples = audio()
+            if (samples == null || samples.isEmpty()) return@background mapOf("error" to "noAudio")
+            val text = Transcriber.transcribe(model, samples, language) { percent ->
+                runOnUiThread { channel?.invokeMethod("transcriptProgress", percent) }
+            } ?: return@background mapOf("error" to "failed")
+            mapOf("text" to text)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -177,6 +204,93 @@ class MainActivity : FlutterFragmentActivity() {
                     "callFeatures" -> result.success(callFeatures())
                     "openCallAccessibilitySettings" -> result.success(openCallAccessibilitySettings())
                     "requestCamera" -> requestCamera(result)
+                    // P19-P21: recordings, voicemail and their transcripts.
+                    "requestMicrophone" -> {
+                        if (has(Manifest.permission.RECORD_AUDIO)) {
+                            result.success(true)
+                        } else {
+                            pendingMicrophone = result
+                            requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_MICROPHONE)
+                        }
+                    }
+                    "speechModels" -> background(result) {
+                        mapOf(
+                            "available" to Transcriber.available,
+                            "installed" to SpeechModels.installed(this).map { it.name },
+                            "offers" to SpeechModels.catalog()?.map {
+                                mapOf(
+                                    "file" to it.file, "bytes" to it.bytes, "languages" to it.languages,
+                                    "labelEn" to it.labelEn, "labelHe" to it.labelHe,
+                                )
+                            },
+                        )
+                    }
+                    "downloadModel" -> {
+                        val file = call.argument<String>("file") ?: ""
+                        downloadCancelled = false
+                        background(result) {
+                            val offer = SpeechModels.catalog()?.firstOrNull { it.file == file }
+                                ?: return@background SpeechModels.Result.NO_CONNECTION.name
+                            SpeechModels.download(this, offer, { downloadCancelled }) { bytes ->
+                                runOnUiThread {
+                                    channel?.invokeMethod("modelProgress", mapOf("file" to file, "bytes" to bytes))
+                                }
+                            }.name
+                        }
+                    }
+                    "cancelDownload" -> {
+                        downloadCancelled = true
+                        result.success(null)
+                    }
+                    "deleteModel" -> background(result) {
+                        SpeechModels.delete(this, call.argument<String>("file") ?: "")
+                        null
+                    }
+                    "recordings" -> background(result) { Recordings.list(this).map { it.toMap() } }
+                    "deleteRecording" -> background(result) {
+                        Recordings.delete(this, call.argument<String>("id") ?: "")
+                        null
+                    }
+                    "playRecording" -> {
+                        Voicemails.stop()
+                        RecordingPlayer.play(this, call.argument<String>("id") ?: "") {
+                            channel?.invokeMethod("playbackDone", null)
+                        }
+                        result.success(null)
+                    }
+                    "stopPlayback" -> {
+                        RecordingPlayer.stopNow()
+                        Voicemails.stop()
+                        result.success(null)
+                    }
+                    "transcribeRecording" -> {
+                        val id = call.argument<String>("id") ?: ""
+                        transcribe(result, call.argument<String>("language") ?: "auto") {
+                            Recordings.samples(this, id)
+                        }
+                    }
+                    "markTranscribed" -> background(result) {
+                        Recordings.markTranscribed(this, call.argument<String>("id") ?: "")
+                        null
+                    }
+                    "voicemails" -> background(result) { Voicemails.list(this) }
+                    "playVoicemail" -> {
+                        RecordingPlayer.stopNow()
+                        val ok = Voicemails.play(this, (call.argument<Number>("id") ?: -1).toLong()) {
+                            channel?.invokeMethod("playbackDone", null)
+                        }
+                        result.success(ok)
+                    }
+                    "transcribeVoicemail" -> {
+                        val id = (call.argument<Number>("id") ?: -1).toLong()
+                        transcribe(result, call.argument<String>("language") ?: "auto") {
+                            Voicemails.samples(this, id)
+                        }
+                    }
+                    "cancelTranscript" -> {
+                        Transcriber.cancel()
+                        result.success(null)
+                    }
                     "callVoicemail" -> {
                         callVoicemail()
                         result.success(null)
@@ -469,6 +583,10 @@ class MainActivity : FlutterFragmentActivity() {
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_MICROPHONE) {
+            pendingMicrophone?.success(has(Manifest.permission.RECORD_AUDIO))
+            pendingMicrophone = null
+        }
         if (requestCode == REQUEST_CAMERA) {
             pendingCamera?.success(has(Manifest.permission.CAMERA))
             pendingCamera = null
@@ -755,6 +873,7 @@ class MainActivity : FlutterFragmentActivity() {
     companion object {
         private const val REQUEST_ROLE = 3101
         private const val REQUEST_CAMERA = 3104
+        private const val REQUEST_MICROPHONE = 3105
         private const val REQUEST_PERMISSIONS = 3102
         private const val REQUEST_RINGTONE = 3103
         const val ACTION_SHOW_RECENTS = "dev.sagron.zerotrustphone.SHOW_RECENTS"
