@@ -183,6 +183,8 @@ class RecentCallsWidgetProvider : AppWidgetProvider() {
         private fun calls(context: Context, missedOnly: Boolean): List<Row> {
             if (!canRead(context)) return emptyList()
             val store = ScreeningStore(context)
+            // Nobody private: no number needs hashing to find that out.
+            val anyPrivate = store.hasPrivate()
             val out = ArrayList<Row>()
             try {
                 context.contentResolver.query(
@@ -199,7 +201,7 @@ class RecentCallsWidgetProvider : AppWidgetProvider() {
                         val number = c.getString(1) ?: ""
                         // A private contact's call (P23) is about to leave
                         // the call log; it never shows here.
-                        if (number.isNotBlank() && store.isPrivate(number)) continue
+                        if (anyPrivate && number.isNotBlank() && store.isPrivate(number)) continue
                         out.add(
                             Row(
                                 id = c.getLong(0),
