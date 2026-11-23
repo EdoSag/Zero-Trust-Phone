@@ -1,7 +1,7 @@
 name: zerotrust_phone
 description: "Zero-Trust Phone: a private dialer for Android, with names from your encrypted ZT Contacts."
 publish_to: none
-version: 0.7.1+12
+version: 0.8.0+13
 
 environment:
   sdk: ^3.9.0
@@ -24,11 +24,7 @@ dependencies:
     git:
       url: https://github.com/EdoSag/Zero-Trust-Core.git
       path: packages/zero_trust_core
-      # The core commit this app used before, plus the import-freeze fix of
-      # Core PR #89 and #90. It lives on the Core branch
-      # backport/import-freeze-fix-on-core-08eccf3: keep that branch until
-      # this pin moves to a core that has the fix.
-      ref: 323528666f3b3b0047a7a69202a39d769a494594
+      ref: v1.0.1
   intl: any
   flutter_riverpod: ^3.5.0
   supabase_flutter: ^2.9.0
@@ -47,7 +43,7 @@ dev_dependencies:
     git:
       url: https://github.com/EdoSag/Zero-Trust-Core.git
       path: packages/zt_release_checks
-      ref: b43fcd045722bc364ef2eaa739db181f9dac144f
+      ref: v1.0.1
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
