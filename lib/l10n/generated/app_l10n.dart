@@ -2004,6 +2004,852 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Return to call'**
   String get returnToCall;
+
+  /// No description provided for @rememberSimForNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember for this number'**
+  String get rememberSimForNumber;
+
+  /// No description provided for @rememberSimForNumberBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Next time this SIM is used without asking'**
+  String get rememberSimForNumberBody;
+
+  /// No description provided for @callHoldForSim.
+  ///
+  /// In en, this message translates to:
+  /// **'Call (hold to pick the SIM)'**
+  String get callHoldForSim;
+
+  /// No description provided for @simPerNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'SIM for each number'**
+  String get simPerNumber;
+
+  /// No description provided for @simPerNumberShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Numbers that always use the same SIM'**
+  String get simPerNumberShort;
+
+  /// No description provided for @simPerNumberBody.
+  ///
+  /// In en, this message translates to:
+  /// **'On a phone with two SIMs, ZT Phone asks which one to use unless Android has a default SIM for calls. Tick \"Remember for this number\" on that question and the number always uses the same SIM. Hold the call button to choose again. A SIM set for a contact always wins.'**
+  String get simPerNumberBody;
+
+  /// No description provided for @simPerNumberEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No numbers yet'**
+  String get simPerNumberEmpty;
+
+  /// No description provided for @forget.
+  ///
+  /// In en, this message translates to:
+  /// **'Forget'**
+  String get forget;
+
+  /// No description provided for @keypadAndHandling.
+  ///
+  /// In en, this message translates to:
+  /// **'Keypad and handling'**
+  String get keypadAndHandling;
+
+  /// No description provided for @keypadAndHandlingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Big keys, one-handed mode, key tones, flip to silence'**
+  String get keypadAndHandlingBody;
+
+  /// No description provided for @largeKeys.
+  ///
+  /// In en, this message translates to:
+  /// **'Big keys'**
+  String get largeKeys;
+
+  /// No description provided for @largeKeysBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Larger keys and digits on the dialpad'**
+  String get largeKeysBody;
+
+  /// No description provided for @oneHandedMode.
+  ///
+  /// In en, this message translates to:
+  /// **'One-handed mode'**
+  String get oneHandedMode;
+
+  /// No description provided for @oneHandedModeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A narrower keypad on one side, in reach of your thumb. The arrow beside it moves it across.'**
+  String get oneHandedModeBody;
+
+  /// No description provided for @handLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Left'**
+  String get handLeft;
+
+  /// No description provided for @handRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Right'**
+  String get handRight;
+
+  /// No description provided for @keypadMoveLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Move keypad left'**
+  String get keypadMoveLeft;
+
+  /// No description provided for @keypadMoveRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Move keypad right'**
+  String get keypadMoveRight;
+
+  /// No description provided for @keyTones.
+  ///
+  /// In en, this message translates to:
+  /// **'Key tones'**
+  String get keyTones;
+
+  /// No description provided for @keyTonesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A short tone for each key, at the phone\'s keypad volume. Silent when the phone is on silent.'**
+  String get keyTonesBody;
+
+  /// No description provided for @keyVibration.
+  ///
+  /// In en, this message translates to:
+  /// **'Key vibration'**
+  String get keyVibration;
+
+  /// No description provided for @vibrationLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get vibrationLight;
+
+  /// No description provided for @vibrationStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get vibrationStrong;
+
+  /// No description provided for @handling.
+  ///
+  /// In en, this message translates to:
+  /// **'Handling'**
+  String get handling;
+
+  /// No description provided for @flipToSilence.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip to silence'**
+  String get flipToSilence;
+
+  /// No description provided for @flipToSilenceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn a ringing phone face down to silence the call. It keeps ringing for the caller, and you can still answer.'**
+  String get flipToSilenceBody;
+
+  /// No description provided for @pocketGuard.
+  ///
+  /// In en, this message translates to:
+  /// **'Pocket-dial guard'**
+  String get pocketGuard;
+
+  /// No description provided for @pocketGuardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t place a call while something covers the screen, like a pocket or a bag. Needs a proximity sensor.'**
+  String get pocketGuardBody;
+
+  /// No description provided for @pocketGuardStopped.
+  ///
+  /// In en, this message translates to:
+  /// **'Call not placed: the screen seems covered. Turn off the pocket-dial guard in Settings if this is wrong.'**
+  String get pocketGuardStopped;
+
+  /// No description provided for @inMeetingDefaultMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m in a meeting. I\'ll call you back soon.'**
+  String get inMeetingDefaultMessage;
+
+  /// No description provided for @meetingUntitled.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting'**
+  String get meetingUntitled;
+
+  /// The person is in a meeting with me right now (from ZT Calendar).
+  ///
+  /// In en, this message translates to:
+  /// **'Now: {title}'**
+  String meetingNow(String title);
+
+  /// No description provided for @meetingToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today {time}'**
+  String meetingToday(String time);
+
+  /// No description provided for @meetingTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow {time}'**
+  String meetingTomorrow(String time);
+
+  /// The next meeting with this contact: when, then its title.
+  ///
+  /// In en, this message translates to:
+  /// **'{when}: {title}'**
+  String meetingAt(String when, String title);
+
+  /// In-call button that opens note, my card and calendar tools.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get callTools;
+
+  /// No description provided for @callNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a note'**
+  String get callNote;
+
+  /// No description provided for @callNoteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved in ZT Notes'**
+  String get callNoteBody;
+
+  /// No description provided for @callNoteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Call with {name}'**
+  String callNoteTitle(String name);
+
+  /// No description provided for @callNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What to remember from this call'**
+  String get callNoteHint;
+
+  /// No description provided for @callNoteWhere.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept encrypted on this phone, and moved into ZT Notes the next time you open ZT Phone.'**
+  String get callNoteWhere;
+
+  /// No description provided for @callNoteSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Note saved. It moves to ZT Notes when you next open ZT Phone.'**
+  String get callNoteSaved;
+
+  /// No description provided for @textMyCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Text my card'**
+  String get textMyCard;
+
+  /// No description provided for @textMyCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens your SMS app with your name and number, ready to send'**
+  String get textMyCardBody;
+
+  /// No description provided for @myCardNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your card in ZT Phone Settings first'**
+  String get myCardNotSet;
+
+  /// No description provided for @openCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Open ZT Calendar'**
+  String get openCalendar;
+
+  /// No description provided for @openCalendarBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your shared calendars. The call keeps going.'**
+  String get openCalendarBody;
+
+  /// No description provided for @calendarMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'ZT Calendar isn\'t installed'**
+  String get calendarMissing;
+
+  /// No description provided for @calendarAndCalls.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar and calls'**
+  String get calendarAndCalls;
+
+  /// No description provided for @calendarAndCallsShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Meetings on calls, and calls during meetings'**
+  String get calendarAndCallsShort;
+
+  /// No description provided for @calendarAndCallsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'ZT Phone reads your ZT Calendar in the same account, on this phone only, to know when you meet people and when you\'re busy.'**
+  String get calendarAndCallsBody;
+
+  /// No description provided for @showMeetings.
+  ///
+  /// In en, this message translates to:
+  /// **'Show meetings with a contact'**
+  String get showMeetings;
+
+  /// No description provided for @showMeetingsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'\"Tomorrow 10:00: Design review\" on their calls and their contact sheet'**
+  String get showMeetingsBody;
+
+  /// No description provided for @callsDuringMeetings.
+  ///
+  /// In en, this message translates to:
+  /// **'Calls during a meeting'**
+  String get callsDuringMeetings;
+
+  /// No description provided for @inMeetingRing.
+  ///
+  /// In en, this message translates to:
+  /// **'Ring as usual'**
+  String get inMeetingRing;
+
+  /// No description provided for @inMeetingSilence.
+  ///
+  /// In en, this message translates to:
+  /// **'Ring silently'**
+  String get inMeetingSilence;
+
+  /// No description provided for @inMeetingSilenceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The call shows, without sound'**
+  String get inMeetingSilenceBody;
+
+  /// No description provided for @inMeetingDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline with a text'**
+  String get inMeetingDecline;
+
+  /// No description provided for @inMeetingDeclineBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The caller gets your message; the call shows in Recents'**
+  String get inMeetingDeclineBody;
+
+  /// No description provided for @inMeetingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get inMeetingMessage;
+
+  /// No description provided for @letRepeatCallersRing.
+  ///
+  /// In en, this message translates to:
+  /// **'Let repeat callers ring'**
+  String get letRepeatCallersRing;
+
+  /// No description provided for @letRepeatCallersRingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A second call from the same number within 15 minutes rings as usual, in case it\'s urgent'**
+  String get letRepeatCallersRingBody;
+
+  /// No description provided for @calendarAndCallsLimits.
+  ///
+  /// In en, this message translates to:
+  /// **'Counts timed events in your own ZT Calendar for the next 7 days; all-day events don\'t count. The times are refreshed each time ZT Phone opens, and only start and end times are kept on the phone for this.'**
+  String get calendarAndCallsLimits;
+
+  /// No description provided for @myCard.
+  ///
+  /// In en, this message translates to:
+  /// **'My card'**
+  String get myCard;
+
+  /// No description provided for @myCardShort.
+  ///
+  /// In en, this message translates to:
+  /// **'What \"Text my card\" sends during a call'**
+  String get myCardShort;
+
+  /// No description provided for @myCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'During a call, \"Text my card\" opens your SMS app with this text to the other person, ready to send. It\'s kept encrypted on this phone so it works while ZT Phone is locked.'**
+  String get myCardBody;
+
+  /// No description provided for @myCardPick.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from ZT Contacts'**
+  String get myCardPick;
+
+  /// No description provided for @myCardText.
+  ///
+  /// In en, this message translates to:
+  /// **'Card text'**
+  String get myCardText;
+
+  /// Settings section for the recent calls widget (W11)
+  ///
+  /// In en, this message translates to:
+  /// **'Home screen widget'**
+  String get homeScreenWidget;
+
+  /// No description provided for @widgetDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Show details on the home screen'**
+  String get widgetDetails;
+
+  /// No description provided for @widgetDetailsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Off: the Recent calls widget shows a lock and the number of new missed calls. On: it lists your latest calls, and the names of your ZT Contacts are stored unencrypted on this phone for the home screen. Private contacts never show'**
+  String get widgetDetailsBody;
+
+  /// No description provided for @widgetRecents.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent calls'**
+  String get widgetRecents;
+
+  /// No description provided for @widgetMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed calls'**
+  String get widgetMissed;
+
+  /// No description provided for @widgetSwitchView.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch between recent and missed calls'**
+  String get widgetSwitchView;
+
+  /// No description provided for @widgetDialpad.
+  ///
+  /// In en, this message translates to:
+  /// **'Dialpad'**
+  String get widgetDialpad;
+
+  /// No description provided for @widgetNoCalls.
+  ///
+  /// In en, this message translates to:
+  /// **'No calls yet'**
+  String get widgetNoCalls;
+
+  /// No description provided for @widgetNoMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'No missed calls'**
+  String get widgetNoMissed;
+
+  /// No description provided for @widgetOpenToAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Open ZT Phone to allow the call log'**
+  String get widgetOpenToAllow;
+
+  /// No description provided for @widgetRecentsHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on \"Show details on the home screen\" in ZT Phone settings to see your calls here'**
+  String get widgetRecentsHidden;
+
+  /// No description provided for @widgetYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get widgetYesterday;
+
+  /// No description provided for @spamHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Numbers reported as spam'**
+  String get spamHeader;
+
+  /// No description provided for @spamOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off (don\'t download the list)'**
+  String get spamOff;
+
+  /// No description provided for @spamWarn.
+  ///
+  /// In en, this message translates to:
+  /// **'Ring, with a warning on the call screen'**
+  String get spamWarn;
+
+  /// No description provided for @spamSilence.
+  ///
+  /// In en, this message translates to:
+  /// **'Silence (they still show in Recents)'**
+  String get spamSilence;
+
+  /// No description provided for @spamVoicemail.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to voicemail'**
+  String get spamVoicemail;
+
+  /// No description provided for @spamExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'Once a week ZT Phone downloads a list of numbers many people reported as spam, from ZT Phone\'s own releases on GitHub, and uses it only if its signature checks out. Numbers are looked up on this phone: nothing about you or your calls is sent. Your contacts are never affected. Sources: complaints to the US Do Not Call registry (FTC) and numbers reported to ZT Phone.'**
+  String get spamExplain;
+
+  /// No description provided for @spamListInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'List from {date}, {count} numbers'**
+  String spamListInfo(String date, int count);
+
+  /// No description provided for @spamListNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No list downloaded yet'**
+  String get spamListNone;
+
+  /// No description provided for @spamCheckNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for a newer list'**
+  String get spamCheckNow;
+
+  /// No description provided for @spamUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'The spam list is updated'**
+  String get spamUpdated;
+
+  /// No description provided for @spamUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'The spam list is up to date'**
+  String get spamUpToDate;
+
+  /// No description provided for @spamCheckFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t get the spam list. Check the connection and try again'**
+  String get spamCheckFailed;
+
+  /// On the call screen (P24)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Reported as spam} other{Reported as spam {count} times}}'**
+  String reportedSpam(int count);
+
+  /// No description provided for @recordingsAndVoicemail.
+  ///
+  /// In en, this message translates to:
+  /// **'Recordings and voicemail'**
+  String get recordingsAndVoicemail;
+
+  /// No description provided for @recordingsAndVoicemailShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded calls, visual voicemail and transcripts made on this phone'**
+  String get recordingsAndVoicemailShort;
+
+  /// No description provided for @recordingSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording and transcripts'**
+  String get recordingSettings;
+
+  /// No description provided for @recordedCalls.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded calls'**
+  String get recordedCalls;
+
+  /// No description provided for @noRecordings.
+  ///
+  /// In en, this message translates to:
+  /// **'No recorded calls'**
+  String get noRecordings;
+
+  /// No description provided for @noRecordingsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on Record calls in settings, then tap More > Record call during a call.'**
+  String get noRecordingsBody;
+
+  /// No description provided for @noVisualVoicemail.
+  ///
+  /// In en, this message translates to:
+  /// **'No visual voicemail on this phone'**
+  String get noVisualVoicemail;
+
+  /// No description provided for @noVisualVoicemailBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages show here only when your carrier offers visual voicemail and it\'s set up on this phone. Otherwise call your voicemail from the dialpad (hold 1).'**
+  String get noVisualVoicemailBody;
+
+  /// No description provided for @play.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get play;
+
+  /// No description provided for @stop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get stop;
+
+  /// No description provided for @copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copy;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get retry;
+
+  /// No description provided for @transcribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcribe'**
+  String get transcribe;
+
+  /// No description provided for @inNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'In ZT Notes'**
+  String get inNotes;
+
+  /// No description provided for @saveToNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to ZT Notes'**
+  String get saveToNotes;
+
+  /// No description provided for @savedToNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to ZT Notes'**
+  String get savedToNotes;
+
+  /// No description provided for @notesSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save to ZT Notes. Try again when you\'re online'**
+  String get notesSaveFailed;
+
+  /// No description provided for @deleteRecordingQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this recording?'**
+  String get deleteRecordingQuestion;
+
+  /// No description provided for @transcriptNeedsModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Download a speech model first'**
+  String get transcriptNeedsModel;
+
+  /// No description provided for @transcriptNeedsModelBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcripts are made on this phone with a speech model (the same ones ZT Keyboard uses). Download one once; nothing is sent anywhere.'**
+  String get transcriptNeedsModelBody;
+
+  /// No description provided for @transcriptNoAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'There\'s no sound to transcribe'**
+  String get transcriptNoAudio;
+
+  /// No description provided for @transcriptFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The transcript didn\'t work. Try again, or try another model'**
+  String get transcriptFailed;
+
+  /// No description provided for @transcriptEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'(No words were heard)'**
+  String get transcriptEmpty;
+
+  /// No description provided for @transcriptMadeOnPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcribed on this phone by ZT Phone'**
+  String get transcriptMadeOnPhone;
+
+  /// No description provided for @voicemailFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Voicemail from {who}'**
+  String voicemailFrom(String who);
+
+  /// No description provided for @minutesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min'**
+  String minutesShort(int count);
+
+  /// No description provided for @recordCalls.
+  ///
+  /// In en, this message translates to:
+  /// **'Record calls'**
+  String get recordCalls;
+
+  /// No description provided for @recordCallsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Adds Record call to the call screen. Recordings stay on this phone, encrypted. Android decides what an app can hear during a call: on many phones, Pixel and GrapheneOS included, it\'s only silence. ZT Phone then stops and tells you.'**
+  String get recordCallsBody;
+
+  /// No description provided for @recordCallsWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording laws differ by place. In some, everyone on the call must agree to be recorded, so tell the other person before you record. ZT Phone records only when you tap Record call, keeps the recording encrypted on this phone, and never uploads it.'**
+  String get recordCallsWarning;
+
+  /// No description provided for @microphoneNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording needs the microphone. Allow it in Android settings'**
+  String get microphoneNeeded;
+
+  /// No description provided for @saveTranscripts.
+  ///
+  /// In en, this message translates to:
+  /// **'Save transcripts to ZT Notes'**
+  String get saveTranscripts;
+
+  /// No description provided for @saveTranscriptsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'New recordings are transcribed on this phone and saved as notes, encrypted, the next time ZT Phone is unlocked. Needs a speech model.'**
+  String get saveTranscriptsBody;
+
+  /// No description provided for @transcriptLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Language of transcripts'**
+  String get transcriptLanguage;
+
+  /// No description provided for @languageAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Detect it'**
+  String get languageAuto;
+
+  /// No description provided for @speechModels.
+  ///
+  /// In en, this message translates to:
+  /// **'Speech models'**
+  String get speechModels;
+
+  /// No description provided for @transcriptsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcripts don\'t work on this phone'**
+  String get transcriptsUnavailable;
+
+  /// No description provided for @modelOnPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'On this phone'**
+  String get modelOnPhone;
+
+  /// No description provided for @modelNoSpace.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough space for this model'**
+  String get modelNoSpace;
+
+  /// No description provided for @modelNoConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t reach the model list. Check the connection'**
+  String get modelNoConnection;
+
+  /// No description provided for @modelFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The download didn\'t work. Try again'**
+  String get modelFailed;
+
+  /// No description provided for @transcriptsExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'Speech models come from ZT Keyboard\'s releases on GitHub and are checked before use. Recordings and voicemail are transcribed on this phone; nothing is sent anywhere. Larger models are more accurate and slower; a long call can take a few minutes.'**
+  String get transcriptsExplain;
+
+  /// No description provided for @recordCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Record call'**
+  String get recordCall;
+
+  /// No description provided for @recordCallBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept encrypted on this phone. If Android gives only silence, it stops and tells you'**
+  String get recordCallBody;
+
+  /// No description provided for @stopRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop recording'**
+  String get stopRecording;
+
+  /// No description provided for @recordingKept.
+  ///
+  /// In en, this message translates to:
+  /// **'The recording is in Settings > Recordings and voicemail'**
+  String get recordingKept;
+
+  /// No description provided for @recordingFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording {time}'**
+  String recordingFor(String time);
+
+  /// No description provided for @recordingSilent.
+  ///
+  /// In en, this message translates to:
+  /// **'Android gave ZT Phone only silence for this call, so nothing was recorded'**
+  String get recordingSilent;
+
+  /// No description provided for @recordingFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording couldn\'t start. Check that ZT Phone may use the microphone'**
+  String get recordingFailed;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

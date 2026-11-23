@@ -53,9 +53,24 @@ class ZtInCallService : InCallService() {
 
     override fun onCallAdded(call: Call) {
         super.onCallAdded(call)
+        // P26: in a meeting, decline with a text (no screen at all) or
+        // ring silently, as chosen in Settings.
+        val ringing = call.stateCompat() == Call.STATE_RINGING
+        val meeting = if (ringing) MeetingGuard.handle(this, call) else MeetingGuard.Outcome.RING
+        if (meeting == MeetingGuard.Outcome.DECLINED) {
+            CallManager.add(call)
+            return
+        }
         CallManager.add(call)
-        if (call.stateCompat() == Call.STATE_RINGING) {
-            call.details.handle?.schemeSpecificPart?.let { CallRinger.start(this, it) }
+        if (ringing) {
+            if (meeting == MeetingGuard.Outcome.SILENCED) {
+                // Silent means silent: not the contact's own ringtone either.
+                CallRinger.skip()
+            } else {
+                call.details.handle?.schemeSpecificPart?.let { CallRinger.start(this, it) }
+            }
+            // P29: face down silences it, when switched on.
+            CallComfort.watchRinging(this)
             // The pinned call card (full screen when locked) ...
             CallNotifications.update(this)
         }
@@ -73,7 +88,9 @@ class ZtInCallService : InCallService() {
             PrivateCallLog.scrubSoon(this, number, call.details.creationTimeMillis)
         }
         CallManager.remove(call)
+        if (CallManager.ringing() == null) CallComfort.stopWatching(this)
         if (!CallManager.hasCalls) CallNotifications.cancel(this)
+        RecentCallsWidget.refreshSoon(this)
     }
 
     @Deprecated("Still delivered on every supported Android version")

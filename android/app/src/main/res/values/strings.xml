@@ -25,4 +25,18 @@
     <string name="call_back_reminder">Call back %s</string>
     <string name="call_back_channel">Call back reminders</string>
     <string name="remind_me">Remind me</string>
+    <!-- Recent calls widget (W11). -->
+    <string name="widget_recents">Recent calls</string>
+    <string name="widget_missed">Missed calls</string>
+    <string name="widget_switch_view">Switch between recent and missed calls</string>
+    <string name="widget_dialpad">Dialpad</string>
+    <string name="widget_no_calls">No calls yet</string>
+    <string name="widget_no_missed">No missed calls</string>
+    <string name="widget_open_to_allow">Open ZT Phone to allow the call log</string>
+    <string name="widget_recents_hidden">Turn on \"Show details on the home screen\" in ZT Phone settings to see your calls here</string>
+    <string name="widget_recents_description">Your latest calls. Tap one to open the dialpad with its number.</string>
+    <string name="widget_yesterday">Yesterday</string>
+    <string name="widget_sample_name">Dana Levi</string>
+    <string name="widget_sample_missed">+1 555 0100</string>
+    <string name="widget_locale">en</string>
 </resources>

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zerotrust_phone/app/call_comfort.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
@@ -106,8 +107,18 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
     });
   }
 
-  void _type(String key) {
-    HapticFeedback.selectionClick();
+  /// A key on the keypad: the chosen buzz and tone (P17), then the digit.
+  void _press(String key) {
+    final CallComfort comfort = ref.read(callComfortProvider);
+    comfort.buzz();
+    if (comfort.keyTones) {
+      ref.read(telecomProvider).playKeyTone(key).ignore();
+    }
+    _type(key, buzz: false);
+  }
+
+  void _type(String key, {bool buzz = true}) {
+    if (buzz) HapticFeedback.selectionClick();
     final TextSelection sel = _number.selection;
     final String text = _number.text;
     final int start = sel.isValid ? sel.start : text.length;
@@ -157,8 +168,12 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
             .where((SpeedDial s) => s.digit == n)
             .firstOrNull;
     if (dial != null) {
-      await placeCall(ref, dial.number, hideCallerId: _hideCallerId);
-      if (mounted) Navigator.of(context).maybePop();
+      final bool placed = await placeCall(
+        ref,
+        dial.number,
+        hideCallerId: _hideCallerId,
+      );
+      if (placed && mounted) Navigator.of(context).maybePop();
       return;
     }
     if (!mounted) return;
@@ -182,7 +197,8 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
     if (assign == true && mounted) await assignSpeedDial(context, ref, n);
   }
 
-  Future<void> _call(String number) async {
+  /// [pickSim]: long-press on the call button picks the SIM (P18).
+  Future<void> _call(String number, {bool pickSim = false}) async {
     if (number.trim().isEmpty) {
       // Like other dialers: an empty call button brings back the last number.
       final List<CallLogEntry> log =
@@ -193,8 +209,13 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
       if (last != null) setState(() => _number.text = last.number);
       return;
     }
-    await placeCall(ref, number.trim(), hideCallerId: _hideCallerId);
-    if (mounted) Navigator.of(context).maybePop();
+    final bool placed = await placeCall(
+      ref,
+      number.trim(),
+      hideCallerId: _hideCallerId,
+      pickSim: pickSim,
+    );
+    if (placed && mounted) Navigator.of(context).maybePop();
   }
 
   void _openPauses() => Navigator.of(context).push(
@@ -218,6 +239,7 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
     final ThemeData theme = Theme.of(context);
 
     final String? hint = countryHintText(context, ref, _number.text);
+    final CallComfort comfort = ref.watch(callComfortProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -348,19 +370,46 @@ class _DialpadPageState extends ConsumerState<DialpadPage> {
                 ),
               ),
             ),
-            DialKeypad(onKey: _type, onLongKey: _longPress),
+            DialKeypad(
+              onKey: _press,
+              onLongKey: _longPress,
+              large: comfort.largeKeys,
+              hand: comfort.hand,
+              onSwitchHand: (KeypadHand to) => ref
+                  .read(callComfortProvider.notifier)
+                  .set(comfort.copyWith(hand: to)),
+            ),
             const SizedBox(height: 12),
-            SizedBox(
-              width: 72,
-              height: 72,
-              child: FloatingActionButton(
-                heroTag: 'dial',
-                shape: const CircleBorder(),
-                backgroundColor: Colors.green.shade600,
-                foregroundColor: Colors.white,
-                tooltip: context.l10n.call,
-                onPressed: () => _call(_number.text),
-                child: const Icon(Icons.call, size: 32),
+            Align(
+              alignment: switch (comfort.hand) {
+                KeypadHand.both => Alignment.center,
+                KeypadHand.left => const Alignment(-0.45, 0),
+                KeypadHand.right => const Alignment(0.45, 0),
+              },
+              child: SizedBox(
+                width: comfort.largeKeys ? 80 : 72,
+                height: comfort.largeKeys ? 80 : 72,
+                // Long-press: pick the SIM for this call (P18).
+                // No tooltip: its own long-press would take the gesture.
+                child: Semantics(
+                  label: context.l10n.callHoldForSim,
+                  button: true,
+                  excludeSemantics: true,
+                  onTap: () => _call(_number.text),
+                  onLongPress: () => _call(_number.text, pickSim: true),
+                  child: GestureDetector(
+                    key: const ValueKey<String>('dial-call'),
+                    onLongPress: () => _call(_number.text, pickSim: true),
+                    child: FloatingActionButton(
+                      heroTag: 'dial',
+                      shape: const CircleBorder(),
+                      backgroundColor: Colors.green.shade600,
+                      foregroundColor: Colors.white,
+                      onPressed: () => _call(_number.text),
+                      child: const Icon(Icons.call, size: 32),
+                    ),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -378,6 +427,9 @@ class DialKeypad extends StatelessWidget {
     required this.onKey,
     this.foreground,
     this.onLongKey,
+    this.large = false,
+    this.hand = KeypadHand.both,
+    this.onSwitchHand,
   });
 
   final ValueChanged<String> onKey;
@@ -386,6 +438,14 @@ class DialKeypad extends StatelessWidget {
   /// Long-press on 1 to 9 (voicemail and speed dial), * and # (pause and
   /// wait). Null in calls.
   final ValueChanged<String>? onLongKey;
+
+  /// P17: bigger keys and digits.
+  final bool large;
+
+  /// P17: one-handed mode, a narrower keypad on this side, with an arrow
+  /// ([onSwitchHand]) that moves it to the other side.
+  final KeypadHand hand;
+  final ValueChanged<KeypadHand>? onSwitchHand;
 
   static const List<(String, String)> keys = <(String, String)>[
     ('1', ''), ('2', 'ABC'), ('3', 'DEF'), //
@@ -398,70 +458,95 @@ class DialKeypad extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final bool hebrew = Localizations.localeOf(context).languageCode == 'he';
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      // A phone keypad is the same in every language: 1 2 3 left to right.
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: GridView.count(
-          crossAxisCount: 3,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          childAspectRatio: 1.6,
-          children: <Widget>[
-            for (final (String digit, String letters) in keys)
-              Semantics(
-                button: true,
-                label: switch (digit) {
-                  '0' => context.l10n.keyZeroHold,
-                  '1' when onLongKey != null => context.l10n.keyOneHold,
-                  '*' when onLongKey != null => context.l10n.keyStarHold,
-                  '#' when onLongKey != null => context.l10n.keyHashHold,
-                  _ => digit,
-                },
-                excludeSemantics: true,
-                child: InkWell(
-                  customBorder: const StadiumBorder(),
-                  onTap: () => onKey(digit),
-                  onLongPress: digit == '0'
-                      ? () => onKey('+')
-                      : (onLongKey != null &&
-                                RegExp(r'^[1-9*#]$').hasMatch(digit)
-                            ? () => onLongKey!(digit)
-                            : null),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        digit,
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          color: foreground,
-                        ),
-                      ),
-                      if (digit == '1' && onLongKey != null)
-                        Icon(
-                          Icons.voicemail,
-                          size: 14,
-                          color:
-                              foreground ?? theme.colorScheme.onSurfaceVariant,
-                        )
-                      else
-                        Text(
-                          // Hebrew letters too when the app is in Hebrew,
-                          // where they sit on Israeli keypads.
-                          hebrew && DialSearch.hebrewKeys[digit] != null
-                              ? '$letters ${DialSearch.hebrewKeys[digit]}'
-                              : letters,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color:
-                                foreground ??
-                                theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
+    final TextStyle? digitStyle =
+        (large ? theme.textTheme.headlineLarge : theme.textTheme.headlineSmall)
+            ?.copyWith(color: foreground);
+    final TextStyle? letterStyle =
+        (large ? theme.textTheme.labelMedium : theme.textTheme.labelSmall)
+            ?.copyWith(color: foreground ?? theme.colorScheme.onSurfaceVariant);
+    final Widget grid = GridView.count(
+      crossAxisCount: 3,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      childAspectRatio: large
+          ? (hand == KeypadHand.both ? 1.35 : 1.1)
+          : (hand == KeypadHand.both ? 1.6 : 1.3),
+      children: <Widget>[
+        for (final (String digit, String letters) in keys)
+          Semantics(
+            button: true,
+            label: switch (digit) {
+              '0' => context.l10n.keyZeroHold,
+              '1' when onLongKey != null => context.l10n.keyOneHold,
+              '*' when onLongKey != null => context.l10n.keyStarHold,
+              '#' when onLongKey != null => context.l10n.keyHashHold,
+              _ => digit,
+            },
+            excludeSemantics: true,
+            child: InkWell(
+              customBorder: const StadiumBorder(),
+              onTap: () => onKey(digit),
+              onLongPress: digit == '0'
+                  ? () => onKey('+')
+                  : (onLongKey != null && RegExp(r'^[1-9*#]$').hasMatch(digit)
+                        ? () => onLongKey!(digit)
+                        : null),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(digit, style: digitStyle),
+                  if (digit == '1' && onLongKey != null)
+                    Icon(
+                      Icons.voicemail,
+                      size: 14,
+                      color: foreground ?? theme.colorScheme.onSurfaceVariant,
+                    )
+                  else
+                    Text(
+                      // Hebrew letters too when the app is in Hebrew,
+                      // where they sit on Israeli keypads.
+                      hebrew && DialSearch.hebrewKeys[digit] != null
+                          ? '$letters ${DialSearch.hebrewKeys[digit]}'
+                          : letters,
+                      style: letterStyle,
+                    ),
+                ],
               ),
+            ),
+          ),
+      ],
+    );
+    // A phone keypad is the same in every language: 1 2 3 left to right,
+    // and "left hand" is the left side of the screen.
+    if (hand == KeypadHand.both) {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: large ? 16 : 32),
+        child: Directionality(textDirection: TextDirection.ltr, child: grid),
+      );
+    }
+    final bool left = hand == KeypadHand.left;
+    final Widget mover = SizedBox(
+      width: 48,
+      child: IconButton(
+        key: const ValueKey<String>('keypad-move'),
+        tooltip: left
+            ? context.l10n.keypadMoveRight
+            : context.l10n.keypadMoveLeft,
+        icon: Icon(left ? Icons.chevron_right : Icons.chevron_left),
+        onPressed: onSwitchHand == null
+            ? null
+            : () => onSwitchHand!(left ? KeypadHand.right : KeypadHand.left),
+      ),
+    );
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Row(
+          children: <Widget>[
+            if (!left) mover,
+            Expanded(child: grid),
+            if (left) mover,
           ],
         ),
       ),

@@ -31,6 +31,17 @@ Map<String, String> nativeStrings(AppL10n l) => <String, String>{
   'nativeCallBackReminder': l.nativeCallBackReminder,
   'nativeCallBackChannel': l.nativeCallBackChannel,
   'nativeRemindMe': l.nativeRemindMe,
+  // The Recent calls widget (W11).
+  'widgetLocale': l.localeName,
+  'widgetRecents': l.widgetRecents,
+  'widgetMissed': l.widgetMissed,
+  'widgetSwitchView': l.widgetSwitchView,
+  'widgetDialpad': l.widgetDialpad,
+  'widgetNoCalls': l.widgetNoCalls,
+  'widgetNoMissed': l.widgetNoMissed,
+  'widgetOpenToAllow': l.widgetOpenToAllow,
+  'widgetRecentsHidden': l.widgetRecentsHidden,
+  'widgetYesterday': l.widgetYesterday,
 };
 
 /// Sends [nativeStrings] to Android whenever the app's language changes.

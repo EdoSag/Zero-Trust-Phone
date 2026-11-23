@@ -123,11 +123,32 @@ class Telecom {
   /// pushes changes while the app is in front; [refreshCall] asks directly.
   final ValueNotifier<bool> callInProgress = ValueNotifier<bool>(false);
 
+  /// P20, P21: bytes of the speech model being downloaded.
+  final ValueNotifier<(String, int)?> modelProgress =
+      ValueNotifier<(String, int)?>(null);
+
+  /// P20, P21: how far the running transcript is, 0..100.
+  final ValueNotifier<int> transcriptProgress = ValueNotifier<int>(0);
+
+  /// Ticks when a recording or voicemail finishes playing.
+  final ValueNotifier<int> playbackDone = ValueNotifier<int>(0);
+
   bool get isSupported => defaultTargetPlatform == TargetPlatform.android;
 
   void listenForDials() {
     _channel.setMethodCallHandler((MethodCall call) async {
       if (call.method == 'dialPending') dialRequests.value++;
+      if (call.method == 'modelProgress') {
+        final Map<Object?, Object?> m = call.arguments as Map<Object?, Object?>;
+        modelProgress.value = (
+          m['file'] as String? ?? '',
+          (m['bytes'] as num?)?.toInt() ?? 0,
+        );
+      }
+      if (call.method == 'transcriptProgress') {
+        transcriptProgress.value = (call.arguments as num?)?.toInt() ?? 0;
+      }
+      if (call.method == 'playbackDone') playbackDone.value++;
       if (call.method == 'recentsPending') recentsRequests.value++;
       if (call.method == 'callBackPending') callBackRequests.value++;
       if (call.method == 'callsChanged') {
@@ -237,6 +258,13 @@ class Telecom {
       if (a is Map<Object?, Object?>)
         PhoneAccount(id: '${a['id']}', label: '${a['label']}'),
   ];
+
+  /// The SIM Android calls with by default ("Calls" in its SIM settings),
+  /// or null when it asks each time (P18).
+  Future<String?> defaultPhoneAccount() async {
+    final String? id = await _call<String>('defaultPhoneAccount');
+    return id == null || id.isEmpty ? null : id;
+  }
 
   /// What on-device call screening needs while the vault is locked (P1,
   /// P7). The Android side keeps only keyed hashes of the numbers.
@@ -381,6 +409,145 @@ class Telecom {
 
   /// Opens the system screen that turns call alerts back on.
   Future<void> fixCallAlerts() => _call<void>('fixCallAlerts');
+
+  /// P26: when I'm in a meeting ([busy], start and end times, kept sealed
+  /// on the phone), what to do then ([mode] ring / silence / decline with
+  /// [message]), and, in memory only, a line about the next meeting per
+  /// number ([hints], by lookup key) for the call screen.
+  Future<void> setMeetings({
+    required String mode,
+    required String message,
+    required bool letRepeatCallersRing,
+    required List<(DateTime, DateTime)> busy,
+    required Map<String, String> hints,
+  }) => _call<void>('setMeetings', {
+    'mode': mode,
+    'message': message,
+    'letRepeatCallersRing': letRepeatCallersRing,
+    'busy': <List<int>>[
+      for (final (DateTime s, DateTime e) in busy)
+        <int>[s.millisecondsSinceEpoch, e.millisecondsSinceEpoch],
+    ],
+    'hints': hints,
+  });
+
+  /// P29: the switches the Android side needs while the app is closed.
+  /// W11: the Recent calls widget's "Show details on the home screen" and,
+  /// while it's on, the contact names it may show (lookup key -> name).
+  Future<void> setRecentsWidget({
+    required bool details,
+    Map<String, String> names = const <String, String>{},
+  }) => _call<void>('setRecentsWidget', {
+    'details': details,
+    'names': details ? names : const <String, String>{},
+  });
+
+  /// P24: hands a verified spam list to the screening service. False when
+  /// Android couldn't save it.
+  Future<bool> installSpamList(String text) async =>
+      await _call<bool>('installSpamList', {'text': text}) ?? false;
+
+  /// P24: the list in use: its date and how many numbers it has.
+  Future<({String? date, int count})> spamListInfo() async {
+    final Map<Object?, Object?>? m = await _call<Map<Object?, Object?>>(
+      'spamListInfo',
+    );
+    return (
+      date: m?['date'] as String?,
+      count: (m?['count'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  /// P24: "off", "warn", "silence" or "voicemail".
+  Future<void> setSpamMode(String mode) =>
+      _call<void>('setSpamMode', {'mode': mode});
+
+  /// P19: asks for the microphone, which recording a call needs.
+  Future<bool> requestMicrophone() async =>
+      await _call<bool>('requestMicrophone') ?? false;
+
+  /// P20, P21: the speech models: whether transcripts work on this phone,
+  /// the files installed, and the list to download (null offline).
+  Future<Map<Object?, Object?>> speechModels() async =>
+      await _call<Map<Object?, Object?>>('speechModels') ??
+      const <Object?, Object?>{};
+
+  /// "OK", "CANCELLED", "NO_CONNECTION", "WRONG_FILE", "NO_SPACE", "FAILED".
+  Future<String> downloadModel(String file) async =>
+      await _call<String>('downloadModel', {'file': file}) ?? 'FAILED';
+
+  Future<void> cancelDownload() => _call<void>('cancelDownload');
+
+  Future<void> deleteModel(String file) =>
+      _call<void>('deleteModel', {'file': file});
+
+  Future<List<Map<Object?, Object?>>> recordings() async =>
+      (await _call<List<Object?>>('recordings') ?? const <Object?>[])
+          .whereType<Map<Object?, Object?>>()
+          .toList();
+
+  Future<void> deleteRecording(String id) =>
+      _call<void>('deleteRecording', {'id': id});
+
+  Future<void> playRecording(String id) =>
+      _call<void>('playRecording', {'id': id});
+
+  Future<void> stopPlayback() => _call<void>('stopPlayback');
+
+  /// {"text": ...} or {"error": "noModel" | "noAudio" | "failed"}.
+  Future<Map<Object?, Object?>> transcribeRecording(
+    String id,
+    String language,
+  ) async =>
+      await _call<Map<Object?, Object?>>('transcribeRecording', {
+        'id': id,
+        'language': language,
+      }) ??
+      const <Object?, Object?>{'error': 'failed'};
+
+  Future<void> markTranscribed(String id) =>
+      _call<void>('markTranscribed', {'id': id});
+
+  Future<List<Map<Object?, Object?>>> voicemails() async =>
+      (await _call<List<Object?>>('voicemails') ?? const <Object?>[])
+          .whereType<Map<Object?, Object?>>()
+          .toList();
+
+  Future<bool> playVoicemail(int id) async =>
+      await _call<bool>('playVoicemail', {'id': id}) ?? false;
+
+  Future<Map<Object?, Object?>> transcribeVoicemail(
+    int id,
+    String language,
+  ) async =>
+      await _call<Map<Object?, Object?>>('transcribeVoicemail', {
+        'id': id,
+        'language': language,
+      }) ??
+      const <Object?, Object?>{'error': 'failed'};
+
+  Future<void> cancelTranscript() => _call<void>('cancelTranscript');
+
+  /// Redraws the Recent calls widget (after the app opens).
+  Future<void> refreshRecentsWidget() => _call<void>('refreshRecentsWidget');
+
+  Future<void> setCallComfort({
+    required bool flipToSilence,
+    required bool pocketGuard,
+  }) => _call<void>('setCallComfort', {
+    'flipToSilence': flipToSilence,
+    'pocketGuard': pocketGuard,
+  });
+
+  /// P17: the keypad tone for [key] (0-9, * or #), at the phone's keypad
+  /// tone volume. Silent when the phone is on silent or vibrate.
+  Future<void> playKeyTone(String key) =>
+      _call<void>('playKeyTone', {'key': key});
+
+  /// P29: whether something covers the screen right now (proximity
+  /// sensor), as in a pocket. False when the phone has no such sensor.
+  Future<bool> screenCovered() async =>
+      await _call<bool>('screenCovered') ?? false;
 }
 
 final telecomProvider = Provider<Telecom>((ref) => Telecom());

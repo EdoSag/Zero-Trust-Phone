@@ -1113,4 +1113,490 @@ class AppL10nHe extends AppL10n {
 
   @override
   String get returnToCall => 'חזרה לשיחה';
+
+  @override
+  String get rememberSimForNumber => 'לזכור עבור המספר הזה';
+
+  @override
+  String get rememberSimForNumberBody => 'בפעם הבאה ייבחר ה-SIM הזה בלי לשאול';
+
+  @override
+  String get callHoldForSim => 'חיוג (לחיצה ארוכה לבחירת SIM)';
+
+  @override
+  String get simPerNumber => 'SIM לכל מספר';
+
+  @override
+  String get simPerNumberShort => 'מספרים שתמיד מחויגים מאותו SIM';
+
+  @override
+  String get simPerNumberBody =>
+      'בטלפון עם שני כרטיסי SIM, ZT Phone שואל באיזה מהם להשתמש, אלא אם נבחר באנדרואיד SIM ברירת מחדל לשיחות. אם מסמנים \"לזכור עבור המספר הזה\" בשאלה, המספר תמיד יחויג מאותו SIM. לחיצה ארוכה על כפתור החיוג מאפשרת לבחור מחדש. SIM שנקבע לאיש קשר תמיד גובר.';
+
+  @override
+  String get simPerNumberEmpty => 'אין עדיין מספרים';
+
+  @override
+  String get forget => 'לשכוח';
+
+  @override
+  String get keypadAndHandling => 'מקלדת ואחיזה';
+
+  @override
+  String get keypadAndHandlingBody =>
+      'מקשים גדולים, מצב יד אחת, צלילי מקשים, הפיכה להשתקה';
+
+  @override
+  String get largeKeys => 'מקשים גדולים';
+
+  @override
+  String get largeKeysBody => 'מקשים וספרות גדולים יותר במקלדת החיוג';
+
+  @override
+  String get oneHandedMode => 'מצב יד אחת';
+
+  @override
+  String get oneHandedModeBody =>
+      'מקלדת צרה יותר בצד אחד, בהישג האגודל. החץ שלידה מעביר אותה לצד השני.';
+
+  @override
+  String get handLeft => 'שמאל';
+
+  @override
+  String get handRight => 'ימין';
+
+  @override
+  String get keypadMoveLeft => 'העברת המקלדת שמאלה';
+
+  @override
+  String get keypadMoveRight => 'העברת המקלדת ימינה';
+
+  @override
+  String get keyTones => 'צלילי מקשים';
+
+  @override
+  String get keyTonesBody =>
+      'צליל קצר לכל מקש, בעוצמת צלילי המקלדת של הטלפון. שקט כשהטלפון במצב שקט.';
+
+  @override
+  String get keyVibration => 'רטט מקשים';
+
+  @override
+  String get vibrationLight => 'קל';
+
+  @override
+  String get vibrationStrong => 'חזק';
+
+  @override
+  String get handling => 'אחיזה';
+
+  @override
+  String get flipToSilence => 'הפיכה להשתקה';
+
+  @override
+  String get flipToSilenceBody =>
+      'הפיכת טלפון מצלצל עם המסך למטה משתיקה את השיחה. המתקשר ממשיך לשמוע צלצול, ועדיין אפשר לענות.';
+
+  @override
+  String get pocketGuard => 'הגנה מחיוג בכיס';
+
+  @override
+  String get pocketGuardBody =>
+      'לא לחייג כשמשהו מכסה את המסך, כמו כיס או תיק. דורש חיישן קרבה.';
+
+  @override
+  String get pocketGuardStopped =>
+      'השיחה לא חויגה: נראה שהמסך מכוסה. אם זו טעות, אפשר לכבות את ההגנה מחיוג בכיס בהגדרות.';
+
+  @override
+  String get inMeetingDefaultMessage => 'אני בפגישה, אחזור אליך בקרוב.';
+
+  @override
+  String get meetingUntitled => 'פגישה';
+
+  @override
+  String meetingNow(String title) {
+    return 'עכשיו: $title';
+  }
+
+  @override
+  String meetingToday(String time) {
+    return 'היום $time';
+  }
+
+  @override
+  String meetingTomorrow(String time) {
+    return 'מחר $time';
+  }
+
+  @override
+  String meetingAt(String when, String title) {
+    return '$when: $title';
+  }
+
+  @override
+  String get callTools => 'עוד';
+
+  @override
+  String get callNote => 'כתיבת פתק';
+
+  @override
+  String get callNoteBody => 'נשמר ב-ZT Notes';
+
+  @override
+  String callNoteTitle(String name) {
+    return 'שיחה עם $name';
+  }
+
+  @override
+  String get callNoteHint => 'מה לזכור מהשיחה';
+
+  @override
+  String get callNoteWhere =>
+      'נשמר מוצפן בטלפון, ועובר ל-ZT Notes בפעם הבאה שפותחים את ZT Phone.';
+
+  @override
+  String get callNoteSaved =>
+      'הפתק נשמר. הוא יעבור ל-ZT Notes כשתפתחו את ZT Phone.';
+
+  @override
+  String get textMyCard => 'שליחת הכרטיס שלי בהודעה';
+
+  @override
+  String get textMyCardBody =>
+      'פותח את אפליקציית ההודעות עם השם והמספר שלך, מוכן לשליחה';
+
+  @override
+  String get myCardNotSet =>
+      'קודם צריך להגדיר את הכרטיס שלך בהגדרות של ZT Phone';
+
+  @override
+  String get openCalendar => 'פתיחת ZT Calendar';
+
+  @override
+  String get openCalendarBody => 'לבדוק את היומנים המשותפים. השיחה ממשיכה.';
+
+  @override
+  String get calendarMissing => 'ZT Calendar לא מותקן';
+
+  @override
+  String get calendarAndCalls => 'יומן ושיחות';
+
+  @override
+  String get calendarAndCallsShort => 'פגישות בשיחות, ושיחות בזמן פגישות';
+
+  @override
+  String get calendarAndCallsBody =>
+      'ZT Phone קורא את ZT Calendar באותו חשבון, בטלפון הזה בלבד, כדי לדעת מתי יש לך פגישות ועם מי.';
+
+  @override
+  String get showMeetings => 'הצגת פגישות עם איש קשר';
+
+  @override
+  String get showMeetingsBody =>
+      '\"מחר 10:00: סקירת עיצוב\" בשיחות שלהם ובכרטיס איש הקשר';
+
+  @override
+  String get callsDuringMeetings => 'שיחות בזמן פגישה';
+
+  @override
+  String get inMeetingRing => 'צלצול רגיל';
+
+  @override
+  String get inMeetingSilence => 'צלצול שקט';
+
+  @override
+  String get inMeetingSilenceBody => 'השיחה מוצגת, בלי צליל';
+
+  @override
+  String get inMeetingDecline => 'דחייה עם הודעה';
+
+  @override
+  String get inMeetingDeclineBody =>
+      'המתקשר מקבל את ההודעה שלך; השיחה מופיעה באחרונות';
+
+  @override
+  String get inMeetingMessage => 'הודעה';
+
+  @override
+  String get letRepeatCallersRing => 'לתת למתקשרים חוזרים לצלצל';
+
+  @override
+  String get letRepeatCallersRingBody =>
+      'שיחה שנייה מאותו מספר תוך 15 דקות תצלצל כרגיל, למקרה שזה דחוף';
+
+  @override
+  String get calendarAndCallsLimits =>
+      'נספרים אירועים עם שעה ב-ZT Calendar שלך ל-7 הימים הקרובים; אירועים של יום שלם לא נספרים. הזמנים מתעדכנים בכל פתיחה של ZT Phone, ונשמרים בטלפון רק זמני התחלה וסיום.';
+
+  @override
+  String get myCard => 'הכרטיס שלי';
+
+  @override
+  String get myCardShort => 'מה נשלח ב\"שליחת הכרטיס שלי\" בזמן שיחה';
+
+  @override
+  String get myCardBody =>
+      'בזמן שיחה, \"שליחת הכרטיס שלי\" פותח את אפליקציית ההודעות עם הטקסט הזה לצד השני, מוכן לשליחה. הוא נשמר מוצפן בטלפון כדי לעבוד גם כש-ZT Phone נעול.';
+
+  @override
+  String get myCardPick => 'בחירה מ-ZT Contacts';
+
+  @override
+  String get myCardText => 'טקסט הכרטיס';
+
+  @override
+  String get homeScreenWidget => 'ווידג\'ט למסך הבית';
+
+  @override
+  String get widgetDetails => 'הצגת פרטים במסך הבית';
+
+  @override
+  String get widgetDetailsBody =>
+      'כבוי: הווידג\'ט של השיחות האחרונות מציג מנעול ואת מספר השיחות החדשות שלא נענו. מופעל: הווידג\'ט מציג את השיחות האחרונות, ושמות אנשי הקשר שלך מ-ZT Contacts נשמרים בטלפון הזה ללא הצפנה, בשביל מסך הבית. אנשי קשר פרטיים אף פעם לא מוצגים';
+
+  @override
+  String get widgetRecents => 'שיחות אחרונות';
+
+  @override
+  String get widgetMissed => 'שיחות שלא נענו';
+
+  @override
+  String get widgetSwitchView => 'מעבר בין שיחות אחרונות לשיחות שלא נענו';
+
+  @override
+  String get widgetDialpad => 'לוח חיוג';
+
+  @override
+  String get widgetNoCalls => 'אין עדיין שיחות';
+
+  @override
+  String get widgetNoMissed => 'אין שיחות שלא נענו';
+
+  @override
+  String get widgetOpenToAllow =>
+      'יש לפתוח את ZT Phone כדי לאשר גישה ליומן השיחות';
+
+  @override
+  String get widgetRecentsHidden =>
+      'כדי לראות כאן את השיחות, יש להפעיל את \"הצגת פרטים במסך הבית\" בהגדרות של ZT Phone';
+
+  @override
+  String get widgetYesterday => 'אתמול';
+
+  @override
+  String get spamHeader => 'מספרים שדווחו כספאם';
+
+  @override
+  String get spamOff => 'כבוי (בלי להוריד את הרשימה)';
+
+  @override
+  String get spamWarn => 'צלצול, עם אזהרה במסך השיחה';
+
+  @override
+  String get spamSilence => 'השתקה (עדיין מופיעים בשיחות האחרונות)';
+
+  @override
+  String get spamVoicemail => 'העברה לתא הקולי';
+
+  @override
+  String get spamExplain =>
+      'פעם בשבוע ZT Phone מורידה רשימה של מספרים שאנשים רבים דיווחו עליהם כספאם, מהגרסאות של ZT Phone עצמה ב-GitHub, ומשתמשת בה רק אם החתימה שלה תקינה. הבדיקה של המספרים נעשית בטלפון הזה: שום דבר עליך או על השיחות שלך לא נשלח. אנשי הקשר שלך אף פעם לא מושפעים. מקורות: תלונות למאגר Do Not Call האמריקאי (FTC) ומספרים שדווחו ל-ZT Phone.';
+
+  @override
+  String spamListInfo(String date, int count) {
+    return 'רשימה מ-$date, $count מספרים';
+  }
+
+  @override
+  String get spamListNone => 'עדיין לא הורדה רשימה';
+
+  @override
+  String get spamCheckNow => 'בדיקה אם יש רשימה חדשה יותר';
+
+  @override
+  String get spamUpdated => 'רשימת הספאם עודכנה';
+
+  @override
+  String get spamUpToDate => 'רשימת הספאם מעודכנת';
+
+  @override
+  String get spamCheckFailed =>
+      'לא הצלחנו להוריד את רשימת הספאם. כדאי לבדוק את החיבור ולנסות שוב';
+
+  @override
+  String reportedSpam(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'דווח כספאם $count פעמים',
+      one: 'דווח כספאם',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recordingsAndVoicemail => 'הקלטות ותא קולי';
+
+  @override
+  String get recordingsAndVoicemailShort =>
+      'שיחות מוקלטות, תא קולי חזותי ותמלולים שנעשים בטלפון הזה';
+
+  @override
+  String get recordingSettings => 'הקלטה ותמלול';
+
+  @override
+  String get recordedCalls => 'שיחות מוקלטות';
+
+  @override
+  String get noRecordings => 'אין שיחות מוקלטות';
+
+  @override
+  String get noRecordingsBody =>
+      'יש להפעיל את \"הקלטת שיחות\" בהגדרות, ואז במהלך שיחה להקיש על \"עוד\" > \"הקלטת השיחה\".';
+
+  @override
+  String get noVisualVoicemail => 'אין תא קולי חזותי בטלפון הזה';
+
+  @override
+  String get noVisualVoicemailBody =>
+      'ההודעות מופיעות כאן רק כשהספק שלך מציע תא קולי חזותי והוא מוגדר בטלפון הזה. אחרת אפשר להתקשר לתא הקולי מלוח החיוג (לחיצה ארוכה על 1).';
+
+  @override
+  String get play => 'השמעה';
+
+  @override
+  String get stop => 'עצירה';
+
+  @override
+  String get copy => 'העתקה';
+
+  @override
+  String get retry => 'ניסיון חוזר';
+
+  @override
+  String get transcribe => 'תמלול';
+
+  @override
+  String get inNotes => 'ב-ZT Notes';
+
+  @override
+  String get saveToNotes => 'שמירה ב-ZT Notes';
+
+  @override
+  String get savedToNotes => 'נשמר ב-ZT Notes';
+
+  @override
+  String get notesSaveFailed =>
+      'לא הצלחנו לשמור ב-ZT Notes. כדאי לנסות שוב כשיש חיבור';
+
+  @override
+  String get deleteRecordingQuestion => 'למחוק את ההקלטה?';
+
+  @override
+  String get transcriptNeedsModel => 'קודם צריך להוריד מודל דיבור';
+
+  @override
+  String get transcriptNeedsModelBody =>
+      'התמלולים נעשים בטלפון הזה בעזרת מודל דיבור (אותם מודלים ש-ZT Keyboard משתמשת בהם). מורידים מודל פעם אחת, ושום דבר לא נשלח לשום מקום.';
+
+  @override
+  String get transcriptNoAudio => 'אין צליל לתמלל';
+
+  @override
+  String get transcriptFailed =>
+      'התמלול לא הצליח. כדאי לנסות שוב, או לנסות מודל אחר';
+
+  @override
+  String get transcriptEmpty => '(לא נשמעו מילים)';
+
+  @override
+  String get transcriptMadeOnPhone => 'תומלל בטלפון הזה על ידי ZT Phone';
+
+  @override
+  String voicemailFrom(String who) {
+    return 'הודעה קולית מאת $who';
+  }
+
+  @override
+  String minutesShort(int count) {
+    return '$count דק׳';
+  }
+
+  @override
+  String get recordCalls => 'הקלטת שיחות';
+
+  @override
+  String get recordCallsBody =>
+      'מוסיפה את \"הקלטת השיחה\" למסך השיחה. ההקלטות נשארות בטלפון הזה, מוצפנות. אנדרואיד קובעת מה אפליקציה יכולה לשמוע בזמן שיחה: בטלפונים רבים, כולל Pixel ו-GrapheneOS, רק שקט. במקרה כזה ZT Phone עוצרת ומודיעה לך.';
+
+  @override
+  String get recordCallsWarning =>
+      'החוקים לגבי הקלטה שונים ממקום למקום. בחלק מהמקומות כל המשתתפים בשיחה צריכים להסכים להקלטה, ולכן כדאי לומר לצד השני לפני שמקליטים. ZT Phone מקליטה רק כשמקישים על \"הקלטת השיחה\", שומרת את ההקלטה מוצפנת בטלפון הזה ואף פעם לא מעלה אותה.';
+
+  @override
+  String get microphoneNeeded =>
+      'הקלטה צריכה גישה למיקרופון. אפשר לאשר אותה בהגדרות אנדרואיד';
+
+  @override
+  String get saveTranscripts => 'שמירת תמלולים ב-ZT Notes';
+
+  @override
+  String get saveTranscriptsBody =>
+      'הקלטות חדשות מתומללות בטלפון הזה ונשמרות כפתקים מוצפנים בפעם הבאה ש-ZT Phone נפתחת. צריך מודל דיבור.';
+
+  @override
+  String get transcriptLanguage => 'שפת התמלול';
+
+  @override
+  String get languageAuto => 'זיהוי אוטומטי';
+
+  @override
+  String get speechModels => 'מודלים של דיבור';
+
+  @override
+  String get transcriptsUnavailable => 'תמלול לא עובד בטלפון הזה';
+
+  @override
+  String get modelOnPhone => 'בטלפון הזה';
+
+  @override
+  String get modelNoSpace => 'אין מספיק מקום למודל הזה';
+
+  @override
+  String get modelNoConnection =>
+      'לא הצלחנו להגיע לרשימת המודלים. כדאי לבדוק את החיבור';
+
+  @override
+  String get modelFailed => 'ההורדה לא הצליחה. כדאי לנסות שוב';
+
+  @override
+  String get transcriptsExplain =>
+      'מודלי הדיבור מגיעים מהגרסאות של ZT Keyboard ב-GitHub ונבדקים לפני השימוש. ההקלטות וההודעות הקוליות מתומללות בטלפון הזה, ושום דבר לא נשלח לשום מקום. מודלים גדולים מדויקים יותר ואיטיים יותר; שיחה ארוכה יכולה לקחת כמה דקות.';
+
+  @override
+  String get recordCall => 'הקלטת השיחה';
+
+  @override
+  String get recordCallBody =>
+      'נשמרת מוצפנת בטלפון הזה. אם אנדרואיד נותנת רק שקט, ההקלטה נעצרת ותופיע הודעה';
+
+  @override
+  String get stopRecording => 'עצירת ההקלטה';
+
+  @override
+  String get recordingKept => 'ההקלטה נמצאת בהגדרות > הקלטות ותא קולי';
+
+  @override
+  String recordingFor(String time) {
+    return 'הקלטה $time';
+  }
+
+  @override
+  String get recordingSilent =>
+      'אנדרואיד נתנה ל-ZT Phone רק שקט בשיחה הזו, ולכן שום דבר לא הוקלט';
+
+  @override
+  String get recordingFailed =>
+      'ההקלטה לא התחילה. כדאי לבדוק של-ZT Phone יש גישה למיקרופון';
 }

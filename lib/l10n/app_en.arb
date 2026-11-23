@@ -603,5 +603,231 @@
   "returnToCall": "Return to call",
   "@returnToCall": {
     "description": "Bar on top of the dialer while a call is in progress; tapping it opens the call screen."
-  }
+  },
+  "rememberSimForNumber": "Remember for this number",
+  "rememberSimForNumberBody": "Next time this SIM is used without asking",
+  "callHoldForSim": "Call (hold to pick the SIM)",
+  "simPerNumber": "SIM for each number",
+  "simPerNumberShort": "Numbers that always use the same SIM",
+  "simPerNumberBody": "On a phone with two SIMs, ZT Phone asks which one to use unless Android has a default SIM for calls. Tick \"Remember for this number\" on that question and the number always uses the same SIM. Hold the call button to choose again. A SIM set for a contact always wins.",
+  "simPerNumberEmpty": "No numbers yet",
+  "forget": "Forget",
+  "keypadAndHandling": "Keypad and handling",
+  "keypadAndHandlingBody": "Big keys, one-handed mode, key tones, flip to silence",
+  "largeKeys": "Big keys",
+  "largeKeysBody": "Larger keys and digits on the dialpad",
+  "oneHandedMode": "One-handed mode",
+  "oneHandedModeBody": "A narrower keypad on one side, in reach of your thumb. The arrow beside it moves it across.",
+  "handLeft": "Left",
+  "handRight": "Right",
+  "keypadMoveLeft": "Move keypad left",
+  "keypadMoveRight": "Move keypad right",
+  "keyTones": "Key tones",
+  "keyTonesBody": "A short tone for each key, at the phone's keypad volume. Silent when the phone is on silent.",
+  "keyVibration": "Key vibration",
+  "vibrationLight": "Light",
+  "vibrationStrong": "Strong",
+  "handling": "Handling",
+  "flipToSilence": "Flip to silence",
+  "flipToSilenceBody": "Turn a ringing phone face down to silence the call. It keeps ringing for the caller, and you can still answer.",
+  "pocketGuard": "Pocket-dial guard",
+  "pocketGuardBody": "Don't place a call while something covers the screen, like a pocket or a bag. Needs a proximity sensor.",
+  "pocketGuardStopped": "Call not placed: the screen seems covered. Turn off the pocket-dial guard in Settings if this is wrong.",
+  "inMeetingDefaultMessage": "I'm in a meeting. I'll call you back soon.",
+  "meetingUntitled": "Meeting",
+  "meetingNow": "Now: {title}",
+  "@meetingNow": {
+    "description": "The person is in a meeting with me right now (from ZT Calendar).",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "meetingToday": "Today {time}",
+  "@meetingToday": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "meetingTomorrow": "Tomorrow {time}",
+  "@meetingTomorrow": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "meetingAt": "{when}: {title}",
+  "@meetingAt": {
+    "description": "The next meeting with this contact: when, then its title.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "callTools": "More",
+  "@callTools": {
+    "description": "In-call button that opens note, my card and calendar tools."
+  },
+  "callNote": "Write a note",
+  "callNoteBody": "Saved in ZT Notes",
+  "callNoteTitle": "Call with {name}",
+  "@callNoteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "callNoteHint": "What to remember from this call",
+  "callNoteWhere": "Kept encrypted on this phone, and moved into ZT Notes the next time you open ZT Phone.",
+  "callNoteSaved": "Note saved. It moves to ZT Notes when you next open ZT Phone.",
+  "textMyCard": "Text my card",
+  "textMyCardBody": "Opens your SMS app with your name and number, ready to send",
+  "myCardNotSet": "Set your card in ZT Phone Settings first",
+  "openCalendar": "Open ZT Calendar",
+  "openCalendarBody": "Check your shared calendars. The call keeps going.",
+  "calendarMissing": "ZT Calendar isn't installed",
+  "calendarAndCalls": "Calendar and calls",
+  "calendarAndCallsShort": "Meetings on calls, and calls during meetings",
+  "calendarAndCallsBody": "ZT Phone reads your ZT Calendar in the same account, on this phone only, to know when you meet people and when you're busy.",
+  "showMeetings": "Show meetings with a contact",
+  "showMeetingsBody": "\"Tomorrow 10:00: Design review\" on their calls and their contact sheet",
+  "callsDuringMeetings": "Calls during a meeting",
+  "inMeetingRing": "Ring as usual",
+  "inMeetingSilence": "Ring silently",
+  "inMeetingSilenceBody": "The call shows, without sound",
+  "inMeetingDecline": "Decline with a text",
+  "inMeetingDeclineBody": "The caller gets your message; the call shows in Recents",
+  "inMeetingMessage": "Message",
+  "letRepeatCallersRing": "Let repeat callers ring",
+  "letRepeatCallersRingBody": "A second call from the same number within 15 minutes rings as usual, in case it's urgent",
+  "calendarAndCallsLimits": "Counts timed events in your own ZT Calendar for the next 7 days; all-day events don't count. The times are refreshed each time ZT Phone opens, and only start and end times are kept on the phone for this.",
+  "myCard": "My card",
+  "myCardShort": "What \"Text my card\" sends during a call",
+  "myCardBody": "During a call, \"Text my card\" opens your SMS app with this text to the other person, ready to send. It's kept encrypted on this phone so it works while ZT Phone is locked.",
+  "myCardPick": "Choose from ZT Contacts",
+  "myCardText": "Card text",
+  "homeScreenWidget": "Home screen widget",
+  "@homeScreenWidget": {
+    "description": "Settings section for the recent calls widget (W11)"
+  },
+  "widgetDetails": "Show details on the home screen",
+  "widgetDetailsBody": "Off: the Recent calls widget shows a lock and the number of new missed calls. On: it lists your latest calls, and the names of your ZT Contacts are stored unencrypted on this phone for the home screen. Private contacts never show",
+  "widgetRecents": "Recent calls",
+  "widgetMissed": "Missed calls",
+  "widgetSwitchView": "Switch between recent and missed calls",
+  "widgetDialpad": "Dialpad",
+  "widgetNoCalls": "No calls yet",
+  "widgetNoMissed": "No missed calls",
+  "widgetOpenToAllow": "Open ZT Phone to allow the call log",
+  "widgetRecentsHidden": "Turn on \"Show details on the home screen\" in ZT Phone settings to see your calls here",
+  "widgetYesterday": "Yesterday",
+  "spamHeader": "Numbers reported as spam",
+  "spamOff": "Off (don't download the list)",
+  "spamWarn": "Ring, with a warning on the call screen",
+  "spamSilence": "Silence (they still show in Recents)",
+  "spamVoicemail": "Send to voicemail",
+  "spamExplain": "Once a week ZT Phone downloads a list of numbers many people reported as spam, from ZT Phone's own releases on GitHub, and uses it only if its signature checks out. Numbers are looked up on this phone: nothing about you or your calls is sent. Your contacts are never affected. Sources: complaints to the US Do Not Call registry (FTC) and numbers reported to ZT Phone.",
+  "spamListInfo": "List from {date}, {count} numbers",
+  "@spamListInfo": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spamListNone": "No list downloaded yet",
+  "spamCheckNow": "Check for a newer list",
+  "spamUpdated": "The spam list is updated",
+  "spamUpToDate": "The spam list is up to date",
+  "spamCheckFailed": "Couldn't get the spam list. Check the connection and try again",
+  "reportedSpam": "{count, plural, =1{Reported as spam} other{Reported as spam {count} times}}",
+  "@reportedSpam": {
+    "description": "On the call screen (P24)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recordingsAndVoicemail": "Recordings and voicemail",
+  "recordingsAndVoicemailShort": "Recorded calls, visual voicemail and transcripts made on this phone",
+  "recordingSettings": "Recording and transcripts",
+  "recordedCalls": "Recorded calls",
+  "noRecordings": "No recorded calls",
+  "noRecordingsBody": "Turn on Record calls in settings, then tap More > Record call during a call.",
+  "noVisualVoicemail": "No visual voicemail on this phone",
+  "noVisualVoicemailBody": "Messages show here only when your carrier offers visual voicemail and it's set up on this phone. Otherwise call your voicemail from the dialpad (hold 1).",
+  "play": "Play",
+  "stop": "Stop",
+  "copy": "Copy",
+  "retry": "Try again",
+  "transcribe": "Transcribe",
+  "inNotes": "In ZT Notes",
+  "saveToNotes": "Save to ZT Notes",
+  "savedToNotes": "Saved to ZT Notes",
+  "notesSaveFailed": "Couldn't save to ZT Notes. Try again when you're online",
+  "deleteRecordingQuestion": "Delete this recording?",
+  "transcriptNeedsModel": "Download a speech model first",
+  "transcriptNeedsModelBody": "Transcripts are made on this phone with a speech model (the same ones ZT Keyboard uses). Download one once; nothing is sent anywhere.",
+  "transcriptNoAudio": "There's no sound to transcribe",
+  "transcriptFailed": "The transcript didn't work. Try again, or try another model",
+  "transcriptEmpty": "(No words were heard)",
+  "transcriptMadeOnPhone": "Transcribed on this phone by ZT Phone",
+  "voicemailFrom": "Voicemail from {who}",
+  "@voicemailFrom": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "minutesShort": "{count} min",
+  "@minutesShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recordCalls": "Record calls",
+  "recordCallsBody": "Adds Record call to the call screen. Recordings stay on this phone, encrypted. Android decides what an app can hear during a call: on many phones, Pixel and GrapheneOS included, it's only silence. ZT Phone then stops and tells you.",
+  "recordCallsWarning": "Recording laws differ by place. In some, everyone on the call must agree to be recorded, so tell the other person before you record. ZT Phone records only when you tap Record call, keeps the recording encrypted on this phone, and never uploads it.",
+  "microphoneNeeded": "Recording needs the microphone. Allow it in Android settings",
+  "saveTranscripts": "Save transcripts to ZT Notes",
+  "saveTranscriptsBody": "New recordings are transcribed on this phone and saved as notes, encrypted, the next time ZT Phone is unlocked. Needs a speech model.",
+  "transcriptLanguage": "Language of transcripts",
+  "languageAuto": "Detect it",
+  "speechModels": "Speech models",
+  "transcriptsUnavailable": "Transcripts don't work on this phone",
+  "modelOnPhone": "On this phone",
+  "modelNoSpace": "Not enough space for this model",
+  "modelNoConnection": "Couldn't reach the model list. Check the connection",
+  "modelFailed": "The download didn't work. Try again",
+  "transcriptsExplain": "Speech models come from ZT Keyboard's releases on GitHub and are checked before use. Recordings and voicemail are transcribed on this phone; nothing is sent anywhere. Larger models are more accurate and slower; a long call can take a few minutes.",
+  "recordCall": "Record call",
+  "recordCallBody": "Kept encrypted on this phone. If Android gives only silence, it stops and tells you",
+  "stopRecording": "Stop recording",
+  "recordingKept": "The recording is in Settings > Recordings and voicemail",
+  "recordingFor": "Recording {time}",
+  "@recordingFor": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "recordingSilent": "Android gave ZT Phone only silence for this call, so nothing was recorded",
+  "recordingFailed": "Recording couldn't start. Check that ZT Phone may use the microphone"
 }

@@ -51,6 +51,10 @@ object CallManager {
     /** Names known only while the vault is unlocked; never written to disk. */
     private val vaultNames = mutableMapOf<String, String>()
 
+    /** P26: "Meeting tomorrow 10:00: ..." per number, from the unlocked
+     * calendar; in memory only, like [vaultNames]. */
+    private val meetingHints = mutableMapOf<String, String>()
+
     private val callback = object : Call.Callback() {
         override fun onStateChanged(call: Call, state: Int) {
             if (ringing() == null) CallRinger.stop()
@@ -95,6 +99,11 @@ object CallManager {
 
     fun remove(call: Call) {
         call.unregisterCallback(callback)
+        // P19: a recording ends with its call.
+        if (recordingCall === call) {
+            CallRecorder.stop()
+            recordingCall = null
+        }
         if (ringing() == null || ringing() === call) CallRinger.stop()
         VideoSessions.remove(call)
         calls.remove(call)?.let { RttSessions.clear(it) }
@@ -140,8 +149,15 @@ object CallManager {
         notifyChanged()
     }
 
+    fun setMeetingHints(hints: Map<String, String>) {
+        meetingHints.clear()
+        meetingHints.putAll(hints)
+        notifyChanged()
+    }
+
     fun clearVaultNames() {
         vaultNames.clear()
+        meetingHints.clear()
         // The call screen and notification drop names only the vault knew.
         notifyChanged()
     }
@@ -150,6 +166,35 @@ object CallManager {
     fun nameFor(number: String): String? {
         val ctx = service ?: return vaultNames[PhoneNumbers.lookupKey(number)]
         return nameFor(ctx, number)
+    }
+
+    /**
+     * P19: starts or stops recording [id]. False when it can't start: no
+     * microphone permission, or Android didn't give any audio source.
+     */
+    fun setRecording(id: String?, on: Boolean): Boolean {
+        if (!on) {
+            CallRecorder.stop()
+            return true
+        }
+        val call = byId(id) ?: return false
+        val ctx = service ?: return false
+        val number = PhoneNumbers.plain(call.details.handle?.schemeSpecificPart ?: "")
+        val started = CallRecorder.start(ctx, number, nameFor(number)) {
+            // Android gave nothing but silence: the file is already gone.
+            if (calls.containsKey(call)) notice(call, "recordingSilent")
+        }
+        if (started) recordingCall = call else notice(call, "recordingFailed")
+        notifyChanged()
+        return started
+    }
+
+    private var recordingCall: Call? = null
+
+    private fun spamReports(number: String): Int? {
+        val ctx = service ?: return null
+        if (number.isEmpty() || SpamList.mode(ctx) == "off" || nameFor(number) != null) return null
+        return SpamList.reports(ctx, number)
     }
 
     fun nameFor(context: Context, number: String): String? {
@@ -209,6 +254,11 @@ object CallManager {
             "id" to id,
             "number" to number,
             "name" to (if (number.isNotEmpty()) nameFor(number) else null),
+            "meeting" to meetingHints[PhoneNumbers.lookupKey(number)],
+            // P24: reports of this number on the spam list; never for a contact.
+            "spamReports" to spamReports(number),
+            // P19: when this call's recording started, while it records.
+            "recordingSince" to (if (recordingCall == call && CallRecorder.isRecording) CallRecorder.startedAt else null),
             "state" to stateName(call.stateCompat()),
             "connectedAt" to details.connectTimeMillis.takeIf { it > 0 },
             "isConference" to details.hasProperty(Call.Details.PROPERTY_CONFERENCE),

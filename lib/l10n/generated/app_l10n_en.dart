@@ -1114,4 +1114,493 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get returnToCall => 'Return to call';
+
+  @override
+  String get rememberSimForNumber => 'Remember for this number';
+
+  @override
+  String get rememberSimForNumberBody =>
+      'Next time this SIM is used without asking';
+
+  @override
+  String get callHoldForSim => 'Call (hold to pick the SIM)';
+
+  @override
+  String get simPerNumber => 'SIM for each number';
+
+  @override
+  String get simPerNumberShort => 'Numbers that always use the same SIM';
+
+  @override
+  String get simPerNumberBody =>
+      'On a phone with two SIMs, ZT Phone asks which one to use unless Android has a default SIM for calls. Tick \"Remember for this number\" on that question and the number always uses the same SIM. Hold the call button to choose again. A SIM set for a contact always wins.';
+
+  @override
+  String get simPerNumberEmpty => 'No numbers yet';
+
+  @override
+  String get forget => 'Forget';
+
+  @override
+  String get keypadAndHandling => 'Keypad and handling';
+
+  @override
+  String get keypadAndHandlingBody =>
+      'Big keys, one-handed mode, key tones, flip to silence';
+
+  @override
+  String get largeKeys => 'Big keys';
+
+  @override
+  String get largeKeysBody => 'Larger keys and digits on the dialpad';
+
+  @override
+  String get oneHandedMode => 'One-handed mode';
+
+  @override
+  String get oneHandedModeBody =>
+      'A narrower keypad on one side, in reach of your thumb. The arrow beside it moves it across.';
+
+  @override
+  String get handLeft => 'Left';
+
+  @override
+  String get handRight => 'Right';
+
+  @override
+  String get keypadMoveLeft => 'Move keypad left';
+
+  @override
+  String get keypadMoveRight => 'Move keypad right';
+
+  @override
+  String get keyTones => 'Key tones';
+
+  @override
+  String get keyTonesBody =>
+      'A short tone for each key, at the phone\'s keypad volume. Silent when the phone is on silent.';
+
+  @override
+  String get keyVibration => 'Key vibration';
+
+  @override
+  String get vibrationLight => 'Light';
+
+  @override
+  String get vibrationStrong => 'Strong';
+
+  @override
+  String get handling => 'Handling';
+
+  @override
+  String get flipToSilence => 'Flip to silence';
+
+  @override
+  String get flipToSilenceBody =>
+      'Turn a ringing phone face down to silence the call. It keeps ringing for the caller, and you can still answer.';
+
+  @override
+  String get pocketGuard => 'Pocket-dial guard';
+
+  @override
+  String get pocketGuardBody =>
+      'Don\'t place a call while something covers the screen, like a pocket or a bag. Needs a proximity sensor.';
+
+  @override
+  String get pocketGuardStopped =>
+      'Call not placed: the screen seems covered. Turn off the pocket-dial guard in Settings if this is wrong.';
+
+  @override
+  String get inMeetingDefaultMessage =>
+      'I\'m in a meeting. I\'ll call you back soon.';
+
+  @override
+  String get meetingUntitled => 'Meeting';
+
+  @override
+  String meetingNow(String title) {
+    return 'Now: $title';
+  }
+
+  @override
+  String meetingToday(String time) {
+    return 'Today $time';
+  }
+
+  @override
+  String meetingTomorrow(String time) {
+    return 'Tomorrow $time';
+  }
+
+  @override
+  String meetingAt(String when, String title) {
+    return '$when: $title';
+  }
+
+  @override
+  String get callTools => 'More';
+
+  @override
+  String get callNote => 'Write a note';
+
+  @override
+  String get callNoteBody => 'Saved in ZT Notes';
+
+  @override
+  String callNoteTitle(String name) {
+    return 'Call with $name';
+  }
+
+  @override
+  String get callNoteHint => 'What to remember from this call';
+
+  @override
+  String get callNoteWhere =>
+      'Kept encrypted on this phone, and moved into ZT Notes the next time you open ZT Phone.';
+
+  @override
+  String get callNoteSaved =>
+      'Note saved. It moves to ZT Notes when you next open ZT Phone.';
+
+  @override
+  String get textMyCard => 'Text my card';
+
+  @override
+  String get textMyCardBody =>
+      'Opens your SMS app with your name and number, ready to send';
+
+  @override
+  String get myCardNotSet => 'Set your card in ZT Phone Settings first';
+
+  @override
+  String get openCalendar => 'Open ZT Calendar';
+
+  @override
+  String get openCalendarBody =>
+      'Check your shared calendars. The call keeps going.';
+
+  @override
+  String get calendarMissing => 'ZT Calendar isn\'t installed';
+
+  @override
+  String get calendarAndCalls => 'Calendar and calls';
+
+  @override
+  String get calendarAndCallsShort =>
+      'Meetings on calls, and calls during meetings';
+
+  @override
+  String get calendarAndCallsBody =>
+      'ZT Phone reads your ZT Calendar in the same account, on this phone only, to know when you meet people and when you\'re busy.';
+
+  @override
+  String get showMeetings => 'Show meetings with a contact';
+
+  @override
+  String get showMeetingsBody =>
+      '\"Tomorrow 10:00: Design review\" on their calls and their contact sheet';
+
+  @override
+  String get callsDuringMeetings => 'Calls during a meeting';
+
+  @override
+  String get inMeetingRing => 'Ring as usual';
+
+  @override
+  String get inMeetingSilence => 'Ring silently';
+
+  @override
+  String get inMeetingSilenceBody => 'The call shows, without sound';
+
+  @override
+  String get inMeetingDecline => 'Decline with a text';
+
+  @override
+  String get inMeetingDeclineBody =>
+      'The caller gets your message; the call shows in Recents';
+
+  @override
+  String get inMeetingMessage => 'Message';
+
+  @override
+  String get letRepeatCallersRing => 'Let repeat callers ring';
+
+  @override
+  String get letRepeatCallersRingBody =>
+      'A second call from the same number within 15 minutes rings as usual, in case it\'s urgent';
+
+  @override
+  String get calendarAndCallsLimits =>
+      'Counts timed events in your own ZT Calendar for the next 7 days; all-day events don\'t count. The times are refreshed each time ZT Phone opens, and only start and end times are kept on the phone for this.';
+
+  @override
+  String get myCard => 'My card';
+
+  @override
+  String get myCardShort => 'What \"Text my card\" sends during a call';
+
+  @override
+  String get myCardBody =>
+      'During a call, \"Text my card\" opens your SMS app with this text to the other person, ready to send. It\'s kept encrypted on this phone so it works while ZT Phone is locked.';
+
+  @override
+  String get myCardPick => 'Choose from ZT Contacts';
+
+  @override
+  String get myCardText => 'Card text';
+
+  @override
+  String get homeScreenWidget => 'Home screen widget';
+
+  @override
+  String get widgetDetails => 'Show details on the home screen';
+
+  @override
+  String get widgetDetailsBody =>
+      'Off: the Recent calls widget shows a lock and the number of new missed calls. On: it lists your latest calls, and the names of your ZT Contacts are stored unencrypted on this phone for the home screen. Private contacts never show';
+
+  @override
+  String get widgetRecents => 'Recent calls';
+
+  @override
+  String get widgetMissed => 'Missed calls';
+
+  @override
+  String get widgetSwitchView => 'Switch between recent and missed calls';
+
+  @override
+  String get widgetDialpad => 'Dialpad';
+
+  @override
+  String get widgetNoCalls => 'No calls yet';
+
+  @override
+  String get widgetNoMissed => 'No missed calls';
+
+  @override
+  String get widgetOpenToAllow => 'Open ZT Phone to allow the call log';
+
+  @override
+  String get widgetRecentsHidden =>
+      'Turn on \"Show details on the home screen\" in ZT Phone settings to see your calls here';
+
+  @override
+  String get widgetYesterday => 'Yesterday';
+
+  @override
+  String get spamHeader => 'Numbers reported as spam';
+
+  @override
+  String get spamOff => 'Off (don\'t download the list)';
+
+  @override
+  String get spamWarn => 'Ring, with a warning on the call screen';
+
+  @override
+  String get spamSilence => 'Silence (they still show in Recents)';
+
+  @override
+  String get spamVoicemail => 'Send to voicemail';
+
+  @override
+  String get spamExplain =>
+      'Once a week ZT Phone downloads a list of numbers many people reported as spam, from ZT Phone\'s own releases on GitHub, and uses it only if its signature checks out. Numbers are looked up on this phone: nothing about you or your calls is sent. Your contacts are never affected. Sources: complaints to the US Do Not Call registry (FTC) and numbers reported to ZT Phone.';
+
+  @override
+  String spamListInfo(String date, int count) {
+    return 'List from $date, $count numbers';
+  }
+
+  @override
+  String get spamListNone => 'No list downloaded yet';
+
+  @override
+  String get spamCheckNow => 'Check for a newer list';
+
+  @override
+  String get spamUpdated => 'The spam list is updated';
+
+  @override
+  String get spamUpToDate => 'The spam list is up to date';
+
+  @override
+  String get spamCheckFailed =>
+      'Couldn\'t get the spam list. Check the connection and try again';
+
+  @override
+  String reportedSpam(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Reported as spam $count times',
+      one: 'Reported as spam',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recordingsAndVoicemail => 'Recordings and voicemail';
+
+  @override
+  String get recordingsAndVoicemailShort =>
+      'Recorded calls, visual voicemail and transcripts made on this phone';
+
+  @override
+  String get recordingSettings => 'Recording and transcripts';
+
+  @override
+  String get recordedCalls => 'Recorded calls';
+
+  @override
+  String get noRecordings => 'No recorded calls';
+
+  @override
+  String get noRecordingsBody =>
+      'Turn on Record calls in settings, then tap More > Record call during a call.';
+
+  @override
+  String get noVisualVoicemail => 'No visual voicemail on this phone';
+
+  @override
+  String get noVisualVoicemailBody =>
+      'Messages show here only when your carrier offers visual voicemail and it\'s set up on this phone. Otherwise call your voicemail from the dialpad (hold 1).';
+
+  @override
+  String get play => 'Play';
+
+  @override
+  String get stop => 'Stop';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String get retry => 'Try again';
+
+  @override
+  String get transcribe => 'Transcribe';
+
+  @override
+  String get inNotes => 'In ZT Notes';
+
+  @override
+  String get saveToNotes => 'Save to ZT Notes';
+
+  @override
+  String get savedToNotes => 'Saved to ZT Notes';
+
+  @override
+  String get notesSaveFailed =>
+      'Couldn\'t save to ZT Notes. Try again when you\'re online';
+
+  @override
+  String get deleteRecordingQuestion => 'Delete this recording?';
+
+  @override
+  String get transcriptNeedsModel => 'Download a speech model first';
+
+  @override
+  String get transcriptNeedsModelBody =>
+      'Transcripts are made on this phone with a speech model (the same ones ZT Keyboard uses). Download one once; nothing is sent anywhere.';
+
+  @override
+  String get transcriptNoAudio => 'There\'s no sound to transcribe';
+
+  @override
+  String get transcriptFailed =>
+      'The transcript didn\'t work. Try again, or try another model';
+
+  @override
+  String get transcriptEmpty => '(No words were heard)';
+
+  @override
+  String get transcriptMadeOnPhone => 'Transcribed on this phone by ZT Phone';
+
+  @override
+  String voicemailFrom(String who) {
+    return 'Voicemail from $who';
+  }
+
+  @override
+  String minutesShort(int count) {
+    return '$count min';
+  }
+
+  @override
+  String get recordCalls => 'Record calls';
+
+  @override
+  String get recordCallsBody =>
+      'Adds Record call to the call screen. Recordings stay on this phone, encrypted. Android decides what an app can hear during a call: on many phones, Pixel and GrapheneOS included, it\'s only silence. ZT Phone then stops and tells you.';
+
+  @override
+  String get recordCallsWarning =>
+      'Recording laws differ by place. In some, everyone on the call must agree to be recorded, so tell the other person before you record. ZT Phone records only when you tap Record call, keeps the recording encrypted on this phone, and never uploads it.';
+
+  @override
+  String get microphoneNeeded =>
+      'Recording needs the microphone. Allow it in Android settings';
+
+  @override
+  String get saveTranscripts => 'Save transcripts to ZT Notes';
+
+  @override
+  String get saveTranscriptsBody =>
+      'New recordings are transcribed on this phone and saved as notes, encrypted, the next time ZT Phone is unlocked. Needs a speech model.';
+
+  @override
+  String get transcriptLanguage => 'Language of transcripts';
+
+  @override
+  String get languageAuto => 'Detect it';
+
+  @override
+  String get speechModels => 'Speech models';
+
+  @override
+  String get transcriptsUnavailable => 'Transcripts don\'t work on this phone';
+
+  @override
+  String get modelOnPhone => 'On this phone';
+
+  @override
+  String get modelNoSpace => 'Not enough space for this model';
+
+  @override
+  String get modelNoConnection =>
+      'Couldn\'t reach the model list. Check the connection';
+
+  @override
+  String get modelFailed => 'The download didn\'t work. Try again';
+
+  @override
+  String get transcriptsExplain =>
+      'Speech models come from ZT Keyboard\'s releases on GitHub and are checked before use. Recordings and voicemail are transcribed on this phone; nothing is sent anywhere. Larger models are more accurate and slower; a long call can take a few minutes.';
+
+  @override
+  String get recordCall => 'Record call';
+
+  @override
+  String get recordCallBody =>
+      'Kept encrypted on this phone. If Android gives only silence, it stops and tells you';
+
+  @override
+  String get stopRecording => 'Stop recording';
+
+  @override
+  String get recordingKept =>
+      'The recording is in Settings > Recordings and voicemail';
+
+  @override
+  String recordingFor(String time) {
+    return 'Recording $time';
+  }
+
+  @override
+  String get recordingSilent =>
+      'Android gave ZT Phone only silence for this call, so nothing was recorded';
+
+  @override
+  String get recordingFailed =>
+      'Recording couldn\'t start. Check that ZT Phone may use the microphone';
 }

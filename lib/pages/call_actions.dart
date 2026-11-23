@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:zerotrust_phone/app/call_comfort.dart';
 import 'package:zerotrust_phone/app/rtt_preference.dart';
+import 'package:zerotrust_phone/calendar/meeting_guard.dart';
+import 'package:zerotrust_phone/calendar/phone_calendar.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
@@ -11,21 +14,40 @@ import 'package:zerotrust_phone/pages/call_details_page.dart';
 import 'package:zerotrust_phone/pages/contact_call_settings_page.dart';
 import 'package:zerotrust_phone/pages/dial_shortcut_page.dart';
 import 'package:zerotrust_phone/pages/dialpad_page.dart';
+import 'package:zerotrust_phone/pages/sim_picker.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/widgets/contact_avatar.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
 
-/// Calls [number], on the contact's own SIM when one is set (P6), with
-/// real-time text when that's switched on (P12). [video] makes it a
-/// carrier video call. [hideCallerId] hides my number for this call; a
+/// Calls [number], on the contact's own SIM when one is set (P6), else
+/// the SIM remembered for the number or picked now (P18, [pickSim] always
+/// asks), with real-time text when that's switched on (P12). [video] makes
+/// it a carrier video call. [hideCallerId] hides my number for this call; a
 /// contact set to "Hide my number" always gets it (P22). [number] may end
-/// in pauses and tones (P15).
-Future<void> placeCall(
+/// in pauses and tones (P15). False when no call was placed: the SIM
+/// picker was closed, or the pocket guard saw a covered screen (P29).
+Future<bool> placeCall(
   WidgetRef ref,
   String number, {
   bool video = false,
   bool hideCallerId = false,
+  bool pickSim = false,
 }) async {
+  final CallComfortNotifier comfort = ref.read(callComfortProvider.notifier);
+  await comfort.loaded;
+  final Telecom telecom = ref.read(telecomProvider);
+  if (ref.read(callComfortProvider).pocketGuard &&
+      await telecom.screenCovered()) {
+    final BuildContext context = ref.context;
+    if (context.mounted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text(context.l10n.pocketGuardStopped)),
+        );
+    }
+    return false;
+  }
   final PhoneContact? contact = ref
       .read(contactDirectoryProvider)
       .lookup(number);
@@ -41,9 +63,17 @@ Future<void> placeCall(
       }
     }
   }
+  if (account == null || pickSim) {
+    final SimPick pick = await pickSimFor(ref, number, ask: pickSim);
+    switch (pick) {
+      case SimCancelled():
+        return false;
+      case SimChosen(:final String? accountId):
+        account = accountId ?? account;
+    }
+  }
   final StartWithRtt rtt = ref.read(startWithRttProvider.notifier);
   await rtt.loaded;
-  final Telecom telecom = ref.read(telecomProvider);
   // Without the camera the call still goes out, showing only their video.
   if (video) await telecom.requestCamera();
   await telecom.placeCall(
@@ -53,6 +83,7 @@ Future<void> placeCall(
     video: video,
     hideCallerId: hide,
   );
+  return true;
 }
 
 Future<void> sendMessage(String number) =>
@@ -83,6 +114,8 @@ Future<void> showNumberSheet(
                 ? Text(contact.company)
                 : null,
           ),
+          // P26: the next meeting with them in ZT Calendar.
+          if (contact != null) MeetingLine(contact: contact),
           const Divider(),
           for (final String n in numbers)
             ListTile(
@@ -260,6 +293,35 @@ Future<void> confirmBlock(
   if (context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(context.l10n.numberBlocked(ltr(number)))),
+    );
+  }
+}
+
+/// "Tomorrow 10:00: Design review": the next meeting with [contact] in ZT
+/// Calendar (P26), or nothing.
+class MeetingLine extends ConsumerWidget {
+  const MeetingLine({super.key, required this.contact});
+  final PhoneContact contact;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (!ref.watch(meetingGuardProvider).showMeetings) {
+      return const SizedBox.shrink();
+    }
+    final List<PhoneEvent> events =
+        ref.watch(phoneEventsProvider).value ?? const <PhoneEvent>[];
+    final DateTime now = DateTime.now();
+    final Meeting? m = Meetings.nextWith(events, contact, now);
+    if (m == null) return const SizedBox.shrink();
+    final AppL10n l = context.l10n;
+    return ListTile(
+      key: const ValueKey<String>('meeting-line'),
+      dense: true,
+      leading: Icon(
+        Icons.event_outlined,
+        color: Theme.of(context).colorScheme.primary,
+      ),
+      title: Text(meetingLine(m, now, l, l.localeName)),
     );
   }
 }

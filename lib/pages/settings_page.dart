@@ -3,13 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zero_trust_core/zero_trust_core.dart';
 import 'package:zerotrust_phone/app/history_retention.dart';
+import 'package:zerotrust_phone/app/recents_widget.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
 import 'package:zerotrust_phone/data/phone_items.dart';
 import 'package:zerotrust_phone/pages/blocked_numbers_page.dart';
 import 'package:zerotrust_phone/pages/call_accessibility_page.dart';
 import 'package:zerotrust_phone/pages/call_protection_page.dart';
 import 'package:zerotrust_phone/pages/history_backup_page.dart';
+import 'package:zerotrust_phone/pages/keypad_settings_page.dart';
+import 'package:zerotrust_phone/pages/meetings_page.dart';
+import 'package:zerotrust_phone/pages/my_card_page.dart';
 import 'package:zerotrust_phone/pages/quick_replies_page.dart';
+import 'package:zerotrust_phone/pages/recordings_page.dart';
+import 'package:zerotrust_phone/pages/sim_picker.dart';
 import 'package:zerotrust_phone/pages/speed_dial_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
@@ -99,6 +105,30 @@ class PhoneSettingsPage extends ConsumerWidget {
           onTap: () => push(const SpeedDialPage()),
         ),
         ListTile(
+          leading: const Icon(Icons.dialpad),
+          title: Text(context.l10n.keypadAndHandling),
+          subtitle: Text(context.l10n.keypadAndHandlingBody),
+          onTap: () => push(const KeypadSettingsPage()),
+        ),
+        ListTile(
+          leading: const Icon(Icons.sim_card_outlined),
+          title: Text(context.l10n.simPerNumber),
+          subtitle: Text(context.l10n.simPerNumberShort),
+          onTap: () => push(const SimChoicesPage()),
+        ),
+        ListTile(
+          leading: const Icon(Icons.event_outlined),
+          title: Text(context.l10n.calendarAndCalls),
+          subtitle: Text(context.l10n.calendarAndCallsShort),
+          onTap: () => push(const MeetingsPage()),
+        ),
+        ListTile(
+          leading: const Icon(Icons.contact_page_outlined),
+          title: Text(context.l10n.myCard),
+          subtitle: Text(context.l10n.myCardShort),
+          onTap: () => push(const MyCardPage()),
+        ),
+        ListTile(
           leading: const Icon(Icons.rtt),
           title: Text(context.l10n.callAccessibility),
           subtitle: Text(context.l10n.callAccessibilityBody),
@@ -119,9 +149,27 @@ class PhoneSettingsPage extends ConsumerWidget {
           onTap: () => push(const HistoryBackupPage()),
         ),
         ListTile(
+          key: const ValueKey<String>('recordings-row'),
+          leading: const Icon(Icons.graphic_eq),
+          title: Text(context.l10n.recordingsAndVoicemail),
+          subtitle: Text(context.l10n.recordingsAndVoicemailShort),
+          onTap: () => push(const RecordingsPage()),
+        ),
+        ListTile(
           leading: const Icon(Icons.do_not_disturb_on_outlined),
           title: Text(context.l10n.dndStarred),
           subtitle: Text(context.l10n.dndStarredBody),
+        ),
+        // W11: off by default, like every Zero-Trust widget.
+        SwitchListTile(
+          key: const ValueKey<String>('recents-widget-details'),
+          secondary: const Icon(Icons.widgets_outlined),
+          title: Text(context.l10n.widgetDetails),
+          subtitle: Text(context.l10n.widgetDetailsBody),
+          isThreeLine: true,
+          value: ref.watch(recentsWidgetDetailsProvider),
+          onChanged: (bool on) =>
+              ref.read(recentsWidgetDetailsProvider.notifier).set(on),
         ),
       ],
     );

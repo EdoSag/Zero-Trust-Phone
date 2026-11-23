@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zero_trust_core/zero_trust_core.dart';
 import 'package:zerotrust_phone/call/call_state.dart';
+import 'package:zerotrust_phone/call/call_tools.dart';
 import 'package:zerotrust_phone/call/rtt.dart';
 import 'package:zerotrust_phone/pages/dialpad_page.dart';
 import 'package:zerotrust_phone/services/quick_replies.dart';
@@ -593,6 +594,68 @@ class _CallerHeader extends StatelessWidget {
           liveRegion: call.state != CallState.active,
           child: Text(status, style: text.titleMedium),
         ),
+        if (call.recordingSince case final DateTime since) ...<Widget>[
+          const SizedBox(height: 8),
+          Row(
+            key: const ValueKey<String>('call-recording'),
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                Icons.fiber_manual_record,
+                size: 14,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              const SizedBox(width: 6),
+              Text(l.recordingFor(_elapsed(l, since)), style: text.bodyMedium),
+            ],
+          ),
+        ],
+        if (call.spamReports case final int reports) ...<Widget>[
+          const SizedBox(height: 8),
+          Row(
+            key: const ValueKey<String>('call-spam'),
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                Icons.report_outlined,
+                size: 18,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                l.reportedSpam(reports),
+                style: text.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.error,
+                ),
+              ),
+            ],
+          ),
+        ],
+        if (call.meeting case final String meeting) ...<Widget>[
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Row(
+              key: const ValueKey<String>('call-meeting'),
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Icon(
+                  Icons.event_outlined,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    meeting,
+                    style: text.bodyMedium,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -794,6 +857,13 @@ class _Controls extends StatelessWidget {
               label: context.l10n.video,
               onTap: onVideo,
             ),
+          // P27: a note, my card, the calendar.
+          if (call.number.isNotEmpty && !call.isConference)
+            _Toggle(
+              icon: Icons.more_horiz,
+              label: context.l10n.callTools,
+              onTap: () => showCallTools(context, call),
+            ),
           if (call.canRtt && !call.rttActive && call.state == CallState.active)
             _Toggle(
               icon: Icons.rtt,
@@ -958,6 +1028,8 @@ class _Notice extends StatelessWidget {
     final String? text = switch (call.notice) {
       'rttFailed' => context.l10n.rttFailed,
       'videoFailed' => context.l10n.videoFailed,
+      'recordingSilent' => context.l10n.recordingSilent,
+      'recordingFailed' => context.l10n.recordingFailed,
       _ => null,
     };
     if (text == null) return const SizedBox.shrink();
