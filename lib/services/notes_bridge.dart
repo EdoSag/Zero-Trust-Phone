@@ -205,24 +205,35 @@ class PendingCallNotes {
 
   /// Moves every waiting note into ZT Notes with [addNote]; each one is
   /// removed here only once it's saved there. Returns how many moved.
+  ///
+  /// Only the notes that moved are taken out, from the queue as it is when
+  /// they are done: a note added meanwhile (the call screen runs its own
+  /// engine and can add one while this waits on ZT Notes) stays.
   Future<int> moveInto(
     Future<void> Function(PendingCallNote note) addNote,
   ) async {
     final List<PendingCallNote> waiting = await all();
     if (waiting.isEmpty) return 0;
-    final List<PendingCallNote> left = <PendingCallNote>[];
-    int moved = 0;
+    final List<String> moved = <String>[];
     for (final PendingCallNote n in waiting) {
       try {
         await addNote(n);
-        moved++;
+        moved.add(_same(n));
       } on Object {
-        left.add(n);
+        // Stays for the next try.
       }
     }
-    await _save(left);
-    return moved;
+    if (moved.isEmpty) return 0;
+    final List<String> toTake = <String>[...moved];
+    await _save(<PendingCallNote>[
+      for (final PendingCallNote n in await all())
+        if (!toTake.remove(_same(n))) n,
+    ]);
+    return moved.length;
   }
+
+  /// What makes two queued notes the same one.
+  static String _same(PendingCallNote n) => jsonEncode(n.toJson());
 }
 
 final pendingCallNotesProvider = Provider<PendingCallNotes>(

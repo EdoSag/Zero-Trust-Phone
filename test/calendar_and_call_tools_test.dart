@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +15,7 @@ import 'package:zerotrust_phone/call/in_call_app.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
 import 'package:zerotrust_phone/services/notes_bridge.dart';
+import 'package:zerotrust_phone/services/recordings.dart';
 
 /// P26 calendar awareness and P27 in-call tools.
 PhoneEvent event(
@@ -262,6 +264,48 @@ void main() {
         expect((await pending.all()).single.text, 'fails');
       },
     );
+
+    test('a note added while the queue moves stays', () async {
+      final InMemoryPreferencesStore prefs = InMemoryPreferencesStore();
+      final PendingCallNotes pending = PendingCallNotes(prefs);
+      await pending.add(
+        PendingCallNote(number: '050', name: '', at: now, text: 'first'),
+      );
+      final int moved = await pending.moveInto((PendingCallNote n) async {
+        // The call screen saves another note meanwhile.
+        await pending.add(
+          PendingCallNote(
+            number: '050',
+            name: '',
+            at: now.add(const Duration(minutes: 1)),
+            text: 'during',
+          ),
+        );
+      });
+      expect(moved, 1);
+      expect((await pending.all()).single.text, 'during');
+    });
+
+    test('the call tools read the recording switch and My card again', () async {
+      final InMemoryPreferencesStore prefs = InMemoryPreferencesStore();
+      final ProviderContainer c = ProviderContainer(
+        overrides: [ztPreferencesStoreProvider.overrideWithValue(prefs)],
+      );
+      addTearDown(c.dispose);
+      await c.read(recordingSettingsProvider.notifier).loaded;
+      expect(c.read(recordingSettingsProvider).recordCalls, isFalse);
+      expect(await c.read(myCardProvider.future), isNull);
+      // Changed in the app, whose engine is another one.
+      await prefs.write(
+        RecordingSettingsNotifier.key,
+        jsonEncode(const RecordingSettings(recordCalls: true).toJson()),
+      );
+      await prefs.write(MyCard.key, 'Dana 050');
+      reloadCallToolSettings(c);
+      await c.read(recordingSettingsProvider.notifier).loaded;
+      expect(c.read(recordingSettingsProvider).recordCalls, isTrue);
+      expect(await c.read(myCardProvider.future), 'Dana 050');
+    });
 
     test('a new note has the shape ZT Notes writes', () {
       final Map<String, Object?> j = newNoteJson(
