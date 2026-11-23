@@ -1,5 +1,10 @@
 // Copied from ZT Calendar (lib/model/recurrence.dart), so Phone expands
 // repeating events the same way Calendar shows them. Keep in step.
+//
+// One difference: [RecurrenceRule.between] here starts near the window
+// asked for instead of walking every period since the series began. Phone
+// expands the whole calendar at once, on the screen thread, so a few daily
+// events from years ago used to cost a second each time.
 import 'package:flutter/foundation.dart';
 
 /// How often a repeating event repeats (RFC 5545 `FREQ`).
@@ -214,7 +219,10 @@ class RecurrenceRule {
     int limit = 2000,
   }) {
     final out = <DateTime>[];
-    for (final t in _iterate(dtStart)) {
+    for (final t in _iterate(
+      dtStart,
+      firstPeriod: _periodsSafelyBefore(dtStart, from),
+    )) {
       if (!t.isBefore(to)) break;
       if (!t.isBefore(from) && !exclude.contains(t)) {
         out.add(t);
@@ -228,13 +236,36 @@ class RecurrenceRule {
   /// Infinite for a rule with neither: take what you need.
   Iterable<DateTime> occurrences(DateTime dtStart) => _iterate(dtStart);
 
-  Iterable<DateTime> _iterate(DateTime dtStart) sync* {
+  /// How many whole periods after [dtStart] can be skipped when only
+  /// occurrences from [from] on are wanted: two short of the period holding
+  /// [from], so nothing near it is missed. Zero for a rule with COUNT, whose
+  /// every occurrence has to be counted from the start.
+  int _periodsSafelyBefore(DateTime dtStart, DateTime from) {
+    if (count != null || !from.isAfter(dtStart)) return 0;
+    // Calendar days, not hours, so daylight-saving changes don't matter.
+    final days = DateTime.utc(
+      from.year,
+      from.month,
+      from.day,
+    ).difference(DateTime.utc(dtStart.year, dtStart.month, dtStart.day)).inDays;
+    final periods = switch (frequency) {
+      Frequency.daily => days ~/ interval,
+      Frequency.weekly => days ~/ (7 * interval),
+      Frequency.monthly =>
+        ((from.year - dtStart.year) * 12 + from.month - dtStart.month) ~/
+            interval,
+      Frequency.yearly => (from.year - dtStart.year) ~/ interval,
+    };
+    return periods > 2 ? periods - 2 : 0;
+  }
+
+  Iterable<DateTime> _iterate(DateTime dtStart, {int firstPeriod = 0}) sync* {
     var produced = 0;
     yield dtStart;
     produced++;
     if (count != null && produced >= count!) return;
     var emptyPeriods = 0;
-    for (var period = 0; period < 100000; period++) {
+    for (var period = firstPeriod; period < firstPeriod + 100000; period++) {
       final candidates = _candidates(dtStart, period);
       if (candidates.isEmpty) {
         // A rule that can never match (BYMONTHDAY=31 with BYMONTH=2).

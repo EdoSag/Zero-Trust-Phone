@@ -43,6 +43,16 @@ class CallTools {
 
 final callToolsProvider = Provider<CallTools>((ref) => CallTools());
 
+/// Reads the recording switch and My card again. The call screen's engine
+/// stays alive between calls, so what it loaded once would otherwise miss a
+/// change made in the app since (Record not offered after recording was
+/// turned on, an old card still sent).
+void reloadCallToolSettings(ProviderContainer container) {
+  container
+    ..invalidate(recordingSettingsProvider)
+    ..invalidate(myCardProvider);
+}
+
 /// P27: in-call tools. A note (kept on the phone until ZT Phone is next
 /// unlocked, then saved in ZT Notes), my card by text, and ZT Calendar.
 Future<void> showCallTools(BuildContext context, PhoneCall call) {
@@ -51,6 +61,7 @@ Future<void> showCallTools(BuildContext context, PhoneCall call) {
     context,
     listen: false,
   );
+  reloadCallToolSettings(container);
   return showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,

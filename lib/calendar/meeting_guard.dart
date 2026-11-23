@@ -127,12 +127,21 @@ class MeetingRules {
     required String locale,
     required DateTime now,
   }) {
+    final bool wantsBusy = guard.mode != InMeeting.ring;
+    // The calendar is expanded once for everything below. It used to be
+    // expanded again for every contact, which froze the app for minutes
+    // with a full calendar and a long contact list.
+    final List<Meeting> week = guard.showMeetings || wantsBusy
+        ? Meetings.between(events, now, now.add(Meetings.week))
+        : const <Meeting>[];
     final Map<String, String> hints = <String, String>{};
-    if (guard.showMeetings) {
+    if (guard.showMeetings && week.isNotEmpty) {
+      final MeetingFinder finder = MeetingFinder(week);
+      final Map<Meeting, String> lines = <Meeting, String>{};
       for (final PhoneContact c in contacts) {
-        final Meeting? m = Meetings.nextWith(events, c, now);
+        final Meeting? m = finder.nextWith(c);
         if (m == null) continue;
-        final String line = meetingLine(m, now, l10n, locale);
+        final String line = lines[m] ??= meetingLine(m, now, l10n, locale);
         for (final String p in c.phones) {
           final String key = PhoneNumbers.lookupKey(p);
           if (key.isNotEmpty) hints[key] = line;
@@ -143,9 +152,7 @@ class MeetingRules {
       mode: guard.mode,
       message: guard.messageIn(l10n),
       letRepeatCallersRing: guard.letRepeatCallersRing,
-      busy: guard.mode == InMeeting.ring
-          ? const <(DateTime, DateTime)>[]
-          : Meetings.busy(events, now),
+      busy: wantsBusy ? Meetings.busyIn(week) : const <(DateTime, DateTime)>[],
       hints: hints,
     );
   }
