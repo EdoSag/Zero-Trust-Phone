@@ -67,7 +67,7 @@ class ZeroTrustPhoneApp extends ConsumerWidget {
           AppL10n.delegate,
           ...ZtLanguages.delegates,
         ],
-        home: const AppGate(),
+        home: const ZtSignInHandoffScope(child: AppGate()),
         // Any touch on any screen counts as activity for auto-lock.
         builder: (BuildContext context, Widget? child) => Listener(
           onPointerDown: (_) =>
