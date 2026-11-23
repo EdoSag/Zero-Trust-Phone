@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zero_trust_core/zero_trust_core.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
+import 'package:zerotrust_phone/data/mirror_items.dart';
 
 /// The ZT Contacts app id, whose items hold the address book.
 const String contactsAppId = 'contacts';
@@ -140,53 +141,37 @@ class ContactsMirror {
     if (!_refreshed.isClosed) _refreshed.add(null);
   }
 
-  Future<List<PhoneContact>> contacts() async {
-    final List<PhoneContact> out = <PhoneContact>[
-      for (final LocalItem item in await store.liveItems())
-        ?PhoneContact.fromItem(item.itemId, item.json),
-    ];
-    out.sort(
-      (PhoneContact a, PhoneContact b) =>
-          a.name.toLowerCase().compareTo(b.name.toLowerCase()),
-    );
-    return out;
+  Future<List<PhoneContact>> contacts() async => byName(<PhoneContact>[
+    for (final LocalItem item in await store.liveItems())
+      ?PhoneContact.fromItem(item.itemId, item.json),
+  ]);
+
+  /// [contacts] sorted by name, capitals aside.
+  static List<PhoneContact> byName(List<PhoneContact> contacts) {
+    // Each name is lowered once, not once per comparison.
+    final List<(String, PhoneContact)> keyed =
+        <(String, PhoneContact)>[
+          for (final PhoneContact c in contacts) (c.name.toLowerCase(), c),
+        ]..sort(
+          ((String, PhoneContact) a, (String, PhoneContact) b) =>
+              a.$1.compareTo(b.$1),
+        );
+    return <PhoneContact>[for (final (String, PhoneContact) k in keyed) k.$2];
   }
 
-  Stream<List<PhoneContact>> watch() async* {
-    yield await contacts();
-    await for (final _ in StreamGroupLite.merge(
-      store.changes,
-      _refreshed.stream,
-    )) {
-      yield await contacts();
-    }
-  }
+  /// The address book now, then after every change. Only the contacts
+  /// that changed are read again (see [MirrorItems]).
+  Stream<List<PhoneContact>> watch() => MirrorItems<PhoneContact>.of(
+    store,
+    refreshed: _refreshed.stream,
+    parse: PhoneContact.fromItem,
+  ).watch().map(byName);
 
   Future<void> close() async {
     _lifecycle?.dispose();
     await _refreshed.close();
     await engine.close();
     await store.close();
-  }
-}
-
-/// Merges two streams without pulling in package:async.
-abstract final class StreamGroupLite {
-  static Stream<void> merge(Stream<Object?> a, Stream<Object?> b) {
-    late final StreamController<void> controller;
-    StreamSubscription<Object?>? sa;
-    StreamSubscription<Object?>? sb;
-    controller = StreamController<void>(
-      onListen: () {
-        sa = a.listen((_) => controller.add(null));
-        sb = b.listen((_) => controller.add(null));
-      },
-      onCancel: () async {
-        await sa?.cancel();
-        await sb?.cancel();
-      },
-    );
-    return controller.stream;
   }
 }
 

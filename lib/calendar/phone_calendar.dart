@@ -7,6 +7,7 @@ import 'package:zero_trust_core/zero_trust_core.dart';
 import 'package:zerotrust_phone/calendar/recurrence.dart';
 import 'package:zerotrust_phone/contacts/phone_contact.dart';
 import 'package:zerotrust_phone/contacts/vault_contacts.dart';
+import 'package:zerotrust_phone/data/mirror_items.dart';
 
 /// The ZT Calendar app id, whose items hold the events (P26).
 const String calendarAppId = 'calendar';
@@ -193,28 +194,33 @@ abstract final class Meetings {
     return m.title.toLowerCase().contains(name);
   }
 
+  /// How far ahead Phone looks for meetings.
+  static const Duration week = Duration(days: 7);
+
   /// The next meeting with [contact] that hasn't ended, within [ahead].
+  ///
+  /// For one contact. For the whole address book expand the calendar once
+  /// with [between] and ask a [MeetingFinder]: expanding it again for every
+  /// contact froze the app with a full calendar and a long contact list.
   static Meeting? nextWith(
     List<PhoneEvent> events,
     PhoneContact contact,
     DateTime now, {
-    Duration ahead = const Duration(days: 7),
-  }) {
-    for (final Meeting m in between(events, now, now.add(ahead))) {
-      if (isWith(m, contact)) return m;
-    }
-    return null;
-  }
+    Duration ahead = week,
+  }) => MeetingFinder(between(events, now, now.add(ahead))).nextWith(contact);
 
   /// Times I'm in a timed meeting in `[now, now + ahead)`, overlapping
   /// ones joined. All-day events (holidays, trips) don't count.
   static List<(DateTime, DateTime)> busy(
     List<PhoneEvent> events,
     DateTime now, {
-    Duration ahead = const Duration(days: 7),
-  }) {
+    Duration ahead = week,
+  }) => busyIn(between(events, now, now.add(ahead)));
+
+  /// [busy] for meetings already expanded with [between].
+  static List<(DateTime, DateTime)> busyIn(List<Meeting> meetings) {
     final List<(DateTime, DateTime)> out = <(DateTime, DateTime)>[];
-    for (final Meeting m in between(events, now, now.add(ahead))) {
+    for (final Meeting m in meetings) {
       if (m.allDay || !m.end.isAfter(m.start)) continue;
       if (out.isNotEmpty && !m.start.isAfter(out.last.$2)) {
         final (DateTime s, DateTime e) = out.removeLast();
@@ -224,6 +230,49 @@ abstract final class Meetings {
       }
     }
     return out;
+  }
+}
+
+/// Finds each contact's next meeting among meetings already expanded with
+/// [Meetings.between] (sorted by start), without expanding the calendar
+/// again per contact. Answers the same as [Meetings.isWith] would.
+class MeetingFinder {
+  MeetingFinder(this.meetings)
+    : _titles = <String>[
+        for (final Meeting m in meetings) m.title.toLowerCase(),
+      ] {
+    for (int i = 0; i < meetings.length; i++) {
+      for (final String id in meetings[i].event.contactIds) {
+        _linked.putIfAbsent(id, () => i);
+      }
+    }
+  }
+
+  final List<Meeting> meetings;
+  final List<String> _titles;
+
+  /// Contact id to the first meeting it is linked to in ZT Calendar.
+  final Map<String, int> _linked = <String, int>{};
+
+  static final RegExp _space = RegExp(r'\s');
+
+  /// The first meeting with [contact], or null.
+  Meeting? nextWith(PhoneContact contact) {
+    if (meetings.isEmpty) return null;
+    int? first = _linked[contact.id];
+    // A title only counts when it names the contact in full: "Lunch with
+    // Dana Levi", not every "Dana".
+    final String name = contact.name.trim().toLowerCase();
+    if (_space.hasMatch(name)) {
+      final int end = first ?? meetings.length;
+      for (int i = 0; i < end; i++) {
+        if (_titles[i].contains(name)) {
+          first = i;
+          break;
+        }
+      }
+    }
+    return first == null ? null : meetings[first];
   }
 }
 
@@ -298,15 +347,13 @@ class CalendarMirror {
       ?PhoneEvent.fromItem(item.itemId, item.json),
   ];
 
-  Stream<List<PhoneEvent>> watch() async* {
-    yield await events();
-    await for (final _ in StreamGroupLite.merge(
-      store.changes,
-      _refreshed.stream,
-    )) {
-      yield await events();
-    }
-  }
+  /// The events now, then after every change. Only the events that
+  /// changed are read again (see [MirrorItems]).
+  Stream<List<PhoneEvent>> watch() => MirrorItems<PhoneEvent>.of(
+    store,
+    refreshed: _refreshed.stream,
+    parse: PhoneEvent.fromItem,
+  ).watch();
 
   Future<void> close() async {
     _lifecycle?.dispose();

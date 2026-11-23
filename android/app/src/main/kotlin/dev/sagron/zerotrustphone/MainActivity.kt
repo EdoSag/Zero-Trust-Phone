@@ -54,6 +54,22 @@ class MainActivity : FlutterFragmentActivity() {
     }
 
     /**
+     * Runs [work] off the main thread and answers with its result, or with
+     * its error as the channel would have. For reads and writes of the call
+     * log, which can be thousands of rows.
+     */
+    private fun <T> offMain(result: MethodChannel.Result, work: () -> T) {
+        Thread {
+            try {
+                val value = work()
+                runOnUiThread { result.success(value) }
+            } catch (e: Exception) {
+                runOnUiThread { result.error("error", e.message, null) }
+            }
+        }.start()
+    }
+
+    /**
      * P20, P21: a transcript on the phone. Answers {"text": ...} or
      * {"error": "noModel" | "noAudio" | "failed"}.
      */
@@ -301,19 +317,37 @@ class MainActivity : FlutterFragmentActivity() {
                     }
                     "phoneAccounts" -> result.success(phoneAccounts())
                     "setScreening" -> {
-                        @Suppress("UNCHECKED_CAST")
-                        ScreeningStore(this).update(
-                            unknownMode = call.argument<String>("unknownMode") ?: "ring",
-                            blockHidden = call.argument<Boolean>("blockHidden") ?: false,
-                            prefixes = call.argument<List<String>>("prefixes") ?: emptyList(),
-                            contactKeys = call.argument<List<String>>("contactKeys") ?: emptyList(),
-                            voicemailKeys = call.argument<List<String>>("voicemailKeys") ?: emptyList(),
-                            ringtones = call.argument<Map<String, String>>("ringtones") ?: emptyMap(),
-                            privateKeys = call.argument<List<String>>("privateKeys") ?: emptyList(),
-                        )
-                        // W11: a contact made private leaves the widget now.
-                        RecentCallsWidget.refresh(this)
-                        result.success(null)
+                        val unknownMode = call.argument<String>("unknownMode") ?: "ring"
+                        val blockHidden = call.argument<Boolean>("blockHidden") ?: false
+                        val prefixes = call.argument<List<String>>("prefixes") ?: emptyList()
+                        val contactKeys = call.argument<List<String>>("contactKeys") ?: emptyList()
+                        val voicemailKeys = call.argument<List<String>>("voicemailKeys") ?: emptyList()
+                        val ringtones = call.argument<Map<String, String>>("ringtones") ?: emptyMap()
+                        val privateKeys = call.argument<List<String>>("privateKeys") ?: emptyList()
+                        val app = applicationContext
+                        // Thousands of numbers to hash with a long address
+                        // book: never on the main thread, where it froze
+                        // the whole app.
+                        ScreeningStore.writer.execute {
+                            try {
+                                ScreeningStore(app).update(
+                                    unknownMode = unknownMode,
+                                    blockHidden = blockHidden,
+                                    prefixes = prefixes,
+                                    contactKeys = contactKeys,
+                                    voicemailKeys = voicemailKeys,
+                                    ringtones = ringtones,
+                                    privateKeys = privateKeys,
+                                )
+                            } catch (_: Exception) {
+                                // The rules saved before stay in place.
+                            }
+                            runOnUiThread {
+                                // W11: a contact made private leaves the widget now.
+                                RecentCallsWidget.refresh(app)
+                                result.success(null)
+                            }
+                        }
                     }
                     "takePrivateCalls" -> result.success(PrivateCallLog.pending(this))
                     "ackPrivateCalls" -> {
@@ -349,14 +383,25 @@ class MainActivity : FlutterFragmentActivity() {
                         pendingCallBackLater = null
                     }
                     "clearScreeningContacts" -> {
-                        ScreeningStore(this).clearContacts()
-                        PrivateCallLog.clear(this)
-                        CallBackAlarms.cancelAll(this)
-                        result.success(null)
+                        val app = applicationContext
+                        // After any rules still being saved, so signing out
+                        // always has the last word.
+                        ScreeningStore.writer.execute {
+                            try {
+                                ScreeningStore(app).clearContacts()
+                            } catch (_: Exception) {
+                            }
+                            runOnUiThread {
+                                PrivateCallLog.clear(app)
+                                CallBackAlarms.cancelAll(app)
+                                result.success(null)
+                            }
+                        }
                     }
-                    "insertCalls" -> result.success(
-                        insertCalls(call.argument<List<Map<String, Any?>>>("calls") ?: emptyList())
-                    )
+                    "insertCalls" -> {
+                        val calls = call.argument<List<Map<String, Any?>>>("calls") ?: emptyList()
+                        offMain(result) { insertCalls(calls) }
+                    }
                     "pickRingtone" -> pickRingtone(call.argument<String>("current"), result)
                     "ringtoneTitle" -> result.success(
                         call.argument<String>("uri")?.let { uri ->
@@ -378,7 +423,10 @@ class MainActivity : FlutterFragmentActivity() {
                         )
                         result.success(null)
                     }
-                    "callLog" -> result.success(callLog(call.argument<Int>("limit") ?: 500))
+                    "callLog" -> {
+                        val limit = call.argument<Int>("limit") ?: 500
+                        offMain(result) { callLog(limit) }
+                    }
                     "deleteCalls" -> result.success(
                         deleteCalls(call.argument<List<Any>>("ids") ?: emptyList())
                     )
