@@ -25,6 +25,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.security.KeyStore
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -285,13 +286,18 @@ object CallRecorder {
 
 /** Plays a recording, decrypting it piece by piece; no plain copy is written. */
 object RecordingPlayer {
-    @Volatile private var playing: Thread? = null
-    @Volatile private var stop = false
+    /**
+     * The playing recording's own "stop" flag. Each playback has its own, so
+     * starting another one can't un-stop the one before it, and a stopped or
+     * replaced playback never reports "done" over the one that replaced it.
+     */
+    @Volatile private var current: AtomicBoolean? = null
 
     fun play(context: Context, id: String, onDone: () -> Unit) {
         stopNow()
         val app = context.applicationContext
-        stop = false
+        val cancelled = AtomicBoolean(false)
+        current = cancelled
         val t = Thread({
             val track = AudioTrack.Builder()
                 .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA)
@@ -303,20 +309,24 @@ object RecordingPlayer {
                 .build()
             try {
                 track.play()
-                Recordings.read(app, id) { piece -> track.write(piece, 0, piece.size); !stop }
+                Recordings.read(app, id) { piece ->
+                    if (!cancelled.get()) track.write(piece, 0, piece.size)
+                    !cancelled.get()
+                }
             } catch (_: Exception) {
             } finally {
                 try { track.stop() } catch (_: Exception) {}
                 track.release()
-                Handler(Looper.getMainLooper()).post(onDone)
+                // Checked on the main thread, where play and stop run: only
+                // a playback that ended by itself says so.
+                Handler(Looper.getMainLooper()).post { if (!cancelled.get()) onDone() }
             }
         }, "RecordingPlayer")
-        playing = t
         t.start()
     }
 
     fun stopNow() {
-        stop = true
-        playing = null
+        current?.set(true)
+        current = null
     }
 }
