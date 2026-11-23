@@ -1434,4 +1434,169 @@ class AppL10nHe extends AppL10n {
     );
     return '$_temp0';
   }
+
+  @override
+  String get recordingsAndVoicemail => 'הקלטות ותא קולי';
+
+  @override
+  String get recordingsAndVoicemailShort =>
+      'שיחות מוקלטות, תא קולי חזותי ותמלולים שנעשים בטלפון הזה';
+
+  @override
+  String get recordingSettings => 'הקלטה ותמלול';
+
+  @override
+  String get recordedCalls => 'שיחות מוקלטות';
+
+  @override
+  String get noRecordings => 'אין שיחות מוקלטות';
+
+  @override
+  String get noRecordingsBody =>
+      'יש להפעיל את \"הקלטת שיחות\" בהגדרות, ואז במהלך שיחה להקיש על \"עוד\" > \"הקלטת השיחה\".';
+
+  @override
+  String get noVisualVoicemail => 'אין תא קולי חזותי בטלפון הזה';
+
+  @override
+  String get noVisualVoicemailBody =>
+      'ההודעות מופיעות כאן רק כשהספק שלך מציע תא קולי חזותי והוא מוגדר בטלפון הזה. אחרת אפשר להתקשר לתא הקולי מלוח החיוג (לחיצה ארוכה על 1).';
+
+  @override
+  String get play => 'השמעה';
+
+  @override
+  String get stop => 'עצירה';
+
+  @override
+  String get copy => 'העתקה';
+
+  @override
+  String get retry => 'ניסיון חוזר';
+
+  @override
+  String get transcribe => 'תמלול';
+
+  @override
+  String get inNotes => 'ב-ZT Notes';
+
+  @override
+  String get saveToNotes => 'שמירה ב-ZT Notes';
+
+  @override
+  String get savedToNotes => 'נשמר ב-ZT Notes';
+
+  @override
+  String get notesSaveFailed =>
+      'לא הצלחנו לשמור ב-ZT Notes. כדאי לנסות שוב כשיש חיבור';
+
+  @override
+  String get deleteRecordingQuestion => 'למחוק את ההקלטה?';
+
+  @override
+  String get transcriptNeedsModel => 'קודם צריך להוריד מודל דיבור';
+
+  @override
+  String get transcriptNeedsModelBody =>
+      'התמלולים נעשים בטלפון הזה בעזרת מודל דיבור (אותם מודלים ש-ZT Keyboard משתמשת בהם). מורידים מודל פעם אחת, ושום דבר לא נשלח לשום מקום.';
+
+  @override
+  String get transcriptNoAudio => 'אין צליל לתמלל';
+
+  @override
+  String get transcriptFailed =>
+      'התמלול לא הצליח. כדאי לנסות שוב, או לנסות מודל אחר';
+
+  @override
+  String get transcriptEmpty => '(לא נשמעו מילים)';
+
+  @override
+  String get transcriptMadeOnPhone => 'תומלל בטלפון הזה על ידי ZT Phone';
+
+  @override
+  String voicemailFrom(String who) {
+    return 'הודעה קולית מאת $who';
+  }
+
+  @override
+  String minutesShort(int count) {
+    return '$count דק׳';
+  }
+
+  @override
+  String get recordCalls => 'הקלטת שיחות';
+
+  @override
+  String get recordCallsBody =>
+      'מוסיפה את \"הקלטת השיחה\" למסך השיחה. ההקלטות נשארות בטלפון הזה, מוצפנות. אנדרואיד קובעת מה אפליקציה יכולה לשמוע בזמן שיחה: בטלפונים רבים, כולל Pixel ו-GrapheneOS, רק שקט. במקרה כזה ZT Phone עוצרת ומודיעה לך.';
+
+  @override
+  String get recordCallsWarning =>
+      'החוקים לגבי הקלטה שונים ממקום למקום. בחלק מהמקומות כל המשתתפים בשיחה צריכים להסכים להקלטה, ולכן כדאי לומר לצד השני לפני שמקליטים. ZT Phone מקליטה רק כשמקישים על \"הקלטת השיחה\", שומרת את ההקלטה מוצפנת בטלפון הזה ואף פעם לא מעלה אותה.';
+
+  @override
+  String get microphoneNeeded =>
+      'הקלטה צריכה גישה למיקרופון. אפשר לאשר אותה בהגדרות אנדרואיד';
+
+  @override
+  String get saveTranscripts => 'שמירת תמלולים ב-ZT Notes';
+
+  @override
+  String get saveTranscriptsBody =>
+      'הקלטות חדשות מתומללות בטלפון הזה ונשמרות כפתקים מוצפנים בפעם הבאה ש-ZT Phone נפתחת. צריך מודל דיבור.';
+
+  @override
+  String get transcriptLanguage => 'שפת התמלול';
+
+  @override
+  String get languageAuto => 'זיהוי אוטומטי';
+
+  @override
+  String get speechModels => 'מודלים של דיבור';
+
+  @override
+  String get transcriptsUnavailable => 'תמלול לא עובד בטלפון הזה';
+
+  @override
+  String get modelOnPhone => 'בטלפון הזה';
+
+  @override
+  String get modelNoSpace => 'אין מספיק מקום למודל הזה';
+
+  @override
+  String get modelNoConnection =>
+      'לא הצלחנו להגיע לרשימת המודלים. כדאי לבדוק את החיבור';
+
+  @override
+  String get modelFailed => 'ההורדה לא הצליחה. כדאי לנסות שוב';
+
+  @override
+  String get transcriptsExplain =>
+      'מודלי הדיבור מגיעים מהגרסאות של ZT Keyboard ב-GitHub ונבדקים לפני השימוש. ההקלטות וההודעות הקוליות מתומללות בטלפון הזה, ושום דבר לא נשלח לשום מקום. מודלים גדולים מדויקים יותר ואיטיים יותר; שיחה ארוכה יכולה לקחת כמה דקות.';
+
+  @override
+  String get recordCall => 'הקלטת השיחה';
+
+  @override
+  String get recordCallBody =>
+      'נשמרת מוצפנת בטלפון הזה. אם אנדרואיד נותנת רק שקט, ההקלטה נעצרת ותופיע הודעה';
+
+  @override
+  String get stopRecording => 'עצירת ההקלטה';
+
+  @override
+  String get recordingKept => 'ההקלטה נמצאת בהגדרות > הקלטות ותא קולי';
+
+  @override
+  String recordingFor(String time) {
+    return 'הקלטה $time';
+  }
+
+  @override
+  String get recordingSilent =>
+      'אנדרואיד נתנה ל-ZT Phone רק שקט בשיחה הזו, ולכן שום דבר לא הוקלט';
+
+  @override
+  String get recordingFailed =>
+      'ההקלטה לא התחילה. כדאי לבדוק של-ZT Phone יש גישה למיקרופון';
 }

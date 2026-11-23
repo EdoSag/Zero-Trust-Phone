@@ -67,6 +67,8 @@ flutter {
 
 dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
+    // On-device transcripts of recorded calls and voicemail (whisper.cpp), see ../whisper.
+    implementation(project(":whisper"))
     // Scrolling list in the recent calls widget (W11).
     implementation("androidx.core:core-remoteviews:1.1.0")
 }

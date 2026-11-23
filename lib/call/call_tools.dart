@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zerotrust_phone/call/call_state.dart';
 import 'package:zerotrust_phone/services/notes_bridge.dart';
+import 'package:zerotrust_phone/services/recordings.dart';
 import 'package:zerotrust_phone/l10n/l10n.dart';
 
 /// ZT Calendar's Android package, opened from the call screen (P27).
@@ -22,6 +23,12 @@ class CallTools {
       await _channel.invokeMethod<bool>('openApp', {
         'package': ztCalendarPackage,
       }) ??
+      false;
+
+  /// P19: starts or stops recording call [id]. False when it couldn't
+  /// start (the call screen then shows why).
+  Future<bool> record(String id, bool on) async =>
+      await _channel.invokeMethod<bool>('record', {'id': id, 'on': on}) ??
       false;
 
   /// Opens the SMS app with [text] to [number], ready to send.
@@ -51,10 +58,34 @@ Future<void> showCallTools(BuildContext context, PhoneCall call) {
       builder: (BuildContext _, WidgetRef ref, Widget? _) {
         final AppL10n l = sheet.l10n;
         final String? card = ref.watch(myCardProvider).value;
+        final bool canRecord =
+            ref.watch(recordingSettingsProvider).recordCalls &&
+            call.state == CallState.active;
+        final bool recording = call.recordingSince != null;
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
+              if (canRecord || recording)
+                ListTile(
+                  key: const ValueKey<String>('tool-record'),
+                  leading: Icon(
+                    recording
+                        ? Icons.stop_circle_outlined
+                        : Icons.fiber_manual_record_outlined,
+                  ),
+                  title: Text(recording ? l.stopRecording : l.recordCall),
+                  subtitle: Text(
+                    recording ? l.recordingKept : l.recordCallBody,
+                  ),
+                  onTap: () {
+                    Navigator.of(sheet).pop();
+                    container
+                        .read(callToolsProvider)
+                        .record(call.id, !recording)
+                        .ignore();
+                  },
+                ),
               ListTile(
                 key: const ValueKey<String>('tool-note'),
                 leading: const Icon(Icons.edit_note),

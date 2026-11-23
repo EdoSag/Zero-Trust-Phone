@@ -58,6 +58,20 @@ Android only: iOS doesn't let an app replace the Phone app.
   `InCallService.VideoCall`. Both go over the carrier's network only;
   nothing is stored. TTY mode can only be changed by the phone's built-in
   Phone app, so Settings links to its screen when there is one.
+- **Recent calls widget (W11).** A home screen widget reads Android's call
+  log; it shows only a lock and the missed-call count until "Show details
+  on the home screen" is on. Private contacts never show.
+- **Signed spam list (P24).** The weekly `Spam list` workflow
+  (`tool/build_spam_list.py`) builds a list from FTC Do Not Call complaints
+  and `spam/reported.tsv`, signs it with the blocklist key
+  (`BLOCKLIST_SIGNING_KEY` secret) and publishes it on the `spam-list`
+  release. The app checks the signature and looks numbers up on the phone.
+- **Recording and transcripts (P19-P21).** Record call writes the sound in
+  Keystore-sealed pieces (`Recordings.kt`). Android usually gives ordinary
+  apps silence during calls; the recorder notices and stops. Transcripts
+  of recordings and visual voicemail run on the phone with whisper.cpp
+  (`android/whisper`, the same module as ZT Keyboard) and the models from
+  ZT Keyboard's `voice-models` release, and can be saved to ZT Notes.
 - No database changes: Phone uses the existing `vault_items` table and
   sign-in. Old and new accounts sign in exactly as in the other apps.
 

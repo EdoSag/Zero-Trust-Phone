@@ -15,6 +15,7 @@ import 'package:zerotrust_phone/services/tasks_bridge.dart';
 import 'package:zerotrust_phone/services/private_calls.dart';
 import 'package:zerotrust_phone/services/screening_sync.dart';
 import 'package:zerotrust_phone/services/spam_list.dart';
+import 'package:zerotrust_phone/services/recordings.dart';
 import 'package:zerotrust_phone/pages/dialpad_page.dart';
 import 'package:zerotrust_phone/pages/home_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
@@ -285,6 +286,9 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
       await ref.read(tasksBridgeProvider).flush();
       // P27: notes written on the call screen move into ZT Notes.
       await _moveCallNotes();
+      // P20: transcripts of new recordings, when that's on. Can take a
+      // while, so it runs on its own.
+      _saveTranscripts();
     } on Object {
       // Locked meanwhile, or offline: the next open tries again.
     }
@@ -345,6 +349,26 @@ class _PhoneHomeState extends ConsumerState<_PhoneHome>
       );
     });
     await notes.flush();
+  }
+
+  bool _transcribing = false;
+
+  Future<void> _saveTranscripts() async {
+    if (_transcribing) return;
+    _transcribing = true;
+    try {
+      await ref.read(recordingSettingsProvider.notifier).loaded;
+      await saveNewTranscripts(
+        telecom: _telecom,
+        settings: ref.read(recordingSettingsProvider),
+        notes: ref.read(notesBridgeProvider),
+        l: appL10nFor(ref.read(ztLanguageProvider)),
+      );
+    } on Object {
+      // Locked or offline: the next open tries again.
+    } finally {
+      _transcribing = false;
+    }
   }
 
   MeetingRules? _sentMeetings;

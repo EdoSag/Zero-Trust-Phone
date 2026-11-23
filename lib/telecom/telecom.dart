@@ -123,11 +123,32 @@ class Telecom {
   /// pushes changes while the app is in front; [refreshCall] asks directly.
   final ValueNotifier<bool> callInProgress = ValueNotifier<bool>(false);
 
+  /// P20, P21: bytes of the speech model being downloaded.
+  final ValueNotifier<(String, int)?> modelProgress =
+      ValueNotifier<(String, int)?>(null);
+
+  /// P20, P21: how far the running transcript is, 0..100.
+  final ValueNotifier<int> transcriptProgress = ValueNotifier<int>(0);
+
+  /// Ticks when a recording or voicemail finishes playing.
+  final ValueNotifier<int> playbackDone = ValueNotifier<int>(0);
+
   bool get isSupported => defaultTargetPlatform == TargetPlatform.android;
 
   void listenForDials() {
     _channel.setMethodCallHandler((MethodCall call) async {
       if (call.method == 'dialPending') dialRequests.value++;
+      if (call.method == 'modelProgress') {
+        final Map<Object?, Object?> m = call.arguments as Map<Object?, Object?>;
+        modelProgress.value = (
+          m['file'] as String? ?? '',
+          (m['bytes'] as num?)?.toInt() ?? 0,
+        );
+      }
+      if (call.method == 'transcriptProgress') {
+        transcriptProgress.value = (call.arguments as num?)?.toInt() ?? 0;
+      }
+      if (call.method == 'playbackDone') playbackDone.value++;
       if (call.method == 'recentsPending') recentsRequests.value++;
       if (call.method == 'callBackPending') callBackRequests.value++;
       if (call.method == 'callsChanged') {
@@ -440,6 +461,72 @@ class Telecom {
   /// P24: "off", "warn", "silence" or "voicemail".
   Future<void> setSpamMode(String mode) =>
       _call<void>('setSpamMode', {'mode': mode});
+
+  /// P19: asks for the microphone, which recording a call needs.
+  Future<bool> requestMicrophone() async =>
+      await _call<bool>('requestMicrophone') ?? false;
+
+  /// P20, P21: the speech models: whether transcripts work on this phone,
+  /// the files installed, and the list to download (null offline).
+  Future<Map<Object?, Object?>> speechModels() async =>
+      await _call<Map<Object?, Object?>>('speechModels') ??
+      const <Object?, Object?>{};
+
+  /// "OK", "CANCELLED", "NO_CONNECTION", "WRONG_FILE", "NO_SPACE", "FAILED".
+  Future<String> downloadModel(String file) async =>
+      await _call<String>('downloadModel', {'file': file}) ?? 'FAILED';
+
+  Future<void> cancelDownload() => _call<void>('cancelDownload');
+
+  Future<void> deleteModel(String file) =>
+      _call<void>('deleteModel', {'file': file});
+
+  Future<List<Map<Object?, Object?>>> recordings() async =>
+      (await _call<List<Object?>>('recordings') ?? const <Object?>[])
+          .whereType<Map<Object?, Object?>>()
+          .toList();
+
+  Future<void> deleteRecording(String id) =>
+      _call<void>('deleteRecording', {'id': id});
+
+  Future<void> playRecording(String id) =>
+      _call<void>('playRecording', {'id': id});
+
+  Future<void> stopPlayback() => _call<void>('stopPlayback');
+
+  /// {"text": ...} or {"error": "noModel" | "noAudio" | "failed"}.
+  Future<Map<Object?, Object?>> transcribeRecording(
+    String id,
+    String language,
+  ) async =>
+      await _call<Map<Object?, Object?>>('transcribeRecording', {
+        'id': id,
+        'language': language,
+      }) ??
+      const <Object?, Object?>{'error': 'failed'};
+
+  Future<void> markTranscribed(String id) =>
+      _call<void>('markTranscribed', {'id': id});
+
+  Future<List<Map<Object?, Object?>>> voicemails() async =>
+      (await _call<List<Object?>>('voicemails') ?? const <Object?>[])
+          .whereType<Map<Object?, Object?>>()
+          .toList();
+
+  Future<bool> playVoicemail(int id) async =>
+      await _call<bool>('playVoicemail', {'id': id}) ?? false;
+
+  Future<Map<Object?, Object?>> transcribeVoicemail(
+    int id,
+    String language,
+  ) async =>
+      await _call<Map<Object?, Object?>>('transcribeVoicemail', {
+        'id': id,
+        'language': language,
+      }) ??
+      const <Object?, Object?>{'error': 'failed'};
+
+  Future<void> cancelTranscript() => _call<void>('cancelTranscript');
 
   /// Redraws the Recent calls widget (after the app opens).
   Future<void> refreshRecentsWidget() => _call<void>('refreshRecentsWidget');

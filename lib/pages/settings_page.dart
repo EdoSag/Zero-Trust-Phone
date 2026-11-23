@@ -14,6 +14,7 @@ import 'package:zerotrust_phone/pages/keypad_settings_page.dart';
 import 'package:zerotrust_phone/pages/meetings_page.dart';
 import 'package:zerotrust_phone/pages/my_card_page.dart';
 import 'package:zerotrust_phone/pages/quick_replies_page.dart';
+import 'package:zerotrust_phone/pages/recordings_page.dart';
 import 'package:zerotrust_phone/pages/sim_picker.dart';
 import 'package:zerotrust_phone/pages/speed_dial_page.dart';
 import 'package:zerotrust_phone/telecom/telecom.dart';
@@ -146,6 +147,13 @@ class PhoneSettingsPage extends ConsumerWidget {
             protection.backupHistory ? context.l10n.backupOn : context.l10n.off,
           ),
           onTap: () => push(const HistoryBackupPage()),
+        ),
+        ListTile(
+          key: const ValueKey<String>('recordings-row'),
+          leading: const Icon(Icons.graphic_eq),
+          title: Text(context.l10n.recordingsAndVoicemail),
+          subtitle: Text(context.l10n.recordingsAndVoicemailShort),
+          onTap: () => push(const RecordingsPage()),
         ),
         ListTile(
           leading: const Icon(Icons.do_not_disturb_on_outlined),

@@ -90,6 +90,10 @@ object CallEngine {
                 "mute" -> CallManager.setMuted(call.argument<Boolean>("on") ?: false)
                 "route" -> CallManager.setRoute(call.argument<Int>("route") ?: 0)
                 "selectAccount" -> CallManager.selectAccount(id, call.argument<Int>("index") ?: 0)
+                "record" -> {
+                    result.success(CallManager.setRecording(id, call.argument<Boolean>("on") ?: false))
+                    return@setMethodCallHandler
+                }
                 "openApp" -> {
                     result.success(openApp(call.argument<String>("package") ?: ""))
                     return@setMethodCallHandler

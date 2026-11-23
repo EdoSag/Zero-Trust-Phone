@@ -594,6 +594,22 @@ class _CallerHeader extends StatelessWidget {
           liveRegion: call.state != CallState.active,
           child: Text(status, style: text.titleMedium),
         ),
+        if (call.recordingSince case final DateTime since) ...<Widget>[
+          const SizedBox(height: 8),
+          Row(
+            key: const ValueKey<String>('call-recording'),
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                Icons.fiber_manual_record,
+                size: 14,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              const SizedBox(width: 6),
+              Text(l.recordingFor(_elapsed(l, since)), style: text.bodyMedium),
+            ],
+          ),
+        ],
         if (call.spamReports case final int reports) ...<Widget>[
           const SizedBox(height: 8),
           Row(
@@ -1012,6 +1028,8 @@ class _Notice extends StatelessWidget {
     final String? text = switch (call.notice) {
       'rttFailed' => context.l10n.rttFailed,
       'videoFailed' => context.l10n.videoFailed,
+      'recordingSilent' => context.l10n.recordingSilent,
+      'recordingFailed' => context.l10n.recordingFailed,
       _ => null,
     };
     if (text == null) return const SizedBox.shrink();

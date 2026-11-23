@@ -25,4 +25,6 @@ plugins {
 }
 
 include(":app")
+// whisper.cpp for call and voicemail transcripts, native code only.
+include(":whisper")
 

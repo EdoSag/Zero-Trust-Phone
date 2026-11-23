@@ -20,6 +20,12 @@
 
     <!-- Carrier video calls (P12). Asked for only when a video call starts. -->
     <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- P19: recording a call, only when the user taps Record (what the
+         phone lets an app hear during a call; often silence). -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <!-- P21: the default Phone app reads the visual voicemail Android keeps. -->
+    <uses-permission android:name="com.android.voicemail.permission.READ_VOICEMAIL"/>
+    <uses-permission android:name="com.android.voicemail.permission.ADD_VOICEMAIL"/>
 
     <!-- Call back reminders (P25) come back after a restart. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
