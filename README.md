@@ -1,15 +1,18 @@
 # Zero-Trust Phone
 
-A private dialer for Android (on the phone: **ZT Phone**). It replaces the
-built-in Phone app: dialpad, in-call screen, call history, favorites and
-blocked numbers, with caller names from your end-to-end encrypted
-[ZT Contacts](https://github.com/EdoSag/Zero-Trust-Contacts) instead of
-Google's contacts. Same account, settings and look as the other Zero-Trust
-apps, built on [Zero-Trust-Core](https://github.com/EdoSag/Zero-Trust-Core).
+A private dialer for Android. It replaces the built-in Phone app: dialpad,
+in-call screen, call history, favorites and blocked numbers, with caller
+names from your end-to-end encrypted [ZT
+Contacts](https://github.com/EdoSag/Zero-Trust-Contacts) instead of Google's
+contacts. On the phone it is called **ZT Phone**; in stores and on release
+pages, **Zero-Trust Phone**. Same account, settings and look as the other
+Zero-Trust apps, built on
+[Zero-Trust-Core](https://github.com/EdoSag/Zero-Trust-Core). Part of the
+[Zero-Trust suite](https://zerotrust.bz).
 
 Android only: iOS doesn't let an app replace the Phone app.
 
-## How it works
+## What it does
 
 - **Default Phone app.** ZT Phone asks for Android's Phone role
   (`RoleManager.ROLE_DIALER`). Telecom then binds `ZtInCallService` for
@@ -75,6 +78,93 @@ Android only: iOS doesn't let an app replace the Phone app.
 - No database changes: Phone uses the existing `vault_items` table and
   sign-in. Old and new accounts sign in exactly as in the other apps.
 
+## Privacy
+
+Like every Zero-Trust app, it is zero-knowledge: your data is encrypted on
+your device, with keys made from your password, before anything is sent.
+The server stores only ciphertext and your password itself is never
+sent, so neither we nor anyone who breaks into the server can read your
+data. The recovery key shown at sign-up is the only way back in if you
+forget the password. How the keys work:
+[Zero-Trust-Core](https://github.com/EdoSag/Zero-Trust-Core#key-hierarchy) and
+[zerotrust.bz/security](https://zerotrust.bz/security/).
+
+- Call history and blocked numbers stay in Android's own call log; backing
+  the history up to your account is opt-in and end-to-end encrypted.
+- The call screen runs without the account, the vault or the network.
+  Caller names reach it only in memory while the vault is unlocked.
+- Call protection works while the app is locked from Keystore-keyed HMACs
+  of contact numbers, never plain numbers.
+- Recordings are sealed on the phone, and transcripts are made on the
+  phone.
+- Real-time text and video calls go over the carrier's network only;
+  nothing is stored.
+
+## One account, one core
+
+One Zero-Trust account opens every app in the suite. Sign-in, unlock
+(fingerprint or face, auto-lock), the recovery key, settings, the look,
+sync and languages come from
+[Zero-Trust-Core](https://github.com/EdoSag/Zero-Trust-Core), so they work
+the same in every app. Accounts made before the core still sign in and
+see their data.
+
+## Install
+
+Android: get the latest signed APK from this repository's
+[Releases](https://github.com/EdoSag/Zero-Trust-Phone/releases/latest),
+or from [zerotrust.bz/install](https://zerotrust.bz/install/#phone),
+which also shows each file's SHA-256, the signing fingerprint and an
+Obtainium link. GitHub Releases are the main way the apps are published.
+
+Builds from GitHub check for a newer release themselves (Settings > About,
+one anonymous request a day, can be turned off). Every Zero-Trust app is signed
+with the same key, and Android only installs an update signed with it.
+
+## Languages
+
+English and Hebrew, with right-to-left layout. Choose under
+Settings > Appearance > Language.
+
+## Build from source
+
+Flutter 3.47.9, the version CI pins (3.50 deprecates `material.dart` and
+fails analyze).
+
+First create a file named `.env` in the project folder. It is not committed
+(CI writes its own) and it is bundled into the APK, so it holds public client
+values only, never a service-role key:
+
+```
+SUPABASE_URL=https://<project>.supabase.co
+SUPABASE_ANON_KEY=<publishable key>
+```
+
+Then:
+
+```bash
+flutter pub get
+dart run zt_release_checks --app phone   # shared release checks
+flutter analyze && flutter test test/
+flutter run
+```
+
+Never add `cryptography_flutter`: it breaks the core's key derivation and
+sign-in fails.
+
+Launcher icons are drawn from the suite's brand mark:
+`flutter test tool/launcher_icon_test.dart`.
+
+## Branches and releases
+
+Work happens on `Dev`: pull requests target `Dev`, never `main`, and get a
+test build. A release is one `Dev` → `main` pull request. Every push to
+`main` runs the suite's release checks, builds a signed APK and a Google Play bundle
+and publishes them as a GitHub Release named "Zero-Trust Phone"
+(`.github/workflows/android-apk.yml`). The workflow needs the repository
+secrets `ANDROID_KEYSTORE_BASE64` and `ANDROID_KEYSTORE_PASSWORD`, the
+keystore shared by all Zero-Trust apps.
+
 ## Google Play
 
 Phone and call-log permissions are restricted on Google Play. Before the
@@ -97,17 +187,15 @@ first upload:
 
 Sideloaded APKs from GitHub Releases need none of this.
 
-## Build
+## Support and security
 
-Like the other apps: push to `main` builds a signed APK release (see
-`.github/workflows/android-apk.yml`); the repository needs the
-`ANDROID_KEYSTORE_BASE64` and `ANDROID_KEYSTORE_PASSWORD` secrets, the
-same shared keystore as the other apps. Locally, put `SUPABASE_URL` and
-`SUPABASE_ANON_KEY` in `.env`, then `flutter run`.
-
-Never add `cryptography_flutter`: it breaks the core's key derivation.
-
-Regenerate the launcher icon with `flutter test tool/launcher_icon_test.dart`.
+- Help centre: [zerotrust.bz/help](https://zerotrust.bz/help/). Questions and
+  account deletion: support@zerotrust.bz.
+- Security problems: please report them privately to cyber@zerotrust.bz. What
+  the encryption does and doesn't protect against is on
+  [zerotrust.bz/security](https://zerotrust.bz/security/).
+- [Privacy policy](https://zerotrust.bz/privacy/) and
+  [terms](https://zerotrust.bz/terms/).
 
 ## License
 
